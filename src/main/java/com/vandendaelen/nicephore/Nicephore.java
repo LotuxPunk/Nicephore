@@ -1,54 +1,28 @@
 package com.vandendaelen.nicephore;
 
-import net.minecraftforge.client.event.ScreenshotEvent;
+import com.vandendaelen.nicephore.event.ClientEvents;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileImageOutputStream;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod("nicephore")
+@Mod(Nicephore.MODID)
 public class Nicephore {
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
+    public static final String MODID = "nicephore";
+    public static final String MOD_NAME = "Nicephore";
 
     public Nicephore() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
         MinecraftForge.EVENT_BUS.register(this);
+        System.setProperty("java.awt.headless", "false");
     }
 
-    @SubscribeEvent
-    public void onScreenshot(ScreenshotEvent event) {
-        try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(event.getImage().getBytes());
-            BufferedImage png = ImageIO.read(bais);
-            File jpeg = new File(event.getScreenshotFile().getParentFile(), event.getScreenshotFile().getName().replace("png", "jpg"));
-            BufferedImage result = new BufferedImage(
-                    png.getWidth(),
-                    png.getHeight(),
-                    BufferedImage.TYPE_INT_RGB);
-            result.createGraphics().drawImage(png, 0, 0, Color.WHITE, null);
-
-            final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-            ImageWriteParam params = writer.getDefaultWriteParam();
-            params.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
-            writer.setOutput(new FileImageOutputStream(jpeg));
-            writer.write(null, new IIOImage(result, null, null), params);
-//            ImageIO.write(result, "jpg", jpeg);
-            //event.setScreenshotFile(jpeg);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void doClientStuff(final FMLClientSetupEvent event) {
+        ClientEvents.init();
     }
 }
