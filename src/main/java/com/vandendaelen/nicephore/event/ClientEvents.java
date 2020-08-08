@@ -3,8 +3,10 @@ package com.vandendaelen.nicephore.event;
 import com.vandendaelen.nicephore.JPEGThread;
 import com.vandendaelen.nicephore.Nicephore;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
+import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.client.event.ScreenshotEvent;
@@ -36,8 +38,10 @@ public class ClientEvents {
             CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
             try {
                 imageToClipBoard.copyLastScreenshot();
+                PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.clipboard.success"));
             } catch (IOException e) {
-                e.printStackTrace();
+                Nicephore.LOGGER.debug(e.getMessage());
+                PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.clipboard.error"));
             }
         }
     }

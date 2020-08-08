@@ -1,7 +1,8 @@
 package com.vandendaelen.nicephore;
 
+import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
-import net.minecraft.client.Minecraft;
+import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -44,6 +45,8 @@ public class JPEGThread extends Thread {
             final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
             ImageWriteParam params = writer.getDefaultWriteParam();
             params.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
+            params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            params.setCompressionQuality(NicephoreConfig.Client.getCompressionLevel());
             writer.setOutput(new FileImageOutputStream(jpeg));
             writer.write(null, new IIOImage(result, null, null), params);
 
@@ -52,10 +55,11 @@ public class JPEGThread extends Thread {
             ITextComponent textComponent = (new StringTextComponent(jpeg.getName())).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style) -> {
                 return style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpeg.getAbsolutePath()));
             });
-            Minecraft.getInstance().player.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", textComponent),Minecraft.getInstance().player.getUniqueID());
+
+            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", textComponent));
         } catch (IOException e) {
-            e.printStackTrace();
-            Minecraft.getInstance().player.sendMessage(new TranslationTextComponent("nicephore.screenshot.error"),Minecraft.getInstance().player.getUniqueID());
+            Nicephore.LOGGER.debug(e.getMessage());
+            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.error"));
         }
     }
 }

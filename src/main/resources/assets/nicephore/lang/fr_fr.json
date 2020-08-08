@@ -1,4 +1,6 @@
 {
-  "nicephore.screenshot.success":"Capture d'écran effectuée : %s",
-  "nicephore.screenshot.error":"Échec à la capture d'écran"
+  "nicephore.screenshot.success":"Capture d'écran effectuée - %s",
+  "nicephore.screenshot.error":"Échec à la capture d'écran",
+  "nicephore.clipboard.success": "La dernière capture d'écran copiée dans le presse-papier",
+  "nicephore.clipboard.error": "Erreur à la copie de la dernière capture d'écan"
 }
