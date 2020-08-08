@@ -16,9 +16,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public final class JPEGThread extends Thread {
     private final NativeImage image;
@@ -49,6 +47,18 @@ public final class JPEGThread extends Thread {
                 params.setCompressionQuality(NicephoreConfig.Client.getCompressionLevel());
                 writer.setOutput(new FileImageOutputStream(jpeg));
                 writer.write(null, new IIOImage(result, null, null), params);
+            }
+
+            if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
+                try {
+                    final File oxipng = new File("mods\\oxipng");
+                    final File pngFile = new File(screenshot.getParentFile(), screenshot.getName());
+                    final Process p = Runtime.getRuntime().exec(oxipng + " -p -o " + NicephoreConfig.Client.getPNGOptimisationLevel() + " -i 1 --fix \"" + pngFile + "\"");
+                    p.waitFor();
+                } catch (IOException | InterruptedException e) {
+                    Nicephore.LOGGER.warn("Unable to optimise screenshot PNG with oxipng. Is it missing from the mods folder?");
+                    Nicephore.LOGGER.warn(e.getMessage());
+                }
             }
 
             CopyImageToClipBoard.setLastScreenshot(screenshot);
