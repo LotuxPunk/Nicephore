@@ -1,6 +1,6 @@
 # Nicephore
 
-Nicephore is a Minecraft mod whichj= convert any screenshot taken to JPEG, and add some useful tools to share these screenshots
+Nicephore is a Minecraft mod which convert any screenshot taken to JPEG, and add some useful tools to share these screenshots
 
 ## Installation
 
