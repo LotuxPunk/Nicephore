@@ -35,7 +35,7 @@ public final class ClientEvents {
 
     @SubscribeEvent
     public static void onKey(final InputUpdateEvent event) {
-        if(COPY_KEY.isPressed()){
+        if (COPY_KEY.isPressed()) {
             final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
             try {
                 imageToClipBoard.copyLastScreenshot();

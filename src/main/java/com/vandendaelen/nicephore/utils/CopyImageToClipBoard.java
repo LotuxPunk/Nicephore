@@ -20,10 +20,11 @@ public class CopyImageToClipBoard implements ClipboardOwner {
     }
 
     public void copyLastScreenshot() throws IOException {
-        if ( lastScreenshot != null )
+        if ( lastScreenshot != null ) {
             copyImage(ImageIO.read(lastScreenshot));
-        else
+        } else {
             throw new IOException("No screenshot taken");
+        }
     }
 
     public void lostOwnership( Clipboard clip, Transferable trans ) {
@@ -38,10 +39,11 @@ public class CopyImageToClipBoard implements ClipboardOwner {
         }
 
         public Object getTransferData( DataFlavor flavor ) throws UnsupportedFlavorException, IOException {
-            if ( flavor.equals( DataFlavor.imageFlavor ) && i != null )
+            if ( flavor.equals( DataFlavor.imageFlavor ) && i != null ) {
                 return i;
-            else
-                throw new UnsupportedFlavorException( flavor );
+            } else {
+                throw new UnsupportedFlavorException(flavor);
+            }
         }
 
         public DataFlavor[] getTransferDataFlavors() {
@@ -53,8 +55,9 @@ public class CopyImageToClipBoard implements ClipboardOwner {
         public boolean isDataFlavorSupported( DataFlavor flavor ) {
             DataFlavor[] flavors = getTransferDataFlavors();
             for ( DataFlavor dataFlavor : flavors ) {
-                if ( flavor.equals(dataFlavor) )
+                if ( flavor.equals(dataFlavor) ) {
                     return true;
+                }
             }
             return false;
         }
