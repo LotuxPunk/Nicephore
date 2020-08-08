@@ -41,13 +41,15 @@ public final class JPEGThread extends Thread {
                     BufferedImage.TYPE_INT_RGB);
             result.createGraphics().drawImage(png, 0, 0, Color.WHITE, null);
 
-            final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-            final ImageWriteParam params = writer.getDefaultWriteParam();
-            params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            params.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
-            params.setCompressionQuality(NicephoreConfig.Client.getCompressionLevel());
-            writer.setOutput(new FileImageOutputStream(jpeg));
-            writer.write(null, new IIOImage(result, null, null), params);
+            if (NicephoreConfig.Client.getJPEGToggle()) {
+                final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+                final ImageWriteParam params = writer.getDefaultWriteParam();
+                params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                params.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
+                params.setCompressionQuality(NicephoreConfig.Client.getCompressionLevel());
+                writer.setOutput(new FileImageOutputStream(jpeg));
+                writer.write(null, new IIOImage(result, null, null), params);
+            }
 
             CopyImageToClipBoard.setLastScreenshot(screenshot);
 
@@ -61,7 +63,12 @@ public final class JPEGThread extends Thread {
                     -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));
 
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", screenshot.getName().replace(".png", "")));
-            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.options", pngComponent, jpgComponent, folderComponent));
+
+            if (NicephoreConfig.Client.getJPEGToggle()) {
+                PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.options", pngComponent, jpgComponent, folderComponent));
+            } else {
+                PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.reducedOptions", pngComponent, folderComponent));
+            }
         } catch (IOException e) {
             Nicephore.LOGGER.error(e.getMessage());
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.error"));
