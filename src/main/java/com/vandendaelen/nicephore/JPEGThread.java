@@ -50,7 +50,7 @@ public class JPEGThread extends Thread {
             writer.setOutput(new FileImageOutputStream(jpeg));
             writer.write(null, new IIOImage(result, null, null), params);
 
-            CopyImageToClipBoard.setLastScreenshot(jpeg);
+            CopyImageToClipBoard.setLastScreenshot(screenshot);
 
             ITextComponent textComponent = (new StringTextComponent(jpeg.getName())).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style) -> {
                 return style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpeg.getAbsolutePath()));
