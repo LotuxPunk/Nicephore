@@ -1,6 +1,10 @@
 {
-  "nicephore.screenshot.success":"Screenshot saved - %s",
+  "nicephore.screenshot.success":"Screenshot saved : %s",
   "nicephore.screenshot.error":"Screenshot failed",
+  "nicephore.screenshot.png":"Show PNG",
+  "nicephore.screenshot.jpg":"Show JPG",
+  "nicephore.screenshot.folder":"Open screenshots folder",
+  "nicephore.screenshot.options" : "[%s] [%s] [%s]",
   "nicephore.clipboard.success": "Last screenshot copied in the clipboard",
   "nicephore.clipboard.error": "Error when trying to copy the last screenshot"
 }

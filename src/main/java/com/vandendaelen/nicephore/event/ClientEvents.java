@@ -6,6 +6,7 @@ import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputUpdateEvent;
@@ -50,6 +51,7 @@ public class ClientEvents {
     public static void onScreenshot(ScreenshotEvent event) {
         JPEGThread thread = new JPEGThread(event.getImage(), event.getScreenshotFile());
         thread.start();
+        event.setResultMessage(new StringTextComponent(""));
     }
 
 }

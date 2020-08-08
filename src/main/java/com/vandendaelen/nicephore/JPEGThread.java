@@ -5,7 +5,6 @@ import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
@@ -52,11 +51,20 @@ public class JPEGThread extends Thread {
 
             CopyImageToClipBoard.setLastScreenshot(screenshot);
 
-            ITextComponent textComponent = (new StringTextComponent(jpeg.getName())).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style) -> {
+            ITextComponent pngComponent = (new TranslationTextComponent("nicephore.screenshot.png")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style) -> {
+                return style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath()));
+            });
+
+            ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style) -> {
                 return style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpeg.getAbsolutePath()));
             });
 
-            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", textComponent));
+            ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style) -> {
+                return style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent()));
+            });
+
+            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", screenshot.getName().replace(".png", "")));
+            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.options", pngComponent, jpgComponent, folderComponent));
         } catch (IOException e) {
             Nicephore.LOGGER.debug(e.getMessage());
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.error"));
