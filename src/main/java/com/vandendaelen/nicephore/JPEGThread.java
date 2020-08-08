@@ -20,9 +20,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
-public class JPEGThread extends Thread {
-    private NativeImage image;
-    private File screenshot;
+public final class JPEGThread extends Thread {
+    private final NativeImage image;
+    private final File screenshot;
 
     public JPEGThread(NativeImage image, File screenshot) {
         this.image = image;
@@ -32,41 +32,38 @@ public class JPEGThread extends Thread {
     @Override
     public void run() {
         try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(image.getBytes());
-            BufferedImage png = ImageIO.read(bais);
-            File jpeg = new File(screenshot.getParentFile(), screenshot.getName().replace("png", "jpg"));
-            BufferedImage result = new BufferedImage(
+            final ByteArrayInputStream bais = new ByteArrayInputStream(image.getBytes());
+            final BufferedImage png = ImageIO.read(bais);
+            final File jpeg = new File(screenshot.getParentFile(), screenshot.getName().replace("png", "jpg"));
+            final BufferedImage result = new BufferedImage(
                     png.getWidth(),
                     png.getHeight(),
                     BufferedImage.TYPE_INT_RGB);
             result.createGraphics().drawImage(png, 0, 0, Color.WHITE, null);
 
             final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-            ImageWriteParam params = writer.getDefaultWriteParam();
-            params.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
+            final ImageWriteParam params = writer.getDefaultWriteParam();
             params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            params.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
             params.setCompressionQuality(NicephoreConfig.Client.getCompressionLevel());
             writer.setOutput(new FileImageOutputStream(jpeg));
             writer.write(null, new IIOImage(result, null, null), params);
 
             CopyImageToClipBoard.setLastScreenshot(screenshot);
 
-            ITextComponent pngComponent = (new TranslationTextComponent("nicephore.screenshot.png")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style) -> {
-                return style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath()));
-            });
+            final ITextComponent pngComponent = (new TranslationTextComponent("nicephore.screenshot.png")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
+                    -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath())));
 
-            ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style) -> {
-                return style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpeg.getAbsolutePath()));
-            });
+            final ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
+                    -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpeg.getAbsolutePath())));
 
-            ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style) -> {
-                return style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent()));
-            });
+            final ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
+                    -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));
 
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", screenshot.getName().replace(".png", "")));
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.options", pngComponent, jpgComponent, folderComponent));
         } catch (IOException e) {
-            Nicephore.LOGGER.debug(e.getMessage());
+            Nicephore.LOGGER.error(e.getMessage());
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.error"));
         }
     }

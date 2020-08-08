@@ -14,15 +14,14 @@ public class CopyImageToClipBoard implements ClipboardOwner {
         lastScreenshot = screenshot;
     }
     public void copyImage(BufferedImage bi) {
-        TransferableImage trans = new TransferableImage( bi );
+        TransferableImage trans = new TransferableImage(bi);
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         c.setContents( trans, this );
     }
 
     public void copyLastScreenshot() throws IOException {
-        if (lastScreenshot != null) {
+        if ( lastScreenshot != null )
             copyImage(ImageIO.read(lastScreenshot));
-        }
         else
             throw new IOException("No screenshot taken");
     }
@@ -31,21 +30,18 @@ public class CopyImageToClipBoard implements ClipboardOwner {
         System.out.println( "Lost Clipboard Ownership" );
     }
 
-    private class TransferableImage implements Transferable {
+    private static class TransferableImage implements Transferable {
 
-        Image i;
+        final Image i;
         public TransferableImage( Image i ) {
             this.i = i;
         }
 
-        public Object getTransferData( DataFlavor flavor )
-                throws UnsupportedFlavorException, IOException {
-            if ( flavor.equals( DataFlavor.imageFlavor ) && i != null ) {
+        public Object getTransferData( DataFlavor flavor ) throws UnsupportedFlavorException, IOException {
+            if ( flavor.equals( DataFlavor.imageFlavor ) && i != null )
                 return i;
-            }
-            else {
+            else
                 throw new UnsupportedFlavorException( flavor );
-            }
         }
 
         public DataFlavor[] getTransferDataFlavors() {
@@ -56,10 +52,9 @@ public class CopyImageToClipBoard implements ClipboardOwner {
 
         public boolean isDataFlavorSupported( DataFlavor flavor ) {
             DataFlavor[] flavors = getTransferDataFlavors();
-            for ( int i = 0; i < flavors.length; i++ ) {
-                if ( flavor.equals( flavors[ i ] ) ) {
+            for ( DataFlavor dataFlavor : flavors ) {
+                if ( flavor.equals(dataFlavor) )
                     return true;
-                }
             }
             return false;
         }

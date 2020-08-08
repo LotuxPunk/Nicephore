@@ -21,10 +21,10 @@ import org.lwjgl.glfw.GLFW;
 import java.io.IOException;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = Nicephore.MODID)
-public class ClientEvents {
+public final class ClientEvents {
     public static KeyBinding COPY_KEY;
 
-    static InputMappings.Input getKey(int key) {
+    static InputMappings.Input getKey(final int key) {
         return InputMappings.Type.KEYSYM.getOrMakeInput(key);
     }
 
@@ -34,14 +34,14 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    public static void onKey(InputUpdateEvent event) {
+    public static void onKey(final InputUpdateEvent event) {
         if(COPY_KEY.isPressed()){
-            CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
+            final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
             try {
                 imageToClipBoard.copyLastScreenshot();
                 PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.clipboard.success"));
             } catch (IOException e) {
-                Nicephore.LOGGER.debug(e.getMessage());
+                Nicephore.LOGGER.error(e.getMessage());
                 PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.clipboard.error"));
             }
         }
@@ -49,7 +49,7 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onScreenshot(ScreenshotEvent event) {
-        JPEGThread thread = new JPEGThread(event.getImage(), event.getScreenshotFile());
+        final JPEGThread thread = new JPEGThread(event.getImage(), event.getScreenshotFile());
         thread.start();
         event.setResultMessage(new StringTextComponent(""));
     }

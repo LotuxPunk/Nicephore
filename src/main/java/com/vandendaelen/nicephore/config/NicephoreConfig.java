@@ -3,7 +3,7 @@ package com.vandendaelen.nicephore.config;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class NicephoreConfig {
+public final class NicephoreConfig {
     public static final Client CLIENT;
     public static final ForgeConfigSpec CLIENT_SPEC;
 
