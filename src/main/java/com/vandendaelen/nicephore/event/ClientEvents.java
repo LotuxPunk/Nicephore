@@ -28,7 +28,7 @@ public class ClientEvents {
     }
 
     public static void init() {
-        COPY_KEY = new KeyBinding(Nicephore.MODID + ".keybinds.copy", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_V), Nicephore.MOD_NAME);
+        COPY_KEY = new KeyBinding(Nicephore.MODID + ".keybinds.copy", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_C), Nicephore.MOD_NAME);
         ClientRegistry.registerKeyBinding(COPY_KEY);
     }
 
