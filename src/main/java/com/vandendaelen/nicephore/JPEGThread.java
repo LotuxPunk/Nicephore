@@ -16,9 +16,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public final class JPEGThread extends Thread {
     private final NativeImage image;
@@ -34,7 +32,7 @@ public final class JPEGThread extends Thread {
         try {
             final ByteArrayInputStream bais = new ByteArrayInputStream(image.getBytes());
             final BufferedImage png = ImageIO.read(bais);
-            final File jpeg = new File(screenshot.getParentFile(), screenshot.getName().replace("png", "jpg"));
+            final File jpegFile = new File(screenshot.getParentFile(), screenshot.getName().replace("png", "jpg"));
             final BufferedImage result = new BufferedImage(
                     png.getWidth(),
                     png.getHeight(),
@@ -47,8 +45,30 @@ public final class JPEGThread extends Thread {
                 params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
                 params.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
                 params.setCompressionQuality(NicephoreConfig.Client.getCompressionLevel());
-                writer.setOutput(new FileImageOutputStream(jpeg));
+                writer.setOutput(new FileImageOutputStream(jpegFile));
                 writer.write(null, new IIOImage(result, null, null), params);
+            }
+
+            if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
+                try {
+                    final File ect = new File("mods\\ect");
+                    // ECT is lightning fast for small JPEG files so we might as well use optimisation level 9
+                    final Process p = Runtime.getRuntime().exec(ect + " --strict -progressive --mt-deflate -keep -9 \"" + jpegFile + "\"");
+                    p.waitFor();
+                } catch (IOException | InterruptedException e) {
+                    Nicephore.LOGGER.warn("Unable to optimise screenshot JPEG with ECT. Is it missing from the mods folder?");
+                    Nicephore.LOGGER.warn(e.getMessage());
+                }
+
+                try {
+                    final File oxipng = new File("mods\\oxipng");
+                    final File pngFile = new File(screenshot.getParentFile(), screenshot.getName());
+                    final Process p = Runtime.getRuntime().exec(oxipng + " -p -o " + NicephoreConfig.Client.getPNGOptimisationLevel() + " -i 1 --fix \"" + pngFile + "\"");
+                    p.waitFor();
+                } catch (IOException | InterruptedException e) {
+                    Nicephore.LOGGER.warn("Unable to optimise screenshot PNG with Oxipng. Is it missing from the mods folder?");
+                    Nicephore.LOGGER.warn(e.getMessage());
+                }
             }
 
             CopyImageToClipBoard.setLastScreenshot(screenshot);
@@ -57,7 +77,7 @@ public final class JPEGThread extends Thread {
                     -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath())));
 
             final ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
-                    -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpeg.getAbsolutePath())));
+                    -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpegFile.getAbsolutePath())));
 
             final ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
                     -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));

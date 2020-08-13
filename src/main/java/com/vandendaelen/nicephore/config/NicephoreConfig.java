@@ -15,7 +15,8 @@ public final class NicephoreConfig {
 
     public static class Client {
         public final ForgeConfigSpec.DoubleValue compression;
-        public final ForgeConfigSpec.BooleanValue makeJPEGs;
+        public final ForgeConfigSpec.BooleanValue makeJPEGs, optimisedOutput;
+        public final ForgeConfigSpec.IntValue pngOptimisationLevel;
 
         public Client(ForgeConfigSpec.Builder builder) {
             builder.push("Client settings");
@@ -27,11 +28,28 @@ public final class NicephoreConfig {
                     .comment("Enable to allow Nicephore to make lossy JPEGs of your screenshots for easier online sharing. Disable to only allow PNGs." +
                             "\r\nNote that PNGs will still be made regardless of this option.")
                     .define("makeJPEGs", true);
+
+            // TODO: Detect and use system installed oxipng and ect rather than only checking for and using the ones found in the mods folder.
+            optimisedOutput = builder
+                    .comment("Enable to allow Nicephore to losslessly optimise the PNG and JPEG screenshots for smaller sized progressive files that are of identical quality to the files before optimisation." +
+                            "\r\nNote: Enabling this will cause screenshots to take slightly longer to save as an optimisation step will have to be run first." +
+                            "\r\nTip: In the rare case that a screenshot PNG is corrupted, run \"oxipng --fix (filename).png\" to attempt to fix it.")
+                    .define("optimiseScreenshots", true);
+
+            builder.push("PNG-specific settings");
+            pngOptimisationLevel = builder
+                    .comment("If optimiseScreenshots is enabled, use the following oxipng optimisation level, with higher numbers taking longer to process but give lower file sizes." +
+                            "\r\nTip: I would avoid anything above 3 unless you have a lot of CPU cores and threads (e.g. 16c/32t+) as it starts taking significantly longer to process for vastly diminishing returns.")
+                    .defineInRange("pngOptimisationLevel", 2, 0, 5);
+            builder.pop();
+
             builder.pop();
         }
         public static float getCompressionLevel() {
             return CLIENT.compression.get().floatValue();
         }
         public static boolean getJPEGToggle() { return CLIENT.makeJPEGs.get(); }
+        public static boolean getOptimisedOutputToggle() { return CLIENT.optimisedOutput.get(); }
+        public static byte getPNGOptimisationLevel() { return CLIENT.pngOptimisationLevel.get().byteValue(); }
     }
 }
