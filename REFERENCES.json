@@ -2,6 +2,8 @@
 	{
 		"version":"1",
 		"oxipng":"https://github.com/shssoichiro/oxipng/releases/download/v3.0.1/oxipng-3.0.1-i686-pc-windows-msvc.zip",
+		"oxipng-command":"{0} -p -o {1} -i 1 --fix \"{2}\"",
 		"ect":"https://github.com/fhanau/Efficient-Compression-Tool/releases/download/v0.8.3/ect-0.8.3-Win64.exe.zip"
+		"ect-command":"{0} --strict -progressive --mt-deflate -keep -9 \"{1}\"",
 	}
 ]
