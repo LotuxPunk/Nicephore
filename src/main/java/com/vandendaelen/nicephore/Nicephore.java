@@ -2,6 +2,7 @@ package com.vandendaelen.nicephore;
 
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.event.ClientEvents;
+import com.vandendaelen.nicephore.thread.InitThread;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -23,6 +24,9 @@ public final class Nicephore {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, NicephoreConfig.CLIENT_SPEC);
         MinecraftForge.EVENT_BUS.register(this);
         System.setProperty("java.awt.headless", "false");
+
+        InitThread initThread = new InitThread();
+        initThread.start();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {

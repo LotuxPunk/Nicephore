@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.2-1.0.0'
+version = '1.16.2-1.1.0'
 group = 'com.vandendaelen.nicephore' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'nicephore'
 
@@ -91,6 +91,8 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.16.2-33.0.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    compile group: 'net.lingala.zip4j', name: 'zip4j', version: '2.6.1'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"

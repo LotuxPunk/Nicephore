@@ -1,8 +1,10 @@
-package com.vandendaelen.nicephore;
+package com.vandendaelen.nicephore.thread;
 
+import com.vandendaelen.nicephore.Nicephore;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
+import com.vandendaelen.nicephore.utils.Reference;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -16,7 +18,9 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 
 public final class JPEGThread extends Thread {
     private final NativeImage image;
@@ -51,7 +55,7 @@ public final class JPEGThread extends Thread {
 
             if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
                 try {
-                    final File ect = new File("mods\\ect");
+                    final File ect = new File("mods\\nicephore\\"+ Reference.ECT_EXE);
                     // ECT is lightning fast for small JPEG files so we might as well use optimisation level 9
                     final Process p = Runtime.getRuntime().exec(ect + " --strict -progressive --mt-deflate -keep -9 \"" + jpegFile + "\"");
                     p.waitFor();
@@ -61,7 +65,7 @@ public final class JPEGThread extends Thread {
                 }
 
                 try {
-                    final File oxipng = new File("mods\\oxipng");
+                    final File oxipng = new File("mods\\nicephore\\"+ Reference.OXIPNG_EXE);
                     final File pngFile = new File(screenshot.getParentFile(), screenshot.getName());
                     final Process p = Runtime.getRuntime().exec(oxipng + " -p -o " + NicephoreConfig.Client.getPNGOptimisationLevel() + " -i 1 --fix \"" + pngFile + "\"");
                     p.waitFor();

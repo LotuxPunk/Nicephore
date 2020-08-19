@@ -1,7 +1,7 @@
 package com.vandendaelen.nicephore.event;
 
-import com.vandendaelen.nicephore.JPEGThread;
 import com.vandendaelen.nicephore.Nicephore;
+import com.vandendaelen.nicephore.thread.JPEGThread;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.settings.KeyBinding;
