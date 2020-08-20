@@ -6,6 +6,7 @@
   "nicephore.screenshot.folder":"Ouvrir le dossier 'screenshots'",
   "nicephore.screenshot.options" : "[%s] [%s] [%s]",
   "nicephore.screenshot.reducedOptions" : "[%s] [%s]",
+  "nicephore.screenshot.optimize":"Optimisation de la capture d'écran en cours",
   "nicephore.clipboard.success": "La dernière capture d'écran copiée dans le presse-papier",
   "nicephore.clipboard.error": "Erreur à la copie de la dernière capture d'écan"
 }

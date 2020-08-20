@@ -30,7 +30,6 @@ public final class NicephoreConfig {
                             "\r\nNote that PNGs will still be made regardless of this option.")
                     .define("makeJPEGs", true);
 
-            // TODO: Detect and use system installed oxipng and ect rather than only checking for and using the ones found in the mods folder.
             optimisedOutput = builder
                     .comment("Enable to allow Nicephore to losslessly optimise the PNG and JPEG screenshots for smaller sized progressive files that are of identical quality to the files before optimisation." +
                             "\r\nNote: Enabling this will cause screenshots to take slightly longer to save as an optimisation step will have to be run first." +

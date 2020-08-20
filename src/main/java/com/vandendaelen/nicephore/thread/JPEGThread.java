@@ -55,6 +55,7 @@ public final class JPEGThread extends Thread {
             }
 
             if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
+                PlayerHelper.sendHotbarMessage(new TranslationTextComponent("nicephore.screenshot.optimize"));
                 try {
                     final File ect = new File("mods\\nicephore\\"+ Reference.File.ECT);
                     // ECT is lightning fast for small JPEG files so we might as well use optimisation level 9
