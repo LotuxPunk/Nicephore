@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 
 public final class JPEGThread extends Thread {
     private final NativeImage image;
@@ -55,9 +56,9 @@ public final class JPEGThread extends Thread {
 
             if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
                 try {
-                    final File ect = new File("mods\\nicephore\\"+ Reference.ECT_EXE);
+                    final File ect = new File("mods\\nicephore\\"+ Reference.File.ECT);
                     // ECT is lightning fast for small JPEG files so we might as well use optimisation level 9
-                    final Process p = Runtime.getRuntime().exec(ect + " --strict -progressive --mt-deflate -keep -9 \"" + jpegFile + "\"");
+                    final Process p = Runtime.getRuntime().exec(MessageFormat.format(Reference.Command.ECT, ect, jpegFile));
                     p.waitFor();
                 } catch (IOException | InterruptedException e) {
                     Nicephore.LOGGER.warn("Unable to optimise screenshot JPEG with ECT. Is it missing from the mods folder?");
@@ -65,9 +66,9 @@ public final class JPEGThread extends Thread {
                 }
 
                 try {
-                    final File oxipng = new File("mods\\nicephore\\"+ Reference.OXIPNG_EXE);
+                    final File oxipng = new File("mods\\nicephore\\"+ Reference.File.OXIPNG);
                     final File pngFile = new File(screenshot.getParentFile(), screenshot.getName());
-                    final Process p = Runtime.getRuntime().exec(oxipng + " -p -o " + NicephoreConfig.Client.getPNGOptimisationLevel() + " -i 1 --fix \"" + pngFile + "\"");
+                    final Process p = Runtime.getRuntime().exec(MessageFormat.format(Reference.Command.OXIPNG, oxipng, NicephoreConfig.Client.getPNGOptimisationLevel(), pngFile));
                     p.waitFor();
                 } catch (IOException | InterruptedException e) {
                     Nicephore.LOGGER.warn("Unable to optimise screenshot PNG with Oxipng. Is it missing from the mods folder?");
@@ -98,4 +99,5 @@ public final class JPEGThread extends Thread {
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.error"));
         }
     }
+
 }
