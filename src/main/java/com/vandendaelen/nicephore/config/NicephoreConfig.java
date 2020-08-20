@@ -1,5 +1,6 @@
 package com.vandendaelen.nicephore.config;
 
+import com.vandendaelen.nicephore.utils.Util;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -34,7 +35,7 @@ public final class NicephoreConfig {
                     .comment("Enable to allow Nicephore to losslessly optimise the PNG and JPEG screenshots for smaller sized progressive files that are of identical quality to the files before optimisation." +
                             "\r\nNote: Enabling this will cause screenshots to take slightly longer to save as an optimisation step will have to be run first." +
                             "\r\nTip: In the rare case that a screenshot PNG is corrupted, run \"oxipng --fix (filename).png\" to attempt to fix it.")
-                    .define("optimiseScreenshots", true);
+                    .define("optimiseScreenshots", Util.getOS().equals(Util.OS.MAC) || Util.getOS().equals(Util.OS.WINDOWS));
 
             builder.push("PNG-specific settings");
             pngOptimisationLevel = builder
