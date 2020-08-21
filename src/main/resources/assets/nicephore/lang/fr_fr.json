@@ -7,6 +7,7 @@
   "nicephore.screenshot.options" : "[%s] [%s] [%s]",
   "nicephore.screenshot.reducedOptions" : "[%s] [%s]",
   "nicephore.screenshot.optimize":"Optimisation de la capture d'écran en cours",
+  "nicephore.screenshot.optimizeFinished":"Capture d'écran optimisée et sauvegardée",
   "nicephore.clipboard.success": "La dernière capture d'écran copiée dans le presse-papier",
   "nicephore.clipboard.error": "Erreur à la copie de la dernière capture d'écan"
 }
