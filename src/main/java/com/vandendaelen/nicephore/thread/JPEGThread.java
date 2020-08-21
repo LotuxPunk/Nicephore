@@ -44,6 +44,7 @@ public final class JPEGThread extends Thread {
                     BufferedImage.TYPE_INT_RGB);
             result.createGraphics().drawImage(png, 0, 0, Color.WHITE, null);
 
+            // only run JPEG creation-related code if "makeJPEGs" is true in the config
             if (NicephoreConfig.Client.getJPEGToggle()) {
                 final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
                 final ImageWriteParam params = writer.getDefaultWriteParam();
@@ -54,18 +55,29 @@ public final class JPEGThread extends Thread {
                 writer.write(null, new IIOImage(result, null, null), params);
             }
 
+            // only run optimisation-related code if "optimiseScreenshots" is true in the config
             if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
-                PlayerHelper.sendHotbarMessage(new TranslationTextComponent("nicephore.screenshot.optimize"));
-                try {
-                    final File ect = new File("mods\\nicephore\\"+ Reference.File.ECT);
-                    // ECT is lightning fast for small JPEG files so we might as well use optimisation level 9
-                    final Process p = Runtime.getRuntime().exec(MessageFormat.format(Reference.Command.ECT, ect, jpegFile));
-                    p.waitFor();
-                } catch (IOException | InterruptedException e) {
-                    Nicephore.LOGGER.warn("Unable to optimise screenshot JPEG with ECT. Is it missing from the mods folder?");
-                    Nicephore.LOGGER.warn(e.getMessage());
+                final boolean shouldShowOptStatus = NicephoreConfig.Client.getShouldShowOptStatus();
+                if (shouldShowOptStatus) {
+                    PlayerHelper.sendHotbarMessage(new TranslationTextComponent("nicephore.screenshot.optimize"));
                 }
 
+                // only run JPEG optimisation with ECT if we "makeJPEGs" is true in the config
+                if (NicephoreConfig.Client.getJPEGToggle()) {
+
+                    // attempt to optimise the JPEG screenshot using ECT
+                    try {
+                        final File ect = new File("mods\\nicephore\\"+ Reference.File.ECT);
+                        // ECT is lightning fast for small JPEG files so we might as well use optimisation level 9
+                        final Process p = Runtime.getRuntime().exec(MessageFormat.format(Reference.Command.ECT, ect, jpegFile));
+                        p.waitFor();
+                    } catch (IOException | InterruptedException e) {
+                        Nicephore.LOGGER.warn("Unable to optimise screenshot JPEG with ECT. Is it missing from the mods folder?");
+                        Nicephore.LOGGER.warn(e.getMessage());
+                    }
+                }
+
+                // attempt to optimise the PNG screenshot using Oxipng
                 try {
                     final File oxipng = new File("mods\\nicephore\\"+ Reference.File.OXIPNG);
                     final File pngFile = new File(screenshot.getParentFile(), screenshot.getName());
@@ -74,6 +86,10 @@ public final class JPEGThread extends Thread {
                 } catch (IOException | InterruptedException e) {
                     Nicephore.LOGGER.warn("Unable to optimise screenshot PNG with Oxipng. Is it missing from the mods folder?");
                     Nicephore.LOGGER.warn(e.getMessage());
+                }
+
+                if (shouldShowOptStatus) {
+                    PlayerHelper.sendHotbarMessage(new TranslationTextComponent("nicephore.screenshot.optimizeFinished"));
                 }
             }
 

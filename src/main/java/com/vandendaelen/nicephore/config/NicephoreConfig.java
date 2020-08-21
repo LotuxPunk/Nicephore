@@ -16,7 +16,7 @@ public final class NicephoreConfig {
 
     public static class Client {
         public final ForgeConfigSpec.DoubleValue compression;
-        public final ForgeConfigSpec.BooleanValue makeJPEGs, optimisedOutput;
+        public final ForgeConfigSpec.BooleanValue makeJPEGs, optimisedOutput, showOptimisationStatus;
         public final ForgeConfigSpec.IntValue pngOptimisationLevel;
 
         public Client(ForgeConfigSpec.Builder builder) {
@@ -36,6 +36,10 @@ public final class NicephoreConfig {
                             "\r\nTip: In the rare case that a screenshot PNG is corrupted, run \"oxipng --fix (filename).png\" to attempt to fix it.")
                     .define("optimiseScreenshots", Util.getOS().equals(Util.OS.MAC) || Util.getOS().equals(Util.OS.WINDOWS));
 
+            showOptimisationStatus = builder
+                    .comment("If enabled, a message will appear above your hotbar telling you that has optimisation started and another when finished. Useful for very slow computers.")
+                    .define("showOptimisationStatus", true);
+
             builder.push("PNG-specific settings");
             pngOptimisationLevel = builder
                     .comment("If optimiseScreenshots is enabled, use the following oxipng optimisation level, with higher numbers taking longer to process but give lower file sizes." +
@@ -50,6 +54,7 @@ public final class NicephoreConfig {
         }
         public static boolean getJPEGToggle() { return CLIENT.makeJPEGs.get(); }
         public static boolean getOptimisedOutputToggle() { return CLIENT.optimisedOutput.get(); }
+        public static boolean getShouldShowOptStatus() { return CLIENT.showOptimisationStatus.get(); }
         public static byte getPNGOptimisationLevel() { return CLIENT.pngOptimisationLevel.get().byteValue(); }
     }
 }

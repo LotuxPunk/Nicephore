@@ -18,16 +18,17 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class InitThread extends Thread {
-    private static final File DESTINATION = new File(Minecraft.getInstance().gameDir.getAbsolutePath(), "mods\\nicephore");
-    private static final File REFERENCES_JSON = new File(DESTINATION,"\\references.json");
-    private static final File OXIPNG_ZIP = new File(DESTINATION,"\\oxipng.zip");
-    private static final File ECT_ZIP = new File(DESTINATION,"\\ect.zip");
+public final class InitThread extends Thread {
+    private static final File
+            DESTINATION = new File(Minecraft.getInstance().gameDir.getAbsolutePath(), "mods\\nicephore"),
+            REFERENCES_JSON = new File(DESTINATION,"\\references.json"),
+            OXIPNG_ZIP = new File(DESTINATION,"\\oxipng.zip"),
+            ECT_ZIP = new File(DESTINATION,"\\ect.zip");
 
     @Override
     public void run() {
-        if (NicephoreConfig.Client.getOptimisedOutputToggle()){
-            Gson gson = new Gson();
+        if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
+            final Gson gson = new Gson();
             JsonReader reader = null;
             try {
                 FileUtils.copyURLToFile(new URL(Reference.DOWNLOADS_URLS), REFERENCES_JSON);
@@ -78,10 +79,10 @@ public class InitThread extends Thread {
     }
 
     private static void unzip(String zipFilePath, String destDir) {
-        File dir = new File(destDir);
+        final File dir = new File(destDir);
         // create output directory if it doesn't exist
-        if(!dir.exists()) dir.mkdirs();
-        FileInputStream fis;
+        if (!dir.exists()) dir.mkdirs();
+        final FileInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
         try {
@@ -94,7 +95,7 @@ public class InitThread extends Thread {
                 System.out.println("Unzipping to "+newFile.getAbsolutePath());
                 //create directories for sub directories in zip
                 new File(newFile.getParent()).mkdirs();
-                FileOutputStream fos = new FileOutputStream(newFile);
+                final FileOutputStream fos = new FileOutputStream(newFile);
                 int len;
                 while ((len = zis.read(buffer)) > 0) {
                     fos.write(buffer, 0, len);
@@ -116,11 +117,7 @@ public class InitThread extends Thread {
 
     static class Response{
         String platform;
-        String oxipng;
-        String oxipng_file;
-        String oxipng_command;
-        String ect;
-        String ect_file;
-        String ect_command;
+        String oxipng, oxipng_file, oxipng_command;
+        String ect, ect_file, ect_command;
     }
 }

@@ -7,12 +7,10 @@ public class Reference {
     public static final String ECT_EXE = "ect-0.8.3.exe";
 
     public static class Command {
-        public static String OXIPNG = "";
-        public static String ECT = "";
+        public static String OXIPNG, ECT = "";
     }
 
     public static class File {
-        public static String OXIPNG = "";
-        public static String ECT = "";
+        public static String OXIPNG, ECT = "";
     }
 }

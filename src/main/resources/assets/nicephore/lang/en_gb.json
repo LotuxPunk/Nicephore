@@ -6,7 +6,7 @@
   "nicephore.screenshot.folder":"Open screenshots folder",
   "nicephore.screenshot.options" : "[%s] [%s] [%s]",
   "nicephore.screenshot.reducedOptions" : "[%s] [%s]",
-  "nicephore.screenshot.optimize":"Optimizing screenshot...",
+  "nicephore.screenshot.optimize":"Optimising screenshot...",
   "nicephore.screenshot.optimizeFinished":"Screenshot optimised and saved",
   "nicephore.clipboard.success": "Last screenshot copied in the clipboard",
   "nicephore.clipboard.error": "Error when trying to copy the last screenshot"

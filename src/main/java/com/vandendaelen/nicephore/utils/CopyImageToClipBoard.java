@@ -14,8 +14,8 @@ public class CopyImageToClipBoard implements ClipboardOwner {
         lastScreenshot = screenshot;
     }
     public void copyImage(BufferedImage bi) {
-        TransferableImage trans = new TransferableImage(bi);
-        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        final TransferableImage trans = new TransferableImage(bi);
+        final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         c.setContents( trans, this );
     }
 
