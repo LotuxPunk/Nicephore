@@ -9,5 +9,6 @@
   "nicephore.screenshot.optimize":"Optimizing screenshot...",
   "nicephore.screenshot.optimizeFinished":"Screenshot optimised and saved",
   "nicephore.clipboard.success": "Last screenshot copied in the clipboard",
-  "nicephore.clipboard.error": "Error when trying to copy the last screenshot"
+  "nicephore.clipboard.error": "Error when trying to copy the last screenshot",
+  "nicephore.gui.screenshots": "Screenshots"
 }
