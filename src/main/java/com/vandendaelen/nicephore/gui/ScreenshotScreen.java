@@ -1,6 +1,7 @@
 package com.vandendaelen.nicephore.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -56,23 +57,34 @@ public class ScreenshotScreen extends Screen {
 
         textureManager.deleteTexture(SCREENSHOT_TEXTURE);
         SCREENSHOT_TEXTURE = Util.fileTotexture(screenshots.get(index));
+
+        this.buttons.clear();
+        this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
+        this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
+        this.addButton(new Button(this.width / 2 - 30, this.height / 2 + 75, 50, 20, new StringTextComponent("Copy"), new Button.IPressable() {
+            @Override
+            public void onPress(Button button) {
+                final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
+                try {
+                    imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }));
     }
 
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-
         this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         textureManager.bindTexture(SCREENSHOT_TEXTURE);
 
         int centerX = this.width / 2;
-        int width = 150;
+        int width = 350;
         int height = (int)(width / aspectRatio);
-        blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
-
-        this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
-        this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
+        blit(matrixStack, centerX - width / 2, 10, 0, 0, width, height, width, height);
 
         drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, TITLE.getUnformattedComponentText(), this.width / 2, (int) (this.height * 0.1), Color.WHITE.getRGB());
         drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), this.width / 2 - 3, (int) (this.height * 0.7), Color.WHITE.getRGB());
