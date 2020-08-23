@@ -52,7 +52,12 @@ public final class ClientEvents {
         }
 
         if (GUI_KEY.isPressed()){
-            Minecraft.getInstance().displayGuiScreen(new ScreenshotScreen());
+            if (ScreenshotScreen.canBeShow()){
+                Minecraft.getInstance().displayGuiScreen(new ScreenshotScreen());
+            }
+            else {
+                PlayerHelper.sendHotbarMessage(new TranslationTextComponent("nicephore.clipboard.empty"));
+            }
         }
     }
 
