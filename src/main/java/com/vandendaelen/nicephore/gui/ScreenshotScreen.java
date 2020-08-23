@@ -61,7 +61,7 @@ public class ScreenshotScreen extends Screen {
         this.buttons.clear();
         this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
         this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
-        this.addButton(new Button(this.width / 2 - 30, this.height / 2 + 75, 50, 20, new StringTextComponent("Copy"), new Button.IPressable() {
+        this.addButton(new Button(this.width / 2 - 30, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), new Button.IPressable() {
             @Override
             public void onPress(Button button) {
                 final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
@@ -82,12 +82,13 @@ public class ScreenshotScreen extends Screen {
         textureManager.bindTexture(SCREENSHOT_TEXTURE);
 
         int centerX = this.width / 2;
-        int width = 350;
+        int width = (int) (this.width * 0.5);
         int height = (int)(width / aspectRatio);
-        blit(matrixStack, centerX - width / 2, 10, 0, 0, width, height, width, height);
+        blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
 
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, TITLE.getUnformattedComponentText(), this.width / 2, (int) (this.height * 0.1), Color.WHITE.getRGB());
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), this.width / 2 - 3, (int) (this.height * 0.7), Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), this.width / 2, 30, Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots"), this.width / 2, 20, Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), this.width / 2, (int) (this.height * 0.9), Color.WHITE.getRGB());
     }
 
     private void modIndex(int value){
@@ -96,5 +97,9 @@ public class ScreenshotScreen extends Screen {
             index += value;
         }
         init();
+    }
+
+    public static boolean canBeShow(){
+        return SCREENSHOTS_DIR.list().length > 0;
     }
 }

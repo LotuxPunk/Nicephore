@@ -10,5 +10,10 @@
   "nicephore.screenshot.optimizeFinished":"Screenshot optimised and saved",
   "nicephore.clipboard.success": "Last screenshot copied in the clipboard",
   "nicephore.clipboard.error": "Error when trying to copy the last screenshot",
-  "nicephore.gui.screenshots": "Screenshots"
+  "nicephore.gui.screenshots": "Screenshots",
+  "nicephore.gui.screenshots.pages": "%s of %s screenshots",
+  "nicephore.gui.screenshots.copy": "Copy",
+  "nicephore.clipboard.empty": "Screenshots folder is empty",
+  "nicephore.keybinds.copy": "Copy last screenshot",
+  "nicephore.keybinds.gui": "Open the screenshots interface"
 }
