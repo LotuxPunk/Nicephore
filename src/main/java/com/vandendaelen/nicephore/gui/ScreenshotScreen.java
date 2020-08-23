@@ -3,89 +3,86 @@ package com.vandendaelen.nicephore.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
-import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Optional;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class ScreenshotScreen extends Screen {
-    public static final TranslationTextComponent TITLE = new TranslationTextComponent("nicephore.gui.screenshots");
-    private static ResourceLocation image = new ResourceLocation("screenshot");
+    private static final TranslationTextComponent TITLE = new TranslationTextComponent("nicephore.gui.screenshots");
+    private static final File SCREENSHOTS_DIR = new File(Minecraft.getInstance().gameDir, "screenshots");
+    private static final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+    private static ResourceLocation SCREENSHOT_TEXTURE;
+    private ArrayList<File> screenshots;
+    private int index;
+    private float aspectRatio;
 
     public ScreenshotScreen() {
         super(TITLE);
+
+        FilenameFilter filter = (dir, name) -> name.endsWith(".jpg") || name.endsWith(".png");
+
+        screenshots = (ArrayList<File>) Arrays.stream(SCREENSHOTS_DIR.listFiles(filter)).collect(Collectors.toList());
+        index = screenshots.size() - 1;
+        aspectRatio = 1.7777F;
     }
 
     @Override
     protected void init() {
         super.init();
+
+        BufferedImage bimg = null;
+        try {
+            bimg = ImageIO.read(screenshots.get(index));
+            int width = bimg.getWidth();
+            int height = bimg.getHeight();
+            bimg.getGraphics().dispose();
+            aspectRatio = (float)(width/(double)height);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        textureManager.deleteTexture(SCREENSHOT_TEXTURE);
+        SCREENSHOT_TEXTURE = Util.fileTotexture(screenshots.get(index));
     }
 
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.minecraft.getTextureManager().bindTexture(Util.fileTotexture(new File(Minecraft.getInstance().gameDir, "screenshots\\2020-08-21_11.11.20.png")));
 
-        float asp = 1.77777F;
-        int centerX = 50 + ((100 - 25) / 2);
+        this.renderBackground(matrixStack);
 
+        textureManager.bindTexture(SCREENSHOT_TEXTURE);
+
+        int centerX = this.width / 2;
         int width = 150;
-        int height = (int)(width / asp);
-        blit(matrixStack, centerX - width / 2, 100, 0, 0, width, height, width, height);
+        int height = (int)(width / aspectRatio);
+        blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
 
+        this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
+        this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
+
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, TITLE.getUnformattedComponentText(), this.width / 2, (int) (this.height * 0.1), Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), this.width / 2 - 3, (int) (this.height * 0.7), Color.WHITE.getRGB());
     }
 
-    @Override
-    public Optional<IGuiEventListener> getEventListenerForPos(double mouseX, double mouseY) {
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int p_231044_5_) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseDragged(double p_231045_1_, double p_231045_3_, int p_231045_5_, double p_231045_6_, double p_231045_8_) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double p_231043_5_) {
-        return false;
-    }
-
-    @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        return false;
-    }
-
-    @Override
-    public boolean charTyped(char p_231042_1_, int p_231042_2_) {
-        return false;
-    }
-
-    @Override
-    public void setFocusedDefault(@Nullable IGuiEventListener eventListener) {
-
-    }
-
-    @Override
-    public void setListenerDefault(@Nullable IGuiEventListener eventListener) {
-
-    }
-
-    @Override
-    public boolean changeFocus(boolean p_231049_1_) {
-        return false;
+    private void modIndex(int value){
+        int max = screenshots.size();
+        if (index + value >= 0 && index + value < max){
+            index += value;
+        }
+        init();
     }
 }
