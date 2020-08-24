@@ -1,9 +1,11 @@
 package com.vandendaelen.nicephore.event;
 
 import com.vandendaelen.nicephore.Nicephore;
+import com.vandendaelen.nicephore.gui.ScreenshotScreen;
 import com.vandendaelen.nicephore.thread.JPEGThread;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.util.text.StringTextComponent;
@@ -23,6 +25,7 @@ import java.io.IOException;
 @EventBusSubscriber(value = Dist.CLIENT, modid = Nicephore.MODID)
 public final class ClientEvents {
     public static KeyBinding COPY_KEY;
+    public static KeyBinding GUI_KEY;
 
     static InputMappings.Input getKey(final int key) {
         return InputMappings.Type.KEYSYM.getOrMakeInput(key);
@@ -31,6 +34,8 @@ public final class ClientEvents {
     public static void init() {
         COPY_KEY = new KeyBinding(Nicephore.MODID + ".keybinds.copy", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_C), Nicephore.MOD_NAME);
         ClientRegistry.registerKeyBinding(COPY_KEY);
+        GUI_KEY = new KeyBinding(Nicephore.MODID + ".keybinds.gui", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_G), Nicephore.MOD_NAME);
+        ClientRegistry.registerKeyBinding(GUI_KEY);
     }
 
     @SubscribeEvent
@@ -43,6 +48,15 @@ public final class ClientEvents {
             } catch (IOException e) {
                 Nicephore.LOGGER.error(e.getMessage());
                 PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.clipboard.error"));
+            }
+        }
+
+        if (GUI_KEY.isPressed()){
+            if (ScreenshotScreen.canBeShow()){
+                Minecraft.getInstance().displayGuiScreen(new ScreenshotScreen());
+            }
+            else {
+                PlayerHelper.sendHotbarMessage(new TranslationTextComponent("nicephore.clipboard.empty"));
             }
         }
     }
