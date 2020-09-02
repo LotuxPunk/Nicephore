@@ -6,6 +6,11 @@ Nicephore is a Minecraft mod which convert any screenshot taken to JPEG, and add
 
 Use the `mods` folder after have installed [Forge ](http://files.minecraftforge.net/) 
 
+
+## Download
+
+Available on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/nicephore)
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
