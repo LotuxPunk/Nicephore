@@ -2,6 +2,7 @@ package com.vandendaelen.nicephore.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
+import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -61,17 +62,15 @@ public class ScreenshotScreen extends Screen {
         this.buttons.clear();
         this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
         this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
-        this.addButton(new Button(this.width / 2 - 30, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), new Button.IPressable() {
-            @Override
-            public void onPress(Button button) {
-                final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
-                try {
-                    imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        this.addButton(new Button(this.width / 2 - 55, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), button -> {
+            final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
+            try {
+                imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }));
+        this.addButton(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20,new TranslationTextComponent("nicephore.gui.screenshots.delete"),button -> deleteScreenshot(screenshots.get(index))));
     }
 
     @Override
@@ -104,8 +103,19 @@ public class ScreenshotScreen extends Screen {
                 index = 0;
             }
         }
-
         init();
+    }
+
+    private void deleteScreenshot(File file){
+        screenshots.remove(file);
+        index = getIndex();
+        init();
+        if (file.delete()){
+            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.deleted.success", file.getName()));
+        }
+        else{
+            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.deleted.error", file.getName()));
+        }
     }
 
     private int getIndex(){

@@ -11,10 +11,12 @@
   "nicephore.clipboard.success": "Last screenshot copied in the clipboard",
   "nicephore.clipboard.error": "Error when trying to copy the last screenshot",
   "nicephore.gui.screenshots": "Screenshots",
-  "nicephore.gui.screenshots.pages": "%s of %s screenshots",
+  "nicephore.gui.screenshots.pages": "%s of %s",
   "nicephore.gui.screenshots.copy": "Copy",
+  "nicephore.gui.screenshots.delete": "Delete",
   "nicephore.clipboard.empty": "Screenshots folder is empty",
   "nicephore.keybinds.copy": "Copy last screenshot",
   "nicephore.keybinds.gui": "Open the screenshots interface",
-
+  "nicephore.screenshot.deleted.success": "%s successfully deleted!",
+  "nicephore.screenshot.deleted.error": "Error when deleting %s"
 }
