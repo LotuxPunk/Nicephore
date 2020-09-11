@@ -2,7 +2,6 @@ package com.vandendaelen.nicephore.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
-import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -90,8 +89,8 @@ public class ScreenshotScreen extends Screen {
         int height = (int)(width / aspectRatio);
         blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
 
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), this.width / 2, 20, Color.WHITE.getRGB());
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), this.width / 2, 35, Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), centerX, 35, Color.WHITE.getRGB());
     }
 
     private void modIndex(int value){
@@ -111,16 +110,7 @@ public class ScreenshotScreen extends Screen {
     }
 
     private void deleteScreenshot(File file){
-        screenshots.remove(file);
-
-        index = getIndex();
-        init();
-        if (file.delete()){
-            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.deleted.success", file.getName()));
-        }
-        else{
-            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.deleted.error", file.getName()));
-        }
+        Minecraft.getInstance().displayGuiScreen(new DeleteConfirmScreen(file));
     }
 
     private int getIndex(){
