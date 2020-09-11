@@ -11,7 +11,7 @@
   "nicephore.clipboard.success": "La dernière capture d'écran copiée dans le presse-papier",
   "nicephore.clipboard.error": "Erreur à la copie de la dernière capture d'écan",
   "nicephore.gui.screenshots": "Captures d'écran",
-  "nicephore.gui.screenshots.pages": "%s sur %s",
+  "nicephore.gui.screenshots.pages": "%s sur %s captures d'écran",
   "nicephore.gui.screenshots.copy": "Copier",
   "nicephore.gui.screenshots.delete": "Supprimer",
   "nicephore.clipboard.empty": "Le dossier \"screenshots\" est vide",

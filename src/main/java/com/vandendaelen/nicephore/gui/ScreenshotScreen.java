@@ -45,6 +45,11 @@ public class ScreenshotScreen extends Screen {
     protected void init() {
         super.init();
 
+        if (screenshots.isEmpty()){
+            this.closeScreen();
+            return;
+        }
+
         BufferedImage bimg = null;
         try {
             bimg = ImageIO.read(screenshots.get(index));
@@ -70,7 +75,7 @@ public class ScreenshotScreen extends Screen {
                 e.printStackTrace();
             }
         }));
-        this.addButton(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20,new TranslationTextComponent("nicephore.gui.screenshots.delete"),button -> deleteScreenshot(screenshots.get(index))));
+        this.addButton(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.delete"),button -> deleteScreenshot(screenshots.get(index))));
     }
 
     @Override
@@ -85,9 +90,8 @@ public class ScreenshotScreen extends Screen {
         int height = (int)(width / aspectRatio);
         blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
 
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), this.width / 2, 30, Color.WHITE.getRGB());
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots"), this.width / 2, 20, Color.WHITE.getRGB());
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), this.width / 2, (int) (this.height * 0.9), Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), this.width / 2, 20, Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), this.width / 2, 35, Color.WHITE.getRGB());
     }
 
     private void modIndex(int value){
@@ -108,6 +112,7 @@ public class ScreenshotScreen extends Screen {
 
     private void deleteScreenshot(File file){
         screenshots.remove(file);
+
         index = getIndex();
         init();
         if (file.delete()){
@@ -119,7 +124,7 @@ public class ScreenshotScreen extends Screen {
     }
 
     private int getIndex(){
-        if (index >= screenshots.size()){
+        if (index >= screenshots.size() || index < 0){
             index = screenshots.size() - 1;
         }
         return index;
