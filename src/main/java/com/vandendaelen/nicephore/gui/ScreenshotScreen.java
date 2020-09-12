@@ -27,7 +27,7 @@ public class ScreenshotScreen extends Screen {
     private static final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
     private static ResourceLocation SCREENSHOT_TEXTURE;
     private ArrayList<File> screenshots;
-    private int index;
+    private static int index;
     private float aspectRatio;
 
     public ScreenshotScreen() {
@@ -36,13 +36,18 @@ public class ScreenshotScreen extends Screen {
         FilenameFilter filter = (dir, name) -> name.endsWith(".jpg") || name.endsWith(".png");
 
         screenshots = (ArrayList<File>) Arrays.stream(SCREENSHOTS_DIR.listFiles(filter)).collect(Collectors.toList());
-        index = screenshots.size() - 1;
+        index = getIndex();
         aspectRatio = 1.7777F;
     }
 
     @Override
     protected void init() {
         super.init();
+
+        if (screenshots.isEmpty()){
+            this.closeScreen();
+            return;
+        }
 
         BufferedImage bimg = null;
         try {
@@ -61,17 +66,15 @@ public class ScreenshotScreen extends Screen {
         this.buttons.clear();
         this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
         this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
-        this.addButton(new Button(this.width / 2 - 30, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), new Button.IPressable() {
-            @Override
-            public void onPress(Button button) {
-                final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
-                try {
-                    imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        this.addButton(new Button(this.width / 2 - 55, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), button -> {
+            final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
+            try {
+                imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }));
+        this.addButton(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.delete"),button -> deleteScreenshot(screenshots.get(index))));
     }
 
     @Override
@@ -86,9 +89,8 @@ public class ScreenshotScreen extends Screen {
         int height = (int)(width / aspectRatio);
         blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
 
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), this.width / 2, 30, Color.WHITE.getRGB());
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots"), this.width / 2, 20, Color.WHITE.getRGB());
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), this.width / 2, (int) (this.height * 0.9), Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(screenshots.get(index).getName()).getUnformattedComponentText(), centerX, 35, Color.WHITE.getRGB());
     }
 
     private void modIndex(int value){
@@ -96,7 +98,26 @@ public class ScreenshotScreen extends Screen {
         if (index + value >= 0 && index + value < max){
             index += value;
         }
+        else {
+            if (index + value < 0){
+                index = max - 1;
+            }
+            else {
+                index = 0;
+            }
+        }
         init();
+    }
+
+    private void deleteScreenshot(File file){
+        Minecraft.getInstance().displayGuiScreen(new DeleteConfirmScreen(file));
+    }
+
+    private int getIndex(){
+        if (index >= screenshots.size() || index < 0){
+            index = screenshots.size() - 1;
+        }
+        return index;
     }
 
     public static boolean canBeShow(){

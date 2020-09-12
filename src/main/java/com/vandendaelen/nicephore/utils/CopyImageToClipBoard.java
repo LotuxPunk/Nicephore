@@ -38,7 +38,7 @@ public class CopyImageToClipBoard implements ClipboardOwner {
             this.i = i;
         }
 
-        public Object getTransferData( DataFlavor flavor ) throws UnsupportedFlavorException, IOException {
+        public Object getTransferData( DataFlavor flavor ) throws UnsupportedFlavorException {
             if ( flavor.equals( DataFlavor.imageFlavor ) && i != null ) {
                 return i;
             } else {
