@@ -52,8 +52,8 @@ public class ScreenshotScreen extends Screen {
         BufferedImage bimg = null;
         try {
             bimg = ImageIO.read(screenshots.get(index));
-            int width = bimg.getWidth();
-            int height = bimg.getHeight();
+            final int width = bimg.getWidth();
+            final int height = bimg.getHeight();
             bimg.getGraphics().dispose();
             aspectRatio = (float)(width/(double)height);
         } catch (IOException e) {
@@ -84,9 +84,9 @@ public class ScreenshotScreen extends Screen {
 
         textureManager.bindTexture(SCREENSHOT_TEXTURE);
 
-        int centerX = this.width / 2;
-        int width = (int) (this.width * 0.5);
-        int height = (int)(width / aspectRatio);
+        final int centerX = this.width / 2;
+        final int width = (int) (this.width * 0.5);
+        final int height = (int)(width / aspectRatio);
         blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
 
         drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
@@ -94,7 +94,7 @@ public class ScreenshotScreen extends Screen {
     }
 
     private void modIndex(int value){
-        int max = screenshots.size();
+        final int max = screenshots.size();
         if (index + value >= 0 && index + value < max){
             index += value;
         }

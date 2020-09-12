@@ -25,7 +25,7 @@ public final class Nicephore {
         MinecraftForge.EVENT_BUS.register(this);
         System.setProperty("java.awt.headless", "false");
 
-        InitThread initThread = new InitThread();
+        final InitThread initThread = new InitThread();
         initThread.start();
     }
 

@@ -53,7 +53,7 @@ public class CopyImageToClipBoard implements ClipboardOwner {
         }
 
         public boolean isDataFlavorSupported( DataFlavor flavor ) {
-            DataFlavor[] flavors = getTransferDataFlavors();
+            final DataFlavor[] flavors = getTransferDataFlavors();
             for ( DataFlavor dataFlavor : flavors ) {
                 if ( flavor.equals(dataFlavor) ) {
                     return true;
