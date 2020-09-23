@@ -51,9 +51,6 @@ public final class InitThread extends Thread {
                         }
                     }
 
-                    downloadAndExtract(response.get().oxipng, OXIPNG_ZIP);
-                    downloadAndExtract(response.get().ect, ECT_ZIP);
-
                     Reference.Command.OXIPNG = response.get().oxipng_command;
                     Reference.Command.ECT = response.get().ect_command;
 
