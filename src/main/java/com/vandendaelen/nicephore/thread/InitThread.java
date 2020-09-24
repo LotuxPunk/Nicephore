@@ -74,7 +74,7 @@ public final class InitThread extends Thread {
         }
     }
 
-    private static void downloadAndExtract(String url, File zip){
+    private static void downloadAndExtract(String url, final File zip){
         try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
              FileOutputStream fileOutputStream = new FileOutputStream(zip)) {
             byte dataBuffer[] = new byte[1024];
@@ -126,7 +126,7 @@ public final class InitThread extends Thread {
 
     }
 
-    private Optional<Response> getResponse(JsonReader reader) {
+    private Optional<Response> getResponse(final JsonReader reader) {
         final Gson gson = new Gson();
         final Type collectionType = new TypeToken<Collection<Response>>() {}.getType();
         final Collection<Response> responses = gson.fromJson(reader, collectionType);
@@ -134,16 +134,16 @@ public final class InitThread extends Thread {
         return response;
     }
 
-    private JsonReader getJsonReader(String URL, File file) throws IOException {
+    private JsonReader getJsonReader(String URL, final File file) throws IOException {
         FileUtils.copyURLToFile(new URL(URL), file);
         return getJsonReader(file);
     }
 
-    private JsonReader getJsonReader(File file) throws FileNotFoundException {
+    private JsonReader getJsonReader(final File file) throws FileNotFoundException {
         return new JsonReader(new FileReader(file));
     }
 
-    private void freshInstall() {
+    private final void freshInstall() {
         try {
             Files.createDirectory(DESTINATION.toPath());
             final Optional<Response> response = getResponse(getJsonReader(Reference.DOWNLOADS_URLS, REFERENCES_JSON));
