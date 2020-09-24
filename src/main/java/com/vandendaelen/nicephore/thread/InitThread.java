@@ -28,78 +28,50 @@ public final class InitThread extends Thread {
     @Override
     public void run() {
         if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
-            // first read the old JSON if present
-            {
-                final Gson gson = new Gson();
-                JsonReader reader = null;
-                try {
-                    reader = new JsonReader(new FileReader(REFERENCES_JSON));
-                } catch (final IOException e) {
-                    e.printStackTrace();
+            if (Files.exists(DESTINATION.toPath())) {
+                {
+                    try {
+                        Optional<Response> response = getResponse(getJsonReader(REFERENCES_JSON));
+
+                        if (response.isPresent()) {
+                            Reference.Command.OXIPNG = response.get().oxipng_command;
+                            Reference.Command.ECT = response.get().ect_command;
+
+                            Reference.File.OXIPNG = response.get().oxipng_file;
+                            Reference.File.ECT = response.get().ect_file;
+
+                            Reference.Version.OXIPNG = response.get().oxipng_version;
+                            Reference.Version.ECT = response.get().ect_version;
+                        }
+                    } catch (final IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
-                Type collectionType = new TypeToken<Collection<Response>>() {}.getType();
-                Collection<Response> responses = gson.fromJson(reader, collectionType);
-                Optional<Response> response = responses.stream().filter(response1 -> response1.platform.equals(Util.getOS().name())).findFirst();
+                {
+                    try {
+                        final Optional<Response> response = getResponse(getJsonReader(Reference.DOWNLOADS_URLS, REFERENCES_JSON));
 
-                if (response.isPresent()) {
-                    if (!Files.exists(DESTINATION.toPath())) {
-                        try {
-                            Files.createDirectory(DESTINATION.toPath());
-                        } catch (final IOException e) {
-                            e.printStackTrace();
+                        if (response.isPresent()) {
+                            if (!Reference.Version.OXIPNG.equals(response.get().oxipng_version)) {
+                                Reference.Version.OXIPNG = response.get().oxipng_version;
+                                downloadAndExtract(response.get().oxipng, OXIPNG_ZIP);
+                            }
+
+                            if (!Reference.Version.ECT.equals(response.get().ect_version)) {
+                                Reference.Version.ECT = response.get().ect_version;
+                                downloadAndExtract(response.get().ect, ECT_ZIP);
+                            }
                         }
+                    } catch (final IOException e) {
+                        e.printStackTrace();
                     }
-
-                    Reference.Command.OXIPNG = response.get().oxipng_command;
-                    Reference.Command.ECT = response.get().ect_command;
-
-                    Reference.File.OXIPNG = response.get().oxipng_file;
-                    Reference.File.ECT = response.get().ect_file;
-
-                    Reference.Version.OXIPNG = response.get().oxipng_version;
-                    Reference.Version.ECT = response.get().ect_version;
                 }
             }
-
-            // now get the new one
-            {
-                final Gson gson = new Gson();
-                JsonReader reader = null;
-                try {
-                    FileUtils.copyURLToFile(new URL(Reference.DOWNLOADS_URLS), REFERENCES_JSON); // download the new one
-                    reader = new JsonReader(new FileReader(REFERENCES_JSON));
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                }
-
-                Type collectionType = new TypeToken<Collection<Response>>() {}.getType();
-                Collection<Response> responses = gson.fromJson(reader, collectionType);
-                Optional<Response> response = responses.stream().filter(response1 -> response1.platform.equals(Util.getOS().name())).findFirst();
-
-                if (response.isPresent()) {
-                    if (!Files.exists(DESTINATION.toPath())) {
-                        try {
-                            Files.createDirectory(DESTINATION.toPath());
-                        } catch (final IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    // only download and extract if the new JSON version is different to the old one
-                    if (!Reference.Version.OXIPNG.equals(response.get().oxipng_version)) {
-                        Reference.Version.OXIPNG = response.get().oxipng_version;
-                        downloadAndExtract(response.get().oxipng, OXIPNG_ZIP);
-                    }
-
-                    if (!Reference.Version.ECT.equals(response.get().ect_version)) {
-                        Reference.Version.ECT = response.get().ect_version;
-                        downloadAndExtract(response.get().ect, ECT_ZIP);
-                    }
-                }
+            else{
+                freshInstall();
             }
         }
-
     }
 
     private static void downloadAndExtract(String url, File zip){
@@ -148,6 +120,45 @@ public final class InitThread extends Thread {
             zis.closeEntry();
             zis.close();
             fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private Optional<Response> getResponse(JsonReader reader) {
+        final Gson gson = new Gson();
+        final Type collectionType = new TypeToken<Collection<Response>>() {}.getType();
+        final Collection<Response> responses = gson.fromJson(reader, collectionType);
+        final Optional<Response> response = responses.stream().filter(response1 -> response1.platform.equals(Util.getOS().name())).findFirst();
+        return response;
+    }
+
+    private JsonReader getJsonReader(String URL, File file) throws IOException {
+        FileUtils.copyURLToFile(new URL(URL), file);
+        return getJsonReader(file);
+    }
+
+    private JsonReader getJsonReader(File file) throws FileNotFoundException {
+        return new JsonReader(new FileReader(file));
+    }
+
+    private void freshInstall() {
+        try {
+            Files.createDirectory(DESTINATION.toPath());
+            final Optional<Response> response = getResponse(getJsonReader(Reference.DOWNLOADS_URLS, REFERENCES_JSON));
+
+            Reference.Command.OXIPNG = response.get().oxipng_command;
+            Reference.Command.ECT = response.get().ect_command;
+
+            Reference.File.OXIPNG = response.get().oxipng_file;
+            Reference.File.ECT = response.get().ect_file;
+
+            Reference.Version.OXIPNG = response.get().oxipng_version;
+            Reference.Version.ECT = response.get().ect_version;
+
+            downloadAndExtract(response.get().oxipng, OXIPNG_ZIP);
+            downloadAndExtract(response.get().ect, ECT_ZIP);
         } catch (IOException e) {
             e.printStackTrace();
         }
