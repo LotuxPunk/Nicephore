@@ -1,6 +1,5 @@
 package com.vandendaelen.nicephore.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,22 +23,22 @@ public class DeleteConfirmScreen extends Screen {
         super.init();
 
         this.buttons.clear();
-        this.addButton(new Button(this.width / 2 - 35, this.height / 2 + 30, 30, 20, new TranslationTextComponent("nicephore.gui.delete.yes"), button -> {
+        this.addButton(new Button(this.width / 2 - 35, this.height / 2 + 30, 30, 20, new TranslationTextComponent("nicephore.gui.delete.yes").toString(), button -> {
             deleteScreenshot();
             Minecraft.getInstance().displayGuiScreen(new ScreenshotScreen());
         }));
-        this.addButton(new Button(this.width / 2 + 5, this.height / 2 + 30, 30, 20, new TranslationTextComponent("nicephore.gui.delete.no"), button -> {
+        this.addButton(new Button(this.width / 2 + 5, this.height / 2 + 30, 30, 20, new TranslationTextComponent("nicephore.gui.delete.no").toString(), button -> {
             Minecraft.getInstance().displayGuiScreen(new ScreenshotScreen());
         }));
 
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground();
+        super.render(mouseX, mouseY, partialTicks);
 
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.delete.question", file.getName()), this.width / 2, this.height / 2 - 20, Color.RED.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.delete.question", file.getName()).toString(), this.width / 2, this.height / 2 - 20, Color.RED.getRGB());
     }
 
     private void deleteScreenshot(){

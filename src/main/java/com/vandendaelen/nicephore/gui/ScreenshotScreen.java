@@ -1,6 +1,5 @@
 package com.vandendaelen.nicephore.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
@@ -49,7 +48,7 @@ public class ScreenshotScreen extends Screen {
         super.init();
 
         if (screenshots.isEmpty()){
-            this.closeScreen();
+            this.onClose();
             return;
         }
 
@@ -68,9 +67,9 @@ public class ScreenshotScreen extends Screen {
         SCREENSHOT_TEXTURE = Util.fileTotexture(screenshots.get(index));
 
         this.buttons.clear();
-        this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
-        this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
-        this.addButton(new Button(this.width / 2 - 55, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), button -> {
+        this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">").getUnformattedComponentText(), button -> modIndex(1)));
+        this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<").getUnformattedComponentText(), button -> modIndex(-1)));
+        this.addButton(new Button(this.width / 2 - 55, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy").getUnformattedComponentText(), button -> {
             final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
             try {
                 imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
@@ -78,23 +77,23 @@ public class ScreenshotScreen extends Screen {
                 e.printStackTrace();
             }
         }));
-        this.addButton(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.delete"),button -> deleteScreenshot(screenshots.get(index))));
+        this.addButton(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.delete").getUnformattedComponentText(),button -> deleteScreenshot(screenshots.get(index))));
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground();
+        super.render(mouseX, mouseY, partialTicks);
 
         textureManager.bindTexture(SCREENSHOT_TEXTURE);
 
         final int centerX = this.width / 2;
         final int width = (int) (this.width * 0.5);
         final int height = (int)(width / aspectRatio);
-        blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
+        blit(centerX - width / 2, 50, 0, 0, width, height, width, height);
 
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(MessageFormat.format("{0} ({1})", screenshots.get(index).getName(), getFileSizeMegaBytes(screenshots.get(index)))).getUnformattedComponentText(), centerX, 35, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()).getUnformattedComponentText(), centerX, 20, Color.WHITE.getRGB());
+        drawCenteredString(Minecraft.getInstance().fontRenderer, new StringTextComponent(MessageFormat.format("{0} ({1})", screenshots.get(index).getName(), getFileSizeMegaBytes(screenshots.get(index)))).getUnformattedComponentText(), centerX, 35, Color.WHITE.getRGB());
     }
 
     private void modIndex(int value){

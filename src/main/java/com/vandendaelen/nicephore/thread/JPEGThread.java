@@ -95,13 +95,13 @@ public final class JPEGThread extends Thread {
 
             CopyImageToClipBoard.setLastScreenshot(screenshot);
 
-            final ITextComponent pngComponent = (new TranslationTextComponent("nicephore.screenshot.png")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
+            final ITextComponent pngComponent = (new TranslationTextComponent("nicephore.screenshot.png")).applyTextStyles(TextFormatting.UNDERLINE).applyTextStyle((style)
                     -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath())));
 
-            final ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
+            final ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).applyTextStyles(TextFormatting.UNDERLINE).applyTextStyle((style)
                     -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpegFile.getAbsolutePath())));
 
-            final ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
+            final ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).applyTextStyles(TextFormatting.UNDERLINE).applyTextStyle((style)
                     -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));
 
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", screenshot.getName().replace(".png", "")));
