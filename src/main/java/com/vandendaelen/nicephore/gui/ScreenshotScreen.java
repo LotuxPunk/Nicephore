@@ -125,7 +125,7 @@ public class ScreenshotScreen extends Screen {
     }
 
     public static boolean canBeShow(){
-        return SCREENSHOTS_DIR.list().length > 0;
+        return SCREENSHOTS_DIR.exists() && SCREENSHOTS_DIR.list().length > 0;
     }
 
     private static String getFileSizeMegaBytes(File file) {
