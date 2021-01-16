@@ -10,7 +10,10 @@ public final class PlayerHelper {
     }
 
     public static void sendHotbarMessage(final ITextComponent message) {
-        Minecraft.getInstance().player.sendStatusMessage(message, true);
+        Minecraft mcInstance = Minecraft.getInstance();
+        if (mcInstance.player != null) {
+            mcInstance.player.sendStatusMessage(message, true);
+        }
     }
 
 }
