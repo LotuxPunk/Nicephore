@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class ScreenshotScreen extends Screen {
     private static final TranslationTextComponent TITLE = new TranslationTextComponent("nicephore.gui.screenshots");
-    private static final File SCREENSHOTS_DIR = new File(Minecraft.getInstance().gameDir, "screenshots");
+    private static final File SCREENSHOTS_DIR = new File(Minecraft.getInstance().gameDirectory, "screenshots");
     private static final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
     private static ResourceLocation SCREENSHOT_TEXTURE;
     private ArrayList<File> screenshots;
@@ -49,7 +49,7 @@ public class ScreenshotScreen extends Screen {
         super.init();
 
         if (screenshots.isEmpty()){
-            this.closeScreen();
+            this.onClose();
             return;
         }
 
@@ -64,8 +64,8 @@ public class ScreenshotScreen extends Screen {
             e.printStackTrace();
         }
 
-        textureManager.deleteTexture(SCREENSHOT_TEXTURE);
-        SCREENSHOT_TEXTURE = Util.fileTotexture(screenshots.get(index));
+        textureManager.release(SCREENSHOT_TEXTURE);
+        SCREENSHOT_TEXTURE = Util.fileToTexture(screenshots.get(index));
 
         this.buttons.clear();
         this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
@@ -86,15 +86,15 @@ public class ScreenshotScreen extends Screen {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        textureManager.bindTexture(SCREENSHOT_TEXTURE);
+        textureManager.bind(SCREENSHOT_TEXTURE);
 
         final int centerX = this.width / 2;
         final int width = (int) (this.width * 0.5);
         final int height = (int)(width / aspectRatio);
         blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
 
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
-        drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, new StringTextComponent(MessageFormat.format("{0} ({1})", screenshots.get(index).getName(), getFileSizeMegaBytes(screenshots.get(index)))).getUnformattedComponentText(), centerX, 35, Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, Minecraft.getInstance().font, new StringTextComponent(MessageFormat.format("{0} ({1})", screenshots.get(index).getName(), getFileSizeMegaBytes(screenshots.get(index)))).getContents(), centerX, 35, Color.WHITE.getRGB());
     }
 
     private void modIndex(int value){
@@ -114,7 +114,7 @@ public class ScreenshotScreen extends Screen {
     }
 
     private void deleteScreenshot(File file){
-        Minecraft.getInstance().displayGuiScreen(new DeleteConfirmScreen(file));
+        Minecraft.getInstance().setScreen(new DeleteConfirmScreen(file));
     }
 
     private int getIndex(){

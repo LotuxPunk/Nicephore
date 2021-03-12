@@ -6,13 +6,15 @@ import net.minecraft.util.text.ITextComponent;
 public final class PlayerHelper {
     public static void sendMessage(final ITextComponent message) {
         Minecraft mcInstance = Minecraft.getInstance();
-        mcInstance.player.sendMessage(message, mcInstance.player.getUniqueID());
+        if (mcInstance.player != null) {
+            mcInstance.player.displayClientMessage(message, false);
+        }
     }
 
     public static void sendHotbarMessage(final ITextComponent message) {
         Minecraft mcInstance = Minecraft.getInstance();
         if (mcInstance.player != null) {
-            mcInstance.player.sendStatusMessage(message, true);
+            mcInstance.player.displayClientMessage(message, true);
         }
     }
 

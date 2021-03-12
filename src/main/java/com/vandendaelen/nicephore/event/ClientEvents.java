@@ -28,7 +28,7 @@ public final class ClientEvents {
     public static KeyBinding GUI_KEY;
 
     static InputMappings.Input getKey(final int key) {
-        return InputMappings.Type.KEYSYM.getOrMakeInput(key);
+        return InputMappings.Type.KEYSYM.getOrCreate(key);
     }
 
     public static void init() {
@@ -40,7 +40,7 @@ public final class ClientEvents {
 
     @SubscribeEvent
     public static void onKey(final InputUpdateEvent event) {
-        if (COPY_KEY.isPressed()) {
+        if (COPY_KEY.consumeClick()) {
             final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
             try {
                 imageToClipBoard.copyLastScreenshot();
@@ -51,9 +51,9 @@ public final class ClientEvents {
             }
         }
 
-        if (GUI_KEY.isPressed()){
+        if (GUI_KEY.consumeClick()){
             if (ScreenshotScreen.canBeShow()){
-                Minecraft.getInstance().displayGuiScreen(new ScreenshotScreen());
+                Minecraft.getInstance().setScreen(new ScreenshotScreen());
             }
             else {
                 PlayerHelper.sendHotbarMessage(new TranslationTextComponent("nicephore.clipboard.empty"));

@@ -20,7 +20,7 @@ import java.util.zip.ZipInputStream;
 
 public final class InitThread extends Thread {
     private static final File
-            DESTINATION = new File(Minecraft.getInstance().gameDir.getAbsolutePath(), "mods\\nicephore"),
+            DESTINATION = new File(Minecraft.getInstance().gameDirectory.getAbsolutePath(), "mods\\nicephore"),
             REFERENCES_JSON = new File(DESTINATION,"\\references.json"),
             OXIPNG_ZIP = new File(DESTINATION,"\\oxipng.zip"),
             ECT_ZIP = new File(DESTINATION,"\\ect.zip");

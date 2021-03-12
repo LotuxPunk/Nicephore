@@ -35,7 +35,7 @@ public final class JPEGThread extends Thread {
     @Override
     public void run() {
         try {
-            final ByteArrayInputStream bais = new ByteArrayInputStream(image.getBytes());
+            final ByteArrayInputStream bais = new ByteArrayInputStream(image.asByteArray());
             final BufferedImage png = ImageIO.read(bais);
             final File jpegFile = new File(screenshot.getParentFile(), screenshot.getName().replace("png", "jpg"));
             final BufferedImage result = new BufferedImage(
@@ -95,14 +95,14 @@ public final class JPEGThread extends Thread {
 
             CopyImageToClipBoard.setLastScreenshot(screenshot);
 
-            final ITextComponent pngComponent = (new TranslationTextComponent("nicephore.screenshot.png")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
-                    -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath())));
+            final ITextComponent pngComponent = (new TranslationTextComponent("nicephore.screenshot.png")).withStyle(TextFormatting.UNDERLINE).withStyle((style)
+                    -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath())));
 
-            final ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
-                    -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpegFile.getAbsolutePath())));
+            final ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).withStyle(TextFormatting.UNDERLINE).withStyle((style)
+                    -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpegFile.getAbsolutePath())));
 
-            final ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).mergeStyle(TextFormatting.UNDERLINE).modifyStyle((style)
-                    -> style.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));
+            final ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).withStyle(TextFormatting.UNDERLINE).withStyle((style)
+                    -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));
 
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", screenshot.getName().replace(".png", "")));
 

@@ -33,13 +33,13 @@ public class Util {
         return os;
     }
 
-    public static ResourceLocation fileTotexture(File file) {
+    public static ResourceLocation fileToTexture(File file) {
         NativeImage nativeImage = null;
         try {
             nativeImage = NativeImage.read(new FileInputStream(file));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return Minecraft.getInstance().getTextureManager().getDynamicTextureLocation("file_" + System.currentTimeMillis(), new DynamicTexture(nativeImage));
+        return Minecraft.getInstance().getTextureManager().register("file_" + System.currentTimeMillis(), new DynamicTexture(nativeImage));
     }
 }
