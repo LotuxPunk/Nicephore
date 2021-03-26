@@ -24,12 +24,12 @@ public final class Nicephore {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, NicephoreConfig.CLIENT_SPEC);
         MinecraftForge.EVENT_BUS.register(this);
         System.setProperty("java.awt.headless", "false");
-
-        final InitThread initThread = new InitThread();
-        initThread.start();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
         ClientEvents.init();
+
+        final InitThread initThread = new InitThread(NicephoreConfig.Client.getOptimisedOutputToggle());
+        initThread.start();
     }
 }

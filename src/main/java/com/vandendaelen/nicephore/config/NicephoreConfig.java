@@ -30,6 +30,7 @@ public final class NicephoreConfig {
 
             optimisedOutput = builder
                     .comment("Enable to allow Nicephore to losslessly optimise the PNG and JPEG screenshots for smaller sized progressive files that are of identical quality to the files before optimisation.", "Note: Enabling this will cause screenshots to take slightly longer to save as an optimisation step will have to be run first.", "Tip: In the rare case that a screenshot PNG is corrupted, run \"oxipng --fix (filename).png\" to attempt to fix it.")
+                    .worldRestart()
                     .define("optimiseScreenshots", Util.getOS().equals(Util.OS.MAC) || Util.getOS().equals(Util.OS.WINDOWS));
 
             showOptimisationStatus = builder

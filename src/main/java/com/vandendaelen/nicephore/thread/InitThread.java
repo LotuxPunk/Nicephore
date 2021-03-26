@@ -3,7 +3,6 @@ package com.vandendaelen.nicephore.thread;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.utils.Reference;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
@@ -19,15 +18,22 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public final class InitThread extends Thread {
+
+    private boolean optimiseConfig;
+
     private static final File
             DESTINATION = new File(Minecraft.getInstance().gameDirectory.getAbsolutePath(), "mods\\nicephore"),
             REFERENCES_JSON = new File(DESTINATION,"\\references.json"),
             OXIPNG_ZIP = new File(DESTINATION,"\\oxipng.zip"),
             ECT_ZIP = new File(DESTINATION,"\\ect.zip");
 
+    public InitThread(boolean optimiseConfig) {
+        this.optimiseConfig = optimiseConfig;
+    }
+
     @Override
     public void run() {
-        if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
+        if (optimiseConfig) {
             if (Files.exists(DESTINATION.toPath())) {
                 {
                     try {
