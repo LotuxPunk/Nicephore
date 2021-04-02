@@ -56,7 +56,7 @@ public final class ClientEvents {
                 Minecraft.getInstance().setScreen(new ScreenshotScreen());
             }
             else {
-                PlayerHelper.sendHotbarMessage(new TranslationTextComponent("nicephore.clipboard.empty"));
+                PlayerHelper.sendHotbarMessage(new TranslationTextComponent("nicephore.screenshots.empty"));
             }
         }
     }

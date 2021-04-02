@@ -2,6 +2,7 @@ package com.vandendaelen.nicephore.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
+import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -50,7 +51,7 @@ public class ScreenshotScreen extends Screen {
         super.init();
 
         if (screenshots.isEmpty()){
-            this.onClose();
+            closeScreen("nicephore.screenshots.empty");
             return;
         }
 
@@ -66,7 +67,15 @@ public class ScreenshotScreen extends Screen {
         }
 
         textureManager.release(SCREENSHOT_TEXTURE);
-        SCREENSHOT_TEXTURE = Util.fileToTexture(screenshots.get(index));
+
+        File fileToLoad = screenshots.get(index);
+        if (fileToLoad.exists()){
+            SCREENSHOT_TEXTURE = Util.fileToTexture(screenshots.get(index));
+        }
+        else{
+            closeScreen("nicephore.screenshots.loading.error");
+            return;
+        }
 
         this.buttons.clear();
         this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
@@ -124,6 +133,11 @@ public class ScreenshotScreen extends Screen {
             index = screenshots.size() - 1;
         }
         return index;
+    }
+
+    private void closeScreen(String textComponentId) {
+        this.onClose();
+        PlayerHelper.sendHotbarMessage(new TranslationTextComponent(textComponentId));
     }
 
     public static boolean canBeShow(){
