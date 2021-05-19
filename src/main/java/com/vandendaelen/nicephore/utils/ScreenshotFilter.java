@@ -17,4 +17,8 @@ public enum ScreenshotFilter {
     public FilenameFilter getPredicate() {
         return predicate;
     }
+
+    public ScreenshotFilter next() {
+        return values()[(this.ordinal() + 1) % values().length];
+    }
 }

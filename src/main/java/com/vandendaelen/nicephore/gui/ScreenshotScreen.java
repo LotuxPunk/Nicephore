@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
+import com.vandendaelen.nicephore.utils.ScreenshotFilter;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -39,17 +40,17 @@ public class ScreenshotScreen extends Screen {
 
     public ScreenshotScreen() {
         super(TITLE);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
 
         FilenameFilter filter = NicephoreConfig.Client.getScreenshotFilter().getPredicate();
 
         screenshots = (ArrayList<File>) Arrays.stream(SCREENSHOTS_DIR.listFiles(filter)).sorted(Comparator.comparingLong(File::lastModified).reversed()).collect(Collectors.toList());
         index = getIndex();
         aspectRatio = 1.7777F;
-    }
-
-    @Override
-    protected void init() {
-        super.init();
 
         if (screenshots.isEmpty()){
             closeScreen("nicephore.screenshots.empty");
@@ -79,8 +80,9 @@ public class ScreenshotScreen extends Screen {
         }
 
         this.buttons.clear();
-        this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
+        this.addButton(new Button(10, 10, 100, 20, new TranslationTextComponent("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name()), button -> changeFilter()));
         this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
+        this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
         this.addButton(new Button(this.width / 2 - 55, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), button -> {
             final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
             try {
@@ -90,6 +92,12 @@ public class ScreenshotScreen extends Screen {
             }
         }));
         this.addButton(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.delete"),button -> deleteScreenshot(screenshots.get(index))));
+    }
+
+    private void changeFilter(){
+        ScreenshotFilter nextFilter = NicephoreConfig.Client.getScreenshotFilter().next();
+        NicephoreConfig.Client.setScreenshotFilter(nextFilter);
+        init();
     }
 
     @Override
