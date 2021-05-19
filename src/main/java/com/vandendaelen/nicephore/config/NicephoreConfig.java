@@ -1,5 +1,6 @@
 package com.vandendaelen.nicephore.config;
 
+import com.vandendaelen.nicephore.utils.ScreenshotFilter;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
@@ -18,6 +19,7 @@ public final class NicephoreConfig {
         public final ForgeConfigSpec.DoubleValue compression;
         public final ForgeConfigSpec.BooleanValue makeJPEGs, optimisedOutput, showOptimisationStatus;
         public final ForgeConfigSpec.IntValue pngOptimisationLevel;
+        public final ForgeConfigSpec.EnumValue<ScreenshotFilter> screenshotFilter;
 
         public Client(ForgeConfigSpec.Builder builder) {
             builder.push("Client settings");
@@ -37,6 +39,10 @@ public final class NicephoreConfig {
                     .comment("If enabled, a message will appear above your hotbar telling you that has optimisation started and another when finished. Useful for very slow computers.")
                     .define("showOptimisationStatus", true);
 
+            screenshotFilter = builder
+                    .comment("Only show the PNG, JPEG or JPEG/PNG on the screenshot GUI")
+                    .defineEnum("screenshotFilter", ScreenshotFilter.BOTH);
+
             builder.push("PNG-specific settings");
             pngOptimisationLevel = builder
                     .comment("If optimiseScreenshots is enabled, use the following oxipng optimisation level, with higher numbers taking longer to process but give lower file sizes.", "Tip: I would avoid anything above 3 unless you have a lot of CPU cores and threads (e.g. 16c/32t+) as it starts taking significantly longer to process for vastly diminishing returns.")
@@ -52,5 +58,7 @@ public final class NicephoreConfig {
         public static boolean getOptimisedOutputToggle() { return CLIENT.optimisedOutput.get(); }
         public static boolean getShouldShowOptStatus() { return CLIENT.showOptimisationStatus.get(); }
         public static byte getPNGOptimisationLevel() { return CLIENT.pngOptimisationLevel.get().byteValue(); }
+        public static ScreenshotFilter getScreenshotFilter() { return CLIENT.screenshotFilter.get(); }
+        public static void setScreenshotFilter(ScreenshotFilter filter) { CLIENT.screenshotFilter.set(filter); }
     }
 }

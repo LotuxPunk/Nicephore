@@ -1,6 +1,7 @@
 package com.vandendaelen.nicephore.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
@@ -39,7 +40,7 @@ public class ScreenshotScreen extends Screen {
     public ScreenshotScreen() {
         super(TITLE);
 
-        FilenameFilter filter = (dir, name) -> name.endsWith(".jpg") || name.endsWith(".png");
+        FilenameFilter filter = NicephoreConfig.Client.getScreenshotFilter().getPredicate();
 
         screenshots = (ArrayList<File>) Arrays.stream(SCREENSHOTS_DIR.listFiles(filter)).sorted(Comparator.comparingLong(File::lastModified).reversed()).collect(Collectors.toList());
         index = getIndex();
