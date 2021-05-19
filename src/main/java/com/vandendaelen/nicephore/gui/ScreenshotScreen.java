@@ -52,48 +52,49 @@ public class ScreenshotScreen extends Screen {
         index = getIndex();
         aspectRatio = 1.7777F;
 
-        if (screenshots.isEmpty()){
-            closeScreen("nicephore.screenshots.empty");
-            return;
-        }
+        if (!screenshots.isEmpty()) {
+//            closeScreen("nicephore.screenshots.empty");
+//            return;
 
-        BufferedImage bimg = null;
-        try {
-            bimg = ImageIO.read(screenshots.get(index));
-            final int width = bimg.getWidth();
-            final int height = bimg.getHeight();
-            bimg.getGraphics().dispose();
-            aspectRatio = (float)(width/(double)height);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            BufferedImage bimg = null;
+            try {
+                bimg = ImageIO.read(screenshots.get(index));
+                final int width = bimg.getWidth();
+                final int height = bimg.getHeight();
+                bimg.getGraphics().dispose();
+                aspectRatio = (float) (width / (double) height);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        textureManager.release(SCREENSHOT_TEXTURE);
+            textureManager.release(SCREENSHOT_TEXTURE);
 
-        File fileToLoad = screenshots.get(index);
-        if (fileToLoad.exists()){
-            SCREENSHOT_TEXTURE = Util.fileToTexture(screenshots.get(index));
-        }
-        else{
-            closeScreen("nicephore.screenshots.loading.error");
-            return;
+            File fileToLoad = screenshots.get(index);
+            if (fileToLoad.exists()) {
+                SCREENSHOT_TEXTURE = Util.fileToTexture(screenshots.get(index));
+            } else {
+                closeScreen("nicephore.screenshots.loading.error");
+                return;
+            }
         }
 
         this.buttons.clear();
         this.addButton(new Button(10, 10, 100, 20, new TranslationTextComponent("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name()), button -> changeFilter()));
-        this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
-        this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
-        this.addButton(new Button(this.width / 2 - 55, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), button -> {
-            final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
-            try {
-                imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }));
-        this.addButton(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.delete"),button -> deleteScreenshot(screenshots.get(index))));
-    }
 
+        if (!screenshots.isEmpty()) {
+            this.addButton(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new StringTextComponent("<"), button -> modIndex(-1)));
+            this.addButton(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new StringTextComponent(">"), button -> modIndex(1)));
+            this.addButton(new Button(this.width / 2 - 55, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), button -> {
+                final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
+                try {
+                    imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }));
+            this.addButton(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.delete"), button -> deleteScreenshot(screenshots.get(index))));
+        }
+    }
     private void changeFilter(){
         ScreenshotFilter nextFilter = NicephoreConfig.Client.getScreenshotFilter().next();
         NicephoreConfig.Client.setScreenshotFilter(nextFilter);
@@ -102,15 +103,19 @@ public class ScreenshotScreen extends Screen {
 
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-
-        textureManager.bind(SCREENSHOT_TEXTURE);
-
         final int centerX = this.width / 2;
         final int width = (int) (this.width * 0.5);
         final int height = (int)(width / aspectRatio);
+
+        this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+
+        if (screenshots.isEmpty()){
+            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslationTextComponent("nicephore.screenshots.empty"), centerX, 20, Color.RED.getRGB());
+            return;
+        }
+
+        textureManager.bind(SCREENSHOT_TEXTURE);
         blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
 
         drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslationTextComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
