@@ -13,7 +13,7 @@
     {
         "platform":"MAC",
         "oxipng":"https://github.com/shssoichiro/oxipng/releases/download/v5.0.0/oxipng-5.0.0-x86_64-apple-darwin.tar.gz",
-        "oxipng_file":"oxipng",
+        "oxipng_file":"oxipng-5.0.0-x86_64-apple-darwin/oxipng",
         "oxipng_command":"{0} -p -o {1} -i 1 --fix \"{2}\"",
         "oxipng_version":"5.0.0",
         "ect":"https://github.com/fhanau/Efficient-Compression-Tool/releases/download/v0.8.3/ect-0.8.3-macOS.zip",
