@@ -1,7 +1,7 @@
 [
     {
         "platform":"WINDOWS",
-        "oxipng":"https://github.com/shssoichiro/oxipng/releases/download/v3.0.1/oxipng-3.0.1-i686-pc-windows-msvc.zip",
+        "oxipng":"https://github.com/shssoichiro/oxipng/releases/download/v5.0.0/oxipng-5.0.0-x86_64-pc-windows-msvc.zip",
         "oxipng_file":"oxipng.exe",
         "oxipng_command":"{0} -p -o {1} -i 1 --fix \"{2}\"",
         "ect":"https://github.com/fhanau/Efficient-Compression-Tool/releases/download/v0.8.3/ect-0.8.3-Win64.exe.zip",
@@ -10,7 +10,7 @@
     },
     {
         "platform":"MAC",
-        "oxipng":"https://github.com/shssoichiro/oxipng/releases/download/v3.0.1/oxipng-3.0.1-x86_64-apple-darwin.tar.gz",
+        "oxipng":"https://github.com/shssoichiro/oxipng/releases/download/v5.0.0/oxipng-5.0.0-x86_64-apple-darwin.tar.gz",
         "oxipng_file":"oxipng",
         "oxipng_command":"{0} -p -o {1} -i 1 --fix \"{2}\"",
         "ect":"https://github.com/fhanau/Efficient-Compression-Tool/releases/download/v0.8.3/ect-0.8.3-macOS.zip",
