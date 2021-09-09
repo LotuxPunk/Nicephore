@@ -19,11 +19,18 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public final class InitThread extends Thread {
+
+    private boolean optimiseConfig;
+
     private static final File
-            DESTINATION = new File(Minecraft.getInstance().gameDir.getAbsolutePath(), "mods\\nicephore"),
-            REFERENCES_JSON = new File(DESTINATION,"\\references.json"),
-            OXIPNG_ZIP = new File(DESTINATION,"\\oxipng.zip"),
-            ECT_ZIP = new File(DESTINATION,"\\ect.zip");
+            DESTINATION = new File(Minecraft.getInstance().gameDir.getAbsolutePath(), String.format("mods%snicephore", File.separator)),
+            REFERENCES_JSON = new File(DESTINATION, String.format("%sreferences.json", File.separator)),
+            OXIPNG_ZIP = new File(DESTINATION,String.format("%soxipng.zip", File.separator)),
+            ECT_ZIP = new File(DESTINATION,String.format("%sect.zip", File.separator));
+
+    public InitThread(boolean optimiseConfig) {
+        this.optimiseConfig = optimiseConfig;
+    }
 
     @Override
     public void run() {
