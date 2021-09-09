@@ -1,18 +1,15 @@
-buildscript {
-    repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
-}
-apply plugin: 'net.minecraftforge.gradle'
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
+import org.gradle.api.java.archives.internal.DefaultManifest
 
-version = '1.17.1-1.4.1'
+plugins {
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "java" // java plugin is needed for the shadow plugin to work
+    id "eclipse"
+    id "maven-publish"
+    id "net.minecraftforge.gradle" version "5.1.+"
+}
+
+
+version = '1.17.1-1.0.0'
 group = 'com.vandendaelen.nicephore' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'nicephore'
 
@@ -94,24 +91,62 @@ minecraft {
     }
 }
 
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.58'
+configurations {
+    library
+    shade
+    implementation.extendsFrom library
+    shade.extendsFrom library
 }
 
-// Example for how to get properties into the manifest for reading by the runtime..
-jar {
-    manifest {
-        attributes([
-            "Specification-Title": "nicephore",
-            "Specification-Vendor": "lotuxpunk",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"lotuxpunk",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
+minecraft.runs.all {
+    lazyToken('minecraft_classpath') {
+        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
     }
 }
+
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.58'
+
+    implementation 'com.github.thrau:jarchivelib:1.2.0'
+    shade 'com.github.thrau:jarchivelib:1.2.0'
+    library 'com.github.thrau:jarchivelib:1.2.0'
+}
+
+ext {
+    MANIFEST = manifest {
+        attributes([
+                "Specification-Title": "nicephore",
+                "Specification-Vendor": "lotuxpunk",
+                "Specification-Version": "1", // We are version 1 of ourselves
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :"lotuxpunk",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    } as DefaultManifest
+}
+
+jar {
+    manifest.from(MANIFEST)
+}
+
+shadowJar {
+    archiveClassifier.set("")
+    configurations = [project.configurations.shade]
+
+    relocate "org.rauschig.jarchivelib", "${project.group}.shadow.org.rauschig.jarchivelib"
+
+    manifest.from(MANIFEST)
+}
+
+reobf {
+    shadowJar { }
+}
+
 
 // Example configuration to allow publishing using the maven-publish task
 // This is the preferred method to reobfuscate your jar file
