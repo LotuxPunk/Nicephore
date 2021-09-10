@@ -28,12 +28,12 @@ public final class NicephoreConfig {
                     .defineInRange("compression", 0.9, 0.0,1.0);
             makeJPEGs = builder
                     .comment("Enable to allow Nicephore to make lossy JPEGs of your screenshots for easier online sharing. Disable to only allow PNGs.", "Note that PNGs will still be made regardless of this option.")
-                    .define("makeJPEGs", true);
+                    .define("makeJPEGs", Util.getOS().equals(Util.OS.WINDOWS) || Util.getOS().equals(Util.OS.LINUX));
 
             optimisedOutput = builder
                     .comment("Enable to allow Nicephore to losslessly optimise the PNG and JPEG screenshots for smaller sized progressive files that are of identical quality to the files before optimisation.", "Note: Enabling this will cause screenshots to take slightly longer to save as an optimisation step will have to be run first.", "Tip: In the rare case that a screenshot PNG is corrupted, run \"oxipng --fix (filename).png\" to attempt to fix it.")
                     .worldRestart()
-                    .define("optimiseScreenshots", Util.getOS().equals(Util.OS.MAC) || Util.getOS().equals(Util.OS.WINDOWS));
+                    .define("optimiseScreenshots", Util.getOS().equals(Util.OS.WINDOWS));
 
             showOptimisationStatus = builder
                     .comment("If enabled, a message will appear above your hotbar telling you that has optimisation started and another when finished. Useful for very slow computers.")
