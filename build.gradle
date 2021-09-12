@@ -77,16 +77,8 @@ minecraft.runs.all {
     }
 }
 
-repositories {
-    maven { url 'https://jitpack.io' }
-}
-
 dependencies {
     minecraft 'net.minecraftforge:forge:1.17.1-37.0.58'
-
-    implementation 'com.github.thrau:jarchivelib:1.2.0'
-    shade 'com.github.thrau:jarchivelib:1.2.0'
-    library 'com.github.thrau:jarchivelib:1.2.0'
 }
 
 ext {
