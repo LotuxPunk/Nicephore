@@ -6,19 +6,16 @@ import com.google.gson.stream.JsonReader;
 import com.vandendaelen.nicephore.utils.Reference;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
-import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.io.FileUtils;
-import org.rauschig.jarchivelib.Archiver;
-import org.rauschig.jarchivelib.ArchiverFactory;
 
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public final class InitThread extends Thread {
 
@@ -26,7 +23,10 @@ public final class InitThread extends Thread {
 
     private static final File
             DESTINATION = new File(Minecraft.getInstance().gameDirectory.getAbsolutePath(), String.format("mods%snicephore", File.separator)),
-            REFERENCES_JSON = new File(DESTINATION, String.format("%sreferences.json", File.separator));
+            REFERENCES_JSON = new File(DESTINATION, String.format("%sreferences.json", File.separator)),
+            OXIPNG_ZIP = new File(DESTINATION, String.format("%soxipng.zip", File.separator)),
+            ECT_ZIP = new File(DESTINATION, String.format("%sect.zip", File.separator));
+
     public InitThread(boolean optimiseConfig) {
         this.optimiseConfig = optimiseConfig;
     }
@@ -61,12 +61,12 @@ public final class InitThread extends Thread {
                         if (response.isPresent()) {
                             if (!Reference.Version.OXIPNG.equals(response.get().oxipng_version)) {
                                 Reference.Version.OXIPNG = response.get().oxipng_version;
-                                downloadAndExtract(response.get().oxipng);
+                                downloadAndExtract(response.get().oxipng, OXIPNG_ZIP);
                             }
 
                             if (!Reference.Version.ECT.equals(response.get().ect_version)) {
                                 Reference.Version.ECT = response.get().ect_version;
-                                downloadAndExtract(response.get().ect);
+                                downloadAndExtract(response.get().ect, ECT_ZIP);
                             }
                         }
                     } catch (final IOException e) {
@@ -80,35 +80,55 @@ public final class InitThread extends Thread {
         }
     }
 
-    private static void downloadAndExtract(String urlString){
+    private static void downloadAndExtract(String url, final File zip){
+        try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream()); FileOutputStream fileOutputStream = new FileOutputStream(zip)) {
+            byte dataBuffer[] = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                fileOutputStream.write(dataBuffer, 0, bytesRead);
+            }
 
-        URL url = null;
-        String filename = "";
+            unzip(zip.getAbsolutePath(), DESTINATION.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private static void unzip(String zipFilePath, String destDir) {
+        final File dir = new File(destDir);
+        // create output directory if it doesn't exist
+        if (!dir.exists()) dir.mkdirs();
+        final FileInputStream fis;
+        //buffer for read and write data to file
+        byte[] buffer = new byte[1024];
         try {
-            url = new URL(urlString);
-            filename = Paths.get(url.getPath()).getFileName().toString();
+            fis = new FileInputStream(zipFilePath);
+            ZipInputStream zis = new ZipInputStream(fis);
+            ZipEntry ze = zis.getNextEntry();
+            while(ze != null){
+                String fileName = ze.getName();
+                File newFile = new File(destDir + File.separator + fileName);
+                System.out.println("Unzipping to "+newFile.getAbsolutePath());
+                //create directories for sub directories in zip
+                new File(newFile.getParent()).mkdirs();
+                final FileOutputStream fos = new FileOutputStream(newFile);
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+                fos.close();
+                //close this ZipEntry
+                zis.closeEntry();
+                ze = zis.getNextEntry();
+            }
+            //close last ZipEntry
+            zis.closeEntry();
+            zis.close();
+            fis.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        final File zip = new File(DESTINATION, String.format("%s%s", File.separator, filename));
-
-        if (!filename.isEmpty()) {
-            try (BufferedInputStream in = new BufferedInputStream(url.openStream()); FileOutputStream fileOutputStream = new FileOutputStream(zip)) {
-                byte dataBuffer[] = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                    fileOutputStream.write(dataBuffer, 0, bytesRead);
-                }
-
-                Archiver archiver = ArchiverFactory.createArchiver(zip);
-                archiver.extract(zip, DESTINATION);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private Optional<Response> getResponse(final JsonReader reader) {
@@ -142,8 +162,8 @@ public final class InitThread extends Thread {
             Reference.Version.OXIPNG = response.get().oxipng_version;
             Reference.Version.ECT = response.get().ect_version;
 
-            downloadAndExtract(response.get().oxipng);
-            downloadAndExtract(response.get().ect);
+            downloadAndExtract(response.get().oxipng, OXIPNG_ZIP);
+            downloadAndExtract(response.get().ect, ECT_ZIP);
         } catch (IOException e) {
             e.printStackTrace();
         }
