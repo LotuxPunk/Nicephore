@@ -54,12 +54,8 @@ public class ScreenshotScreen extends Screen {
         aspectRatio = 1.7777F;
 
         if (!screenshots.isEmpty()) {
-//            closeScreen("nicephore.screenshots.empty");
-//            return;
-
-            BufferedImage bimg = null;
             try {
-                bimg = ImageIO.read(screenshots.get(index));
+                BufferedImage bimg = ImageIO.read(screenshots.get(index));
                 final int width = bimg.getWidth();
                 final int height = bimg.getHeight();
                 bimg.getGraphics().dispose();
@@ -116,12 +112,14 @@ public class ScreenshotScreen extends Screen {
             return;
         }
 
-        //textureManager.bindForSetup(SCREENSHOT_TEXTURE);
-        RenderSystem.setShaderTexture(0, SCREENSHOT_TEXTURE);
-        blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
+        final File currentScreenshot = screenshots.get(index);
+        if (currentScreenshot.exists()){
+            RenderSystem.setShaderTexture(0, SCREENSHOT_TEXTURE);
+            blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
 
-        drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
-        drawCenteredString(matrixStack, Minecraft.getInstance().font, new TextComponent(MessageFormat.format("{0} ({1})", screenshots.get(index).getName(), getFileSizeMegaBytes(screenshots.get(index)))).getContents(), centerX, 35, Color.WHITE.getRGB());
+            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
+            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TextComponent(MessageFormat.format("{0} ({1})", currentScreenshot.getName(), getFileSizeMegaBytes(currentScreenshot))).getContents(), centerX, 35, Color.WHITE.getRGB());
+        }
     }
 
     private void modIndex(int value){
