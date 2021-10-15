@@ -1,6 +1,6 @@
 package com.vandendaelen.nicephore.config;
 
-import com.vandendaelen.nicephore.utils.ScreenshotFilter;
+import com.vandendaelen.nicephore.enums.ScreenshotFilter;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,9 +37,13 @@ public final class NicephoreConfig {
                     .comment("Automatically put newly made screenshots into your clipboard")
                     .define("screenshotToClipboard", true);
 
+            builder.push("GUI-specific settings");
+
             screenshotFilter = builder
                     .comment("Only show the PNG, JPEG or JPEG/PNG on the screenshot GUI")
                     .defineEnum("screenshotFilter", ScreenshotFilter.BOTH);
+
+            builder.pop();
 
             builder.push("JPEG-specific settings");
 

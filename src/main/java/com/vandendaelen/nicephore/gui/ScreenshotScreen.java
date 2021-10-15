@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
-import com.vandendaelen.nicephore.utils.ScreenshotFilter;
+import com.vandendaelen.nicephore.enums.ScreenshotFilter;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
