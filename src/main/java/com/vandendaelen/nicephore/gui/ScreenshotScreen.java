@@ -41,6 +41,11 @@ public class ScreenshotScreen extends Screen {
 
     public ScreenshotScreen() {
         super(TITLE);
+        index = getIndex();
+    }
+    public ScreenshotScreen(int index) {
+        super(TITLE);
+        this.index = index;
     }
 
     @Override

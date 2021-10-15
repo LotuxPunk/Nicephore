@@ -20,7 +20,7 @@
   "nicephore.gui.delete.no": "Hayır",
   "nicephore.screenshots.empty": "Ekran görüntüleri klasörü boş.",
   "nicephore.keybinds.copy": "Son ekran görüntüsünü kopyala.",
-  "nicephore.keybinds.gui": "Ekran görüntüleri arayüzünü aç.",
+  "nicephore.keybinds.screenshots.gui": "Ekran görüntüleri arayüzünü aç.",
   "nicephore.screenshot.deleted.success": "%s başarılı bir şekilde silindi.",
   "nicephore.screenshot.deleted.error": "%s silinirken hata oluştu.",
   "nicephore.keybinds.category": "Nicephore",

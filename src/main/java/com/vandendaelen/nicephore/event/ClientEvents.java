@@ -1,6 +1,7 @@
 package com.vandendaelen.nicephore.event;
 
 import com.vandendaelen.nicephore.Nicephore;
+import com.vandendaelen.nicephore.gui.GalleryScreen;
 import com.vandendaelen.nicephore.gui.ScreenshotScreen;
 import com.vandendaelen.nicephore.thread.JPEGThread;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
@@ -25,7 +26,8 @@ import java.io.IOException;
 @EventBusSubscriber(value = Dist.CLIENT, modid = Nicephore.MODID)
 public final class ClientEvents {
     public static KeyMapping COPY_KEY;
-    public static KeyMapping GUI_KEY;
+    public static KeyMapping GUI_SCREENSHOT_KEY;
+    public static KeyMapping GUI_GALLERY_KEY;
 
     static InputConstants.Key getKey(final int key) {
         return InputConstants.Type.KEYSYM.getOrCreate(key);
@@ -34,8 +36,10 @@ public final class ClientEvents {
     public static void init() {
         COPY_KEY = new KeyMapping(Nicephore.MODID + ".keybinds.copy", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_C), Nicephore.MOD_NAME);
         ClientRegistry.registerKeyBinding(COPY_KEY);
-        GUI_KEY = new KeyMapping(Nicephore.MODID + ".keybinds.gui", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_G), Nicephore.MOD_NAME);
-        ClientRegistry.registerKeyBinding(GUI_KEY);
+        GUI_SCREENSHOT_KEY = new KeyMapping(Nicephore.MODID + ".keybinds.screenshots.gui", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_S), Nicephore.MOD_NAME);
+        ClientRegistry.registerKeyBinding(GUI_SCREENSHOT_KEY);
+        GUI_GALLERY_KEY = new KeyMapping(Nicephore.MODID + ".keybinds.gallery.gui", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_G), Nicephore.MOD_NAME);
+        ClientRegistry.registerKeyBinding(GUI_GALLERY_KEY);
     }
 
     @SubscribeEvent
@@ -51,9 +55,18 @@ public final class ClientEvents {
             }
         }
 
-        if (GUI_KEY.consumeClick()){
+        if (GUI_SCREENSHOT_KEY.consumeClick()){
             if (ScreenshotScreen.canBeShow()){
                 Minecraft.getInstance().setScreen(new ScreenshotScreen());
+            }
+            else {
+                PlayerHelper.sendHotbarMessage(new TranslatableComponent("nicephore.screenshots.empty"));
+            }
+        }
+
+        if (GUI_GALLERY_KEY.consumeClick()){
+            if (GalleryScreen.canBeShow()){
+                Minecraft.getInstance().setScreen(new GalleryScreen());
             }
             else {
                 PlayerHelper.sendHotbarMessage(new TranslatableComponent("nicephore.screenshots.empty"));
