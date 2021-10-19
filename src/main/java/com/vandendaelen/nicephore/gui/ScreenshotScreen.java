@@ -36,12 +36,11 @@ public class ScreenshotScreen extends Screen {
     private static final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
     private static ResourceLocation SCREENSHOT_TEXTURE;
     private ArrayList<File> screenshots;
-    private static int index;
+    private int index;
     private float aspectRatio;
 
     public ScreenshotScreen() {
         super(TITLE);
-        index = getIndex();
     }
     public ScreenshotScreen(int index) {
         super(TITLE);
@@ -53,8 +52,8 @@ public class ScreenshotScreen extends Screen {
         super.init();
 
         FilenameFilter filter = NicephoreConfig.Client.getScreenshotFilter().getPredicate();
-
         screenshots = (ArrayList<File>) Arrays.stream(SCREENSHOTS_DIR.listFiles(filter)).sorted(Comparator.comparingLong(File::lastModified).reversed()).collect(Collectors.toList());
+
         index = getIndex();
         aspectRatio = 1.7777F;
 

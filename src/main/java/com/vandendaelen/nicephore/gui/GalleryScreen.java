@@ -34,7 +34,7 @@ public class GalleryScreen extends Screen {
     private static ArrayList<ResourceLocation> SCREENSHOT_TEXTURES = new ArrayList<>();
     private ArrayList<File> screenshots;
     private ArrayList<List<File>> pagesOfScreenshots;
-    private static int index;
+    private int index;
     private float aspectRatio;
 
     private static final int ROW = 2;
