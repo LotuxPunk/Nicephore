@@ -8,6 +8,7 @@ import com.vandendaelen.nicephore.utils.Reference;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.chat.ClickEvent;
 
@@ -94,27 +95,32 @@ public final class JPEGThread extends Thread {
             }
 
             CopyImageToClipBoard.setLastScreenshot(screenshot);
-            if (NicephoreConfig.Client.getScreenshotToClipboard()){
-                new CopyImageToClipBoard().copyLastScreenshot();
-                PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.success"));
+
+            if (NicephoreConfig.Client.getScreenshotCustomMessage()){
+
+                if (NicephoreConfig.Client.getScreenshotToClipboard()){
+                    new CopyImageToClipBoard().copyLastScreenshot();
+                    PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.success").withStyle(ChatFormatting.GREEN));
+                }
+
+                final Component pngComponent = (new TranslatableComponent("nicephore.screenshot.png")).withStyle(ChatFormatting.UNDERLINE).withStyle((style)
+                        -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath())));
+
+                final Component jpgComponent = (new TranslatableComponent("nicephore.screenshot.jpg")).withStyle(ChatFormatting.UNDERLINE).withStyle((style)
+                        -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpegFile.getAbsolutePath())));
+
+                final Component folderComponent = (new TranslatableComponent("nicephore.screenshot.folder")).withStyle(ChatFormatting.UNDERLINE).withStyle((style)
+                        -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));
+
+                PlayerHelper.sendMessage(new TranslatableComponent("nicephore.screenshot.success", screenshot.getName().replace(".png", "")));
+
+                if (NicephoreConfig.Client.getJPEGToggle()) {
+                    PlayerHelper.sendMessage(new TranslatableComponent("nicephore.screenshot.options", pngComponent, jpgComponent, folderComponent));
+                } else {
+                    PlayerHelper.sendMessage(new TranslatableComponent("nicephore.screenshot.reducedOptions", pngComponent, folderComponent));
+                }
             }
 
-            final Component pngComponent = (new TranslatableComponent("nicephore.screenshot.png")).withStyle(ChatFormatting.UNDERLINE).withStyle((style)
-                    -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath())));
-
-            final Component jpgComponent = (new TranslatableComponent("nicephore.screenshot.jpg")).withStyle(ChatFormatting.UNDERLINE).withStyle((style)
-                    -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpegFile.getAbsolutePath())));
-
-            final Component folderComponent = (new TranslatableComponent("nicephore.screenshot.folder")).withStyle(ChatFormatting.UNDERLINE).withStyle((style)
-                    -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));
-
-            PlayerHelper.sendMessage(new TranslatableComponent("nicephore.screenshot.success", screenshot.getName().replace(".png", "")));
-
-            if (NicephoreConfig.Client.getJPEGToggle()) {
-                PlayerHelper.sendMessage(new TranslatableComponent("nicephore.screenshot.options", pngComponent, jpgComponent, folderComponent));
-            } else {
-                PlayerHelper.sendMessage(new TranslatableComponent("nicephore.screenshot.reducedOptions", pngComponent, folderComponent));
-            }
         } catch (IOException e) {
             Nicephore.LOGGER.error(e.getMessage());
             PlayerHelper.sendMessage(new TranslatableComponent("nicephore.screenshot.error"));

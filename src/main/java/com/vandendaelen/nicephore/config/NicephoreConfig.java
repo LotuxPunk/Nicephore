@@ -17,7 +17,7 @@ public final class NicephoreConfig {
 
     public static class Client {
         public final ForgeConfigSpec.DoubleValue compression;
-        public final ForgeConfigSpec.BooleanValue makeJPEGs, optimisedOutput, showOptimisationStatus, screenshotToClipboard;
+        public final ForgeConfigSpec.BooleanValue makeJPEGs, optimisedOutput, showOptimisationStatus, screenshotToClipboard, screenshotCustomMessage;
         public final ForgeConfigSpec.IntValue pngOptimisationLevel;
         public final ForgeConfigSpec.EnumValue<ScreenshotFilter> screenshotFilter;
 
@@ -36,6 +36,10 @@ public final class NicephoreConfig {
             screenshotToClipboard = builder
                     .comment("Automatically put newly made screenshots into your clipboard")
                     .define("screenshotToClipboard", true);
+
+            screenshotCustomMessage = builder
+                    .comment("Display a custom message when a screenshot is made.", "This message show some option to open directly the different screenshots made or the folder.")
+                    .define("screenshotCustomMessage", true);
 
             builder.push("GUI-specific settings");
 
@@ -72,6 +76,7 @@ public final class NicephoreConfig {
         public static boolean getOptimisedOutputToggle() { return CLIENT.optimisedOutput.get(); }
         public static boolean getShouldShowOptStatus() { return CLIENT.showOptimisationStatus.get(); }
         public static boolean getScreenshotToClipboard() { return CLIENT.screenshotToClipboard.get(); }
+        public static boolean getScreenshotCustomMessage() { return CLIENT.screenshotCustomMessage.get(); }
         public static byte getPNGOptimisationLevel() { return CLIENT.pngOptimisationLevel.get().byteValue(); }
         public static ScreenshotFilter getScreenshotFilter() { return CLIENT.screenshotFilter.get(); }
         public static void setScreenshotFilter(ScreenshotFilter filter) { CLIENT.screenshotFilter.set(filter); }

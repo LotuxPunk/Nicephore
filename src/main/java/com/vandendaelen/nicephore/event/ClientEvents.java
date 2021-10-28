@@ -1,6 +1,7 @@
 package com.vandendaelen.nicephore.event;
 
 import com.vandendaelen.nicephore.Nicephore;
+import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.gui.GalleryScreen;
 import com.vandendaelen.nicephore.gui.ScreenshotScreen;
 import com.vandendaelen.nicephore.thread.JPEGThread;
@@ -78,7 +79,10 @@ public final class ClientEvents {
     public static void onScreenshot(ScreenshotEvent event) {
         final JPEGThread thread = new JPEGThread(event.getImage(), event.getScreenshotFile());
         thread.start();
-        event.setResultMessage(new TextComponent(""));
+
+        if (NicephoreConfig.Client.getScreenshotCustomMessage()) {
+            event.setResultMessage(new TextComponent(""));
+        }
     }
 
 }
