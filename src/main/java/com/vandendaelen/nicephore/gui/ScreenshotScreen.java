@@ -38,13 +38,20 @@ public class ScreenshotScreen extends Screen {
     private ArrayList<File> screenshots;
     private int index;
     private float aspectRatio;
+    private final int galleryScreenPage;
 
-    public ScreenshotScreen() {
-        super(TITLE);
-    }
-    public ScreenshotScreen(int index) {
+    public ScreenshotScreen(int index, int galleryScreenPage) {
         super(TITLE);
         this.index = index;
+        this.galleryScreenPage = galleryScreenPage;
+    }
+
+    public ScreenshotScreen(int index) {
+        this(index, -1);
+    }
+
+    public ScreenshotScreen() {
+        this(0, -1);
     }
 
     @Override
@@ -143,7 +150,7 @@ public class ScreenshotScreen extends Screen {
     }
 
     private void deleteScreenshot(File file){
-        Minecraft.getInstance().setScreen(new DeleteConfirmScreen(file));
+        Minecraft.getInstance().pushGuiLayer(new DeleteConfirmScreen(file, galleryScreenPage > -1 ? new GalleryScreen(this.galleryScreenPage) : new ScreenshotScreen(index)));
     }
 
     private int getIndex(){

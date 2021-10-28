@@ -13,10 +13,12 @@ import java.io.File;
 public class DeleteConfirmScreen extends Screen {
 
     private final File file;
+    private final Screen instanceToOpenIfDeleted;
 
-    protected DeleteConfirmScreen(File file) {
+    protected DeleteConfirmScreen(File file, Screen instanceToOpenIfDeleted) {
         super(new TranslatableComponent(  "nicephore.gui.delete"));
         this.file = file;
+        this.instanceToOpenIfDeleted = instanceToOpenIfDeleted;
     }
 
     @Override
@@ -26,10 +28,16 @@ public class DeleteConfirmScreen extends Screen {
         this.clearWidgets();
         this.addRenderableWidget(new Button(this.width / 2 - 35, this.height / 2 + 30, 30, 20, new TranslatableComponent("nicephore.gui.delete.yes"), button -> {
             deleteScreenshot();
-            Minecraft.getInstance().setScreen(new ScreenshotScreen());
+
+            if (instanceToOpenIfDeleted != null){
+                Minecraft.getInstance().setScreen(instanceToOpenIfDeleted);
+            }
+            else {
+                onClose();
+            }
         }));
         this.addRenderableWidget(new Button(this.width / 2 + 5, this.height / 2 + 30, 30, 20, new TranslatableComponent("nicephore.gui.delete.no"), button -> {
-            Minecraft.getInstance().setScreen(new ScreenshotScreen());
+            onClose();
         }));
 
     }

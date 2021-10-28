@@ -41,8 +41,13 @@ public class GalleryScreen extends Screen {
     private static final int COLUMN = 4;
     private static final int IMAGES_TO_DISPLAY = ROW * COLUMN;
 
-    public GalleryScreen() {
+    public GalleryScreen(int index) {
         super(TITLE);
+        this.index = index;
+    }
+
+    public GalleryScreen(){
+        this(0);
     }
 
     @Override
@@ -173,7 +178,7 @@ public class GalleryScreen extends Screen {
     }
 
     private void openScreenshotScreen(int value){
-        Minecraft.getInstance().pushGuiLayer(new ScreenshotScreen(value));
+        Minecraft.getInstance().pushGuiLayer(new ScreenshotScreen(value, index));
     }
 
     private int getIndex(){
