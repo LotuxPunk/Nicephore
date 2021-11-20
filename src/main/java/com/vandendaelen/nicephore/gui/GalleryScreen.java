@@ -105,7 +105,7 @@ public class GalleryScreen extends Screen {
 
         if (!screenshots.isEmpty()) {
             this.addRenderableWidget(new Button(this.width / 2 - 80, this.height / 2 + 100, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
-            this.addRenderableWidget(new Button(this.width / 2 + 50, this.height / 2 + 100, 20, 20, new TextComponent(">"), button -> modIndex(1)));
+            this.addRenderableWidget(new Button(this.width / 2 + 60, this.height / 2 + 100, 20, 20, new TextComponent(">"), button -> modIndex(1)));
         }
 
         if (pagesOfScreenshots.isEmpty()){
@@ -133,7 +133,7 @@ public class GalleryScreen extends Screen {
                 this.addRenderableWidget(new Button(x, y + 5 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
             });
 
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, this.height / 2 + 85, Color.WHITE.getRGB());
+            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, this.height / 2 + 105, Color.WHITE.getRGB());
         }
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }

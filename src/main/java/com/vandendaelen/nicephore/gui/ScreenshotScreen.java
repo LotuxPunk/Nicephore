@@ -106,8 +106,8 @@ public class ScreenshotScreen extends Screen {
 
         if (!screenshots.isEmpty()) {
             this.addRenderableWidget(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
-            this.addRenderableWidget(new Button(this.width / 2 + 50, this.height / 2 + 75, 20, 20, new TextComponent(">"), button -> modIndex(1)));
-            this.addRenderableWidget(new Button(this.width / 2 - 55, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.copy"), button -> {
+            this.addRenderableWidget(new Button(this.width / 2 + 60, this.height / 2 + 75, 20, 20, new TextComponent(">"), button -> modIndex(1)));
+            this.addRenderableWidget(new Button(this.width / 2 - 52, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.copy"), button -> {
                 final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
                 try {
                     imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
@@ -115,7 +115,7 @@ public class ScreenshotScreen extends Screen {
                     e.printStackTrace();
                 }
             }));
-            this.addRenderableWidget(new Button(this.width / 2 - 5, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.delete"), button -> deleteScreenshot(screenshots.get(index))));
+            this.addRenderableWidget(new Button(this.width / 2 + 3, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.delete"), button -> deleteScreenshot(screenshots.get(index))));
         }
 
         if (screenshots.isEmpty()){
