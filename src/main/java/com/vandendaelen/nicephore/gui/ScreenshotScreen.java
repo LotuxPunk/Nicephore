@@ -102,6 +102,7 @@ public class ScreenshotScreen extends Screen {
 
         this.clearWidgets();
         this.addRenderableWidget(new Button(10, 10, 100, 20, new TranslatableComponent("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name()), button -> changeFilter()));
+        this.addRenderableWidget(new Button(this.width - 60, 10, 50, 20, new TranslatableComponent("nicephore.screenshot.exit"), button -> onClose()));
 
         if (!screenshots.isEmpty()) {
             this.addRenderableWidget(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
