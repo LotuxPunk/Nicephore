@@ -9,10 +9,15 @@ import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.FormattedCharSink;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
@@ -21,9 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,7 @@ public class GalleryScreen extends Screen {
     private ArrayList<List<File>> pagesOfScreenshots;
     private int index;
     private float aspectRatio;
+    private boolean dirty;
 
     private static final int ROW = 2;
     private static final int COLUMN = 4;
@@ -44,6 +48,7 @@ public class GalleryScreen extends Screen {
     public GalleryScreen(int index) {
         super(TITLE);
         this.index = index;
+        this.dirty = true;
     }
 
     public GalleryScreen(){
@@ -91,6 +96,8 @@ public class GalleryScreen extends Screen {
             this.addRenderableWidget(new Button(this.width / 2 - 80, this.height / 2 + 100, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
             this.addRenderableWidget(new Button(this.width / 2 + 50, this.height / 2 + 100, 20, 20, new TextComponent(">"), button -> modIndex(1)));
         }
+
+        //this.addRenderableWidget(new ClientTextTooltip(new TextComponent("test").getVisualOrderText()))
     }
     private void changeFilter(){
         ScreenshotFilter nextFilter = NicephoreConfig.Client.getScreenshotFilter().next();
@@ -121,43 +128,56 @@ public class GalleryScreen extends Screen {
 
                 RenderSystem.setShaderTexture(0, TEXTURE);
 
+                int x = 0, y = 0;
+
                 switch (imageIndex) {
                     case 0 -> {
-                        blit(matrixStack, centerX - 15 - 2 * imageWidth, 50, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                        this.addRenderableWidget(new Button(centerX - 15 - 2 * imageWidth, 55 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                        x = centerX - 15 - 2 * imageWidth;
+                        y = 50;
                     }
                     case 1 -> {
-                        blit(matrixStack, centerX - 5 - imageWidth, 50, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                        this.addRenderableWidget(new Button(centerX - 5 - imageWidth, 55 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                        x = centerX - 5 - imageWidth;
+                        y = 50;
                     }
                     case 2 -> {
-                        blit(matrixStack, centerX + 5, 50, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                        this.addRenderableWidget(new Button(centerX + 5, 55 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                        x = centerX + 5;
+                        y = 50;
                     }
                     case 3 -> {
-                        blit(matrixStack, centerX + 15 + imageWidth, 50, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                        this.addRenderableWidget(new Button(centerX + 15 + imageWidth, 55 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                        x = centerX + 15 + imageWidth;
+                        y = 50;
                     }
                     case 4 -> {
-                        blit(matrixStack, centerX - 15 - 2 * imageWidth, imageHeight + 80, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                        this.addRenderableWidget(new Button(centerX - 15 - 2 * imageWidth, 2 * imageHeight + 85, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                        x = centerX - 15 - 2 * imageWidth;
+                        y = imageHeight + 80;
                     }
                     case 5 -> {
-                        blit(matrixStack, centerX - 5 - imageWidth, imageHeight + 80, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                        this.addRenderableWidget(new Button(centerX - 5 - imageWidth, 2 * imageHeight + 85, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                        x = centerX - 5 - imageWidth;
+                        y = imageHeight + 80;
                     }
                     case 6 -> {
-                        blit(matrixStack, centerX + 5, imageHeight + 80, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                        this.addRenderableWidget(new Button(centerX + 5, 2 * imageHeight + 85, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                        x = centerX + 5;
+                        y = imageHeight + 80;
                     }
                     case 7 -> {
-                        blit(matrixStack, centerX + 15 + imageWidth, imageHeight + 80, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                        this.addRenderableWidget(new Button(centerX + 15 + imageWidth, 2 * imageHeight + 85, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                        x = centerX + 15 + imageWidth;
+                        y = imageHeight + 80;
                     }
                 }
+
+                blit(matrixStack, x, y, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+                drawExtensionBadge(matrixStack, FilenameUtils.getExtension(name), x - 10, y + 14);
+                this.addRenderableWidget(new Button(x, y + 5 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
             });
 
             drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, this.height / 2 + 85, Color.WHITE.getRGB());
+        }
+    }
+
+    private void drawExtensionBadge(PoseStack matrixStack, String extension, int x, int y) {
+        if (NicephoreConfig.Client.getScreenshotFilter() == ScreenshotFilter.BOTH){
+            drawString(matrixStack, Minecraft.getInstance().font, extension.toUpperCase(), x + 12, y - 12, Color.WHITE.getRGB());
+            //renderTooltip(matrixStack, new TextComponent(extension.toUpperCase()), x, y);
         }
     }
 
@@ -174,6 +194,7 @@ public class GalleryScreen extends Screen {
                 index = 0;
             }
         }
+        dirty = true;
         init();
     }
 
