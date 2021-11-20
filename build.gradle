@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.x-1.4.1'
+version = '1.16.x-1.5.0'
 group = 'com.vandendaelen.nicephore' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'nicephore'
 
@@ -96,7 +96,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.0.48'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.16'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
