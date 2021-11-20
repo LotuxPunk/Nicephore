@@ -95,22 +95,31 @@ public final class JPEGThread extends Thread {
 
             CopyImageToClipBoard.setLastScreenshot(screenshot);
 
-            final ITextComponent pngComponent = (new TranslationTextComponent("nicephore.screenshot.png")).withStyle(TextFormatting.UNDERLINE).withStyle((style)
-                    -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath())));
+            if (NicephoreConfig.Client.getScreenshotCustomMessage()){
 
-            final ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).withStyle(TextFormatting.UNDERLINE).withStyle((style)
-                    -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpegFile.getAbsolutePath())));
+                if (NicephoreConfig.Client.getScreenshotToClipboard()){
+                    new CopyImageToClipBoard().copyLastScreenshot();
+                    PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.clipboard.success").withStyle(TextFormatting.GREEN));
+                }
 
-            final ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).withStyle(TextFormatting.UNDERLINE).withStyle((style)
-                    -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));
+                final ITextComponent pngComponent = (new TranslationTextComponent("nicephore.screenshot.png")).withStyle(TextFormatting.UNDERLINE).withStyle((style)
+                        -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getAbsolutePath())));
 
-            PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", screenshot.getName().replace(".png", "")));
+                final ITextComponent jpgComponent = (new TranslationTextComponent("nicephore.screenshot.jpg")).withStyle(TextFormatting.UNDERLINE).withStyle((style)
+                        -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, jpegFile.getAbsolutePath())));
 
-            if (NicephoreConfig.Client.getJPEGToggle()) {
-                PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.options", pngComponent, jpgComponent, folderComponent));
-            } else {
-                PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.reducedOptions", pngComponent, folderComponent));
+                final ITextComponent folderComponent = (new TranslationTextComponent("nicephore.screenshot.folder")).withStyle(TextFormatting.UNDERLINE).withStyle((style)
+                        -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.getParent())));
+
+                PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.success", screenshot.getName().replace(".png", "")));
+
+                if (NicephoreConfig.Client.getJPEGToggle()) {
+                    PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.options", pngComponent, jpgComponent, folderComponent));
+                } else {
+                    PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.reducedOptions", pngComponent, folderComponent));
+                }
             }
+
         } catch (IOException e) {
             Nicephore.LOGGER.error(e.getMessage());
             PlayerHelper.sendMessage(new TranslationTextComponent("nicephore.screenshot.error"));

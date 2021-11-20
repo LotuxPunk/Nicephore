@@ -1,13 +1,15 @@
 package com.vandendaelen.nicephore.utils;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.util.ResourceLocation;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Util {
     public enum OS {
@@ -33,13 +35,25 @@ public class Util {
         return os;
     }
 
-    public static ResourceLocation fileToTexture(File file) {
+    public static DynamicTexture fileToTexture(File file) {
         NativeImage nativeImage = null;
         try {
-            nativeImage = NativeImage.read(new FileInputStream(file));
+            InputStream is = new FileInputStream(file);
+            nativeImage = NativeImage.read(is);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return Minecraft.getInstance().getTextureManager().register("file_" + System.currentTimeMillis(), new DynamicTexture(nativeImage));
+        return new DynamicTexture(nativeImage);
+    }
+
+    public static <T> Stream<List<T>> batches(List<T> source, int length) {
+        if (length <= 0)
+            throw new IllegalArgumentException("length = " + length);
+        int size = source.size();
+        if (size <= 0)
+            return Stream.empty();
+        int fullChunks = (size - 1) / length;
+        return IntStream.range(0, fullChunks + 1).mapToObj(
+                n -> source.subList(n * length, n == fullChunks ? size : (n + 1) * length));
     }
 }

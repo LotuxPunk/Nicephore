@@ -149,7 +149,7 @@ public final class InitThread extends Thread {
         return new JsonReader(new FileReader(file));
     }
 
-    private final void freshInstall() {
+    private void freshInstall() {
         try {
             Files.createDirectory(DESTINATION.toPath());
             final Optional<Response> response = getResponse(getJsonReader(Reference.DOWNLOADS_URLS, REFERENCES_JSON));

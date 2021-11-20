@@ -17,18 +17,12 @@ public final class NicephoreConfig {
 
     public static class Client {
         public final ForgeConfigSpec.DoubleValue compression;
-        public final ForgeConfigSpec.BooleanValue makeJPEGs, optimisedOutput, showOptimisationStatus;
+        public final ForgeConfigSpec.BooleanValue makeJPEGs, optimisedOutput, showOptimisationStatus, screenshotToClipboard, screenshotCustomMessage;
         public final ForgeConfigSpec.IntValue pngOptimisationLevel;
         public final ForgeConfigSpec.EnumValue<ScreenshotFilter> screenshotFilter;
 
         public Client(ForgeConfigSpec.Builder builder) {
             builder.push("Client settings");
-            compression = builder
-                    .comment("JPEG compression level, the higher the number, the better the quality.", "Note that 1.0 is *not* lossless as JPEG is a lossy-only format, use the PNG files instead if you want lossless.")
-                    .defineInRange("compression", 0.9, 0.0,1.0);
-            makeJPEGs = builder
-                    .comment("Enable to allow Nicephore to make lossy JPEGs of your screenshots for easier online sharing. Disable to only allow PNGs.", "Note that PNGs will still be made regardless of this option.")
-                    .define("makeJPEGs", true);
 
             optimisedOutput = builder
                     .comment("Enable to allow Nicephore to losslessly optimise the PNG and JPEG screenshots for smaller sized progressive files that are of identical quality to the files before optimisation.", "Note: Enabling this will cause screenshots to take slightly longer to save as an optimisation step will have to be run first.", "Tip: In the rare case that a screenshot PNG is corrupted, run \"oxipng --fix (filename).png\" to attempt to fix it.")
@@ -39,9 +33,33 @@ public final class NicephoreConfig {
                     .comment("If enabled, a message will appear above your hotbar telling you that has optimisation started and another when finished. Useful for very slow computers.")
                     .define("showOptimisationStatus", true);
 
+            screenshotToClipboard = builder
+                    .comment("Automatically put newly made screenshots into your clipboard")
+                    .define("screenshotToClipboard", true);
+
+            screenshotCustomMessage = builder
+                    .comment("Display a custom message when a screenshot is made.", "This message show some option to open directly the different screenshots made or the folder.")
+                    .define("screenshotCustomMessage", true);
+
+            builder.push("GUI-specific settings");
+
             screenshotFilter = builder
                     .comment("Only show the PNG, JPEG or JPEG/PNG on the screenshot GUI")
                     .defineEnum("screenshotFilter", ScreenshotFilter.BOTH);
+
+            builder.pop();
+
+            builder.push("JPEG-specific settings");
+
+            compression = builder
+                    .comment("JPEG compression level, the higher the number, the better the quality.", "Note that 1.0 is *not* lossless as JPEG is a lossy-only format, use the PNG files instead if you want lossless.")
+                    .defineInRange("compression", 0.9, 0.0,1.0);
+
+            makeJPEGs = builder
+                    .comment("Enable to allow Nicephore to make lossy JPEGs of your screenshots for easier online sharing. Disable to only allow PNGs.", "Note that PNGs will still be made regardless of this option.")
+                    .define("makeJPEGs", Util.getOS().equals(Util.OS.WINDOWS));
+
+            builder.pop();
 
             builder.push("PNG-specific settings");
             pngOptimisationLevel = builder
@@ -57,6 +75,8 @@ public final class NicephoreConfig {
         public static boolean getJPEGToggle() { return CLIENT.makeJPEGs.get(); }
         public static boolean getOptimisedOutputToggle() { return CLIENT.optimisedOutput.get(); }
         public static boolean getShouldShowOptStatus() { return CLIENT.showOptimisationStatus.get(); }
+        public static boolean getScreenshotToClipboard() { return CLIENT.screenshotToClipboard.get(); }
+        public static boolean getScreenshotCustomMessage() { return CLIENT.screenshotCustomMessage.get(); }
         public static byte getPNGOptimisationLevel() { return CLIENT.pngOptimisationLevel.get().byteValue(); }
         public static ScreenshotFilter getScreenshotFilter() { return CLIENT.screenshotFilter.get(); }
         public static void setScreenshotFilter(ScreenshotFilter filter) { CLIENT.screenshotFilter.set(filter); }
