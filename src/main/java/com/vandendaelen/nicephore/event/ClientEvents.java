@@ -1,5 +1,6 @@
 package com.vandendaelen.nicephore.event;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.vandendaelen.nicephore.Nicephore;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.gui.GalleryScreen;
@@ -7,19 +8,18 @@ import com.vandendaelen.nicephore.gui.ScreenshotScreen;
 import com.vandendaelen.nicephore.thread.JPEGThread;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.KeyMapping;
-import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputUpdateEvent;
+import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ScreenshotEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fmlclient.registry.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public final class ClientEvents {
     }
 
     @SubscribeEvent
-    public static void onKey(final InputUpdateEvent event) {
+    public static void onKey(final InputEvent.KeyInputEvent event) {
         if (COPY_KEY.consumeClick()) {
             final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
             try {
