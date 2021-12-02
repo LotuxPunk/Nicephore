@@ -109,32 +109,33 @@ public class GalleryScreen extends Screen {
         }
 
         if (pagesOfScreenshots.isEmpty()){
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.screenshots.empty"), centerX, 20, Color.RED.getRGB());
-            return;
+            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.screenshots.empty"), centerX, 50, Color.RED.getRGB());
+        }
+        else {
+            final List<File> currentPage = pagesOfScreenshots.get(index);
+            if (currentPage.stream().allMatch(File::exists)){
+                SCREENSHOT_TEXTURES.forEach(TEXTURE -> {
+
+                    final int imageIndex = SCREENSHOT_TEXTURES.indexOf(TEXTURE);
+                    final String name = currentPage.get(imageIndex).getName();
+                    final TextComponent text = new TextComponent(StringUtils.abbreviate(name, 13));
+
+                    int x = centerX - (15 - (imageIndex % 4) * 10) - (2 - (imageIndex % 4)) * imageWidth;
+                    int y = 50 + (imageIndex / 4 * (imageHeight + 30));
+
+                    RenderSystem.setShaderTexture(0, TEXTURE.getId());
+                    RenderSystem.enableBlend();
+                    blit(matrixStack, x, y, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+                    RenderSystem.disableBlend();
+
+                    drawExtensionBadge(matrixStack, FilenameUtils.getExtension(name), x - 10, y + 14);
+                    this.addRenderableWidget(new Button(x, y + 5 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                });
+
+                drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, this.height / 2 + 105, Color.WHITE.getRGB());
+            }
         }
 
-        final List<File> currentPage = pagesOfScreenshots.get(index);
-        if (currentPage.stream().allMatch(File::exists)){
-            SCREENSHOT_TEXTURES.forEach(TEXTURE -> {
-
-                final int imageIndex = SCREENSHOT_TEXTURES.indexOf(TEXTURE);
-                final String name = currentPage.get(imageIndex).getName();
-                final TextComponent text = new TextComponent(StringUtils.abbreviate(name, 13));
-
-                int x = centerX - (15 - (imageIndex % 4) * 10) - (2 - (imageIndex % 4)) * imageWidth;
-                int y = 50 + (imageIndex / 4 * (imageHeight + 30));
-
-                RenderSystem.setShaderTexture(0, TEXTURE.getId());
-                RenderSystem.enableBlend();
-                blit(matrixStack, x, y, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                RenderSystem.disableBlend();
-
-                drawExtensionBadge(matrixStack, FilenameUtils.getExtension(name), x - 10, y + 14);
-                this.addRenderableWidget(new Button(x, y + 5 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
-            });
-
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, this.height / 2 + 105, Color.WHITE.getRGB());
-        }
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 

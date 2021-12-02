@@ -120,19 +120,19 @@ public class ScreenshotScreen extends Screen {
 
         if (screenshots.isEmpty()){
             drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.screenshots.empty"), centerX, 20, Color.RED.getRGB());
-            return;
         }
+        else {
+            final File currentScreenshot = screenshots.get(index);
+            if (currentScreenshot.exists()){
 
-        final File currentScreenshot = screenshots.get(index);
-        if (currentScreenshot.exists()){
+                RenderSystem.setShaderTexture(0, SCREENSHOT_TEXTURE.getId());
+                RenderSystem.enableBlend();
+                blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
+                RenderSystem.disableBlend();
 
-            RenderSystem.setShaderTexture(0, SCREENSHOT_TEXTURE.getId());
-            RenderSystem.enableBlend();
-            blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
-            RenderSystem.disableBlend();
-
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TextComponent(MessageFormat.format("{0} ({1})", currentScreenshot.getName(), getFileSizeMegaBytes(currentScreenshot))).getContents(), centerX, 35, Color.WHITE.getRGB());
+                drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
+                drawCenteredString(matrixStack, Minecraft.getInstance().font, new TextComponent(MessageFormat.format("{0} ({1})", currentScreenshot.getName(), getFileSizeMegaBytes(currentScreenshot))).getContents(), centerX, 35, Color.WHITE.getRGB());
+            }
         }
 
         super.render(matrixStack, mouseX, mouseY, partialTicks);
