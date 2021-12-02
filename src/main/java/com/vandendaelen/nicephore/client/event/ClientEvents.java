@@ -66,7 +66,7 @@ public final class ClientEvents {
         }
 
         if (GUI_GALLERY_KEY.consumeClick()){
-            if (GalleryScreen.canBeShow()){
+            if (GalleryScreen.Companion.canBeShow()){
                 Minecraft.getInstance().setScreen(new GalleryScreen());
             }
             else {
