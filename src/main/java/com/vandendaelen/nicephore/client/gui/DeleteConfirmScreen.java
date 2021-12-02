@@ -1,10 +1,10 @@
-package com.vandendaelen.nicephore.gui;
+package com.vandendaelen.nicephore.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TranslatableComponent;
 
 import java.awt.*;

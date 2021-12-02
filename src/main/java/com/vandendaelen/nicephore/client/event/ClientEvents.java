@@ -1,10 +1,10 @@
-package com.vandendaelen.nicephore.event;
+package com.vandendaelen.nicephore.client.event;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.vandendaelen.nicephore.Nicephore;
+import com.vandendaelen.nicephore.client.gui.GalleryScreen;
+import com.vandendaelen.nicephore.client.gui.ScreenshotScreen;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
-import com.vandendaelen.nicephore.gui.GalleryScreen;
-import com.vandendaelen.nicephore.gui.ScreenshotScreen;
 import com.vandendaelen.nicephore.thread.JPEGThread;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;

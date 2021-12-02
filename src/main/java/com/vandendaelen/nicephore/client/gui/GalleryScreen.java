@@ -1,4 +1,4 @@
-package com.vandendaelen.nicephore.gui;
+package com.vandendaelen.nicephore.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;

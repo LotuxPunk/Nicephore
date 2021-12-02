@@ -1,7 +1,7 @@
 package com.vandendaelen.nicephore;
 
+import com.vandendaelen.nicephore.client.event.ClientEvents;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
-import com.vandendaelen.nicephore.event.ClientEvents;
 import com.vandendaelen.nicephore.thread.InitThread;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
