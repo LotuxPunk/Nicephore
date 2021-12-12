@@ -2,10 +2,15 @@ package com.vandendaelen.nicephore.utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class CopyImageToClipBoard implements ClipboardOwner {
     private static File lastScreenshot = null;
@@ -13,10 +18,15 @@ public class CopyImageToClipBoard implements ClipboardOwner {
     public static void setLastScreenshot(File screenshot){
         lastScreenshot = screenshot;
     }
-    public void copyImage(BufferedImage bi) {
-        final TransferableImage trans = new TransferableImage(bi);
-        final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        c.setContents( trans, this );
+    public void copyImage(BufferedImage bi) throws IOException {
+        if (Objects.equals(System.getProperty("java.awt.headless"), "false")){
+            final TransferableImage trans = new TransferableImage(bi);
+            final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+            c.setContents( trans, this );
+        }
+        else {
+            throw new IOException("Couldn't copy the screenshot");
+        }
     }
 
     public void copyLastScreenshot() throws IOException {

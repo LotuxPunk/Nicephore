@@ -1,16 +1,15 @@
 package com.vandendaelen.nicephore.thread;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.vandendaelen.nicephore.Nicephore;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Reference;
-import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -123,7 +122,7 @@ public final class JPEGThread extends Thread {
 
         } catch (IOException e) {
             Nicephore.LOGGER.error(e.getMessage());
-            PlayerHelper.sendMessage(new TranslatableComponent("nicephore.screenshot.error"));
+            PlayerHelper.sendMessage(new TranslatableComponent("nicephore.screenshot.error").withStyle(ChatFormatting.RED));
         }
     }
 
