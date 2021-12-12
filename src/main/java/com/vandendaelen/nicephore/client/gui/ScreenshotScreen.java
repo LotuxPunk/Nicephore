@@ -16,8 +16,9 @@ import net.minecraft.network.chat.TranslatableComponent;
 import org.apache.commons.io.FileUtils;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 public class ScreenshotScreen extends Screen {
@@ -63,12 +65,17 @@ public class ScreenshotScreen extends Screen {
         aspectRatio = 1.7777F;
 
         if (!screenshots.isEmpty()) {
-            try {
-                BufferedImage bimg = ImageIO.read(screenshots.get(index));
-                final int width = bimg.getWidth();
-                final int height = bimg.getHeight();
-                bimg.getGraphics().dispose();
-                aspectRatio = (float) (width / (double) height);
+            try(ImageInputStream in = ImageIO.createImageInputStream(screenshots.get(index))){
+                final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
+                if (readers.hasNext()) {
+                    ImageReader reader = readers.next();
+                    try {
+                        reader.setInput(in);
+                        aspectRatio = (float)(reader.getWidth(0)/ (float) reader.getHeight(0));
+                    } finally {
+                        reader.dispose();
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
