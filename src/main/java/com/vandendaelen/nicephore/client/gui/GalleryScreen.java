@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.enums.ScreenshotFilter;
+import com.vandendaelen.nicephore.utils.FilterListener;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
@@ -29,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GalleryScreen extends Screen {
+public class GalleryScreen extends Screen implements FilterListener {
     private static final TranslatableComponent TITLE = new TranslatableComponent("nicephore.gui.screenshots");
     private static final File SCREENSHOTS_DIR = new File(Minecraft.getInstance().gameDirectory, "screenshots");
     private static ArrayList<DynamicTexture> SCREENSHOT_TEXTURES = new ArrayList<>();
@@ -70,7 +71,7 @@ public class GalleryScreen extends Screen {
                     ImageReader reader = readers.next();
                     try {
                         reader.setInput(in);
-                        aspectRatio = (float)(reader.getWidth(0)/ (float) reader.getHeight(0));
+                        aspectRatio = reader.getWidth(0)/ (float) reader.getHeight(0);
                     } finally {
                         reader.dispose();
                     }
@@ -91,6 +92,7 @@ public class GalleryScreen extends Screen {
             }
         }
     }
+
     private void changeFilter(){
         ScreenshotFilter nextFilter = NicephoreConfig.Client.getScreenshotFilter().next();
         NicephoreConfig.Client.setScreenshotFilter(nextFilter);
@@ -168,7 +170,7 @@ public class GalleryScreen extends Screen {
     }
 
     private void openScreenshotScreen(int value){
-        Minecraft.getInstance().pushGuiLayer(new ScreenshotScreen(value, index));
+        Minecraft.getInstance().pushGuiLayer(new ScreenshotScreen(value, index, this));
     }
 
     private int getIndex(){
@@ -179,14 +181,25 @@ public class GalleryScreen extends Screen {
     }
 
     private void closeScreen(String textComponentId) {
-        SCREENSHOT_TEXTURES.forEach(DynamicTexture::close);
-        SCREENSHOT_TEXTURES.clear();
-
         this.onClose();
         PlayerHelper.sendHotbarMessage(new TranslatableComponent(textComponentId));
     }
 
     public static boolean canBeShow(){
         return SCREENSHOTS_DIR.exists() && SCREENSHOTS_DIR.list().length > 0;
+    }
+
+    @Override
+    public void onClose() {
+        SCREENSHOT_TEXTURES.forEach(DynamicTexture::close);
+        SCREENSHOT_TEXTURES.clear();
+
+        super.onClose();
+    }
+
+    @Override
+    public void onFilterChange(ScreenshotFilter filter) {
+        NicephoreConfig.Client.setScreenshotFilter(filter);
+        init();
     }
 }

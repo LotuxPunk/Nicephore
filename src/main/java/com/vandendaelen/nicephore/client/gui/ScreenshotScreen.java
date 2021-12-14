@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.enums.ScreenshotFilter;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
+import com.vandendaelen.nicephore.utils.FilterListener;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
@@ -39,19 +40,21 @@ public class ScreenshotScreen extends Screen {
     private int index;
     private float aspectRatio;
     private final int galleryScreenPage;
+    private FilterListener listener;
 
-    public ScreenshotScreen(int index, int galleryScreenPage) {
+    public ScreenshotScreen(int index, int galleryScreenPage, FilterListener listener) {
         super(TITLE);
         this.index = index;
         this.galleryScreenPage = galleryScreenPage;
+        this.listener = listener;
     }
 
     public ScreenshotScreen(int index) {
-        this(index, -1);
+        this(index, -1, null);
     }
 
     public ScreenshotScreen() {
-        this(0, -1);
+        this(0, -1, null);
     }
 
     @Override
@@ -96,7 +99,10 @@ public class ScreenshotScreen extends Screen {
     private void changeFilter(){
         ScreenshotFilter nextFilter = NicephoreConfig.Client.getScreenshotFilter().next();
         NicephoreConfig.Client.setScreenshotFilter(nextFilter);
-        init();
+
+        if (listener != null){
+            listener.onFilterChange(nextFilter);
+        }
     }
 
     @Override
@@ -174,10 +180,6 @@ public class ScreenshotScreen extends Screen {
     }
 
     private void closeScreen(String textComponentId) {
-        if (SCREENSHOT_TEXTURE != null){
-            SCREENSHOT_TEXTURE.close();
-        }
-
         this.onClose();
         PlayerHelper.sendHotbarMessage(new TranslatableComponent(textComponentId));
     }
@@ -196,5 +198,14 @@ public class ScreenshotScreen extends Screen {
             return MessageFormat.format("{0} MB", formatter.format((double) FileUtils.sizeOf(file) / MB_SIZE));
         }
         return MessageFormat.format("{0} KB", formatter.format((double) FileUtils.sizeOf(file) / KB_SIZE));
+    }
+
+    @Override
+    public void onClose() {
+        if (SCREENSHOT_TEXTURE != null){
+            SCREENSHOT_TEXTURE.close();
+        }
+
+        super.onClose();
     }
 }
