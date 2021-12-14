@@ -117,7 +117,8 @@ public class ScreenshotScreen extends Screen {
             this.addRenderableWidget(new Button(this.width / 2 - 52, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.copy"), button -> {
                 final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
                 try {
-                    imageToClipBoard.copyImage(ImageIO.read(screenshots.get(index)));
+                    final File screenshot = screenshots.get(index);
+                    imageToClipBoard.copyImage(ImageIO.read(screenshot), screenshot);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
