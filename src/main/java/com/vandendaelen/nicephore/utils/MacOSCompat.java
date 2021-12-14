@@ -5,7 +5,6 @@ import ca.weblite.objc.Proxy;
 import com.vandendaelen.nicephore.Nicephore;
 import net.minecraft.client.Minecraft;
 
-
 //Source : https://github.com/comp500/ScreenshotToClipboard/blob/1.16-arch/common/src/main/java/link/infra/screenshotclipboard/MacOSCompat.java
 public class MacOSCompat {
     public static void doCopyMacOS(String path) {

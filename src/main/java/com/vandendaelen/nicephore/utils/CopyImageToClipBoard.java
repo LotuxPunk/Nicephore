@@ -1,6 +1,5 @@
 package com.vandendaelen.nicephore.utils;
 
-import com.mojang.blaze3d.platform.ClipboardManager;
 import net.minecraft.client.Minecraft;
 
 import javax.imageio.ImageIO;
@@ -11,23 +10,25 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UncheckedIOException;
-import java.util.Base64;
 import java.util.Objects;
 
 public class CopyImageToClipBoard implements ClipboardOwner {
     private static File lastScreenshot = null;
-    private final ClipboardManager clipboardManager = new ClipboardManager();
+    private static CopyImageToClipBoard instance;
 
-    public static void setLastScreenshot(File screenshot){
+    public static CopyImageToClipBoard getInstance() {
+        if (instance == null){
+            instance = new CopyImageToClipBoard();
+        }
+        return instance;
+    }
+
+    public void setLastScreenshot(File screenshot){
         lastScreenshot = screenshot;
     }
-    public void copyImage(BufferedImage bi, File screenshot) {
+    public boolean copyImage(BufferedImage bi, File screenshot) {
         if (Minecraft.ON_OSX) {
             MacOSCompat.doCopyMacOS(screenshot.getPath());
         }
@@ -37,25 +38,18 @@ public class CopyImageToClipBoard implements ClipboardOwner {
                 final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
                 c.setContents( trans, this );
             }
+            else {
+                return false;
+            }
         }
+        return true;
     }
 
-    public void copyLastScreenshot() throws IOException {
+    public boolean copyLastScreenshot() throws IOException {
         if ( lastScreenshot != null ) {
-            copyImage(ImageIO.read(lastScreenshot), lastScreenshot);
-        } else {
-            throw new IOException("No screenshot taken");
+            return copyImage(ImageIO.read(lastScreenshot), lastScreenshot);
         }
-    }
-
-    public static String imgToBase64String(final RenderedImage img, final String formatName) {
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try (final OutputStream b64os = Base64.getEncoder().wrap(os)) {
-            ImageIO.write(img, formatName, b64os);
-        } catch (final IOException ioe) {
-            throw new UncheckedIOException(ioe);
-        }
-        return os.toString();
+        return false;
     }
 
     public void lostOwnership( Clipboard clip, Transferable trans ) {

@@ -93,13 +93,17 @@ public final class JPEGThread extends Thread {
                 }
             }
 
-            CopyImageToClipBoard.setLastScreenshot(screenshot);
+            CopyImageToClipBoard.getInstance().setLastScreenshot(screenshot);
 
             if (NicephoreConfig.Client.getScreenshotCustomMessage()){
 
                 if (NicephoreConfig.Client.getScreenshotToClipboard()){
-                    new CopyImageToClipBoard().copyLastScreenshot();
-                    PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.success").withStyle(ChatFormatting.GREEN));
+                    if (CopyImageToClipBoard.getInstance().copyLastScreenshot()){
+                        PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.success").withStyle(ChatFormatting.GREEN));
+                    }
+                    else {
+                        PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.error").withStyle(ChatFormatting.RED));
+                    }
                 }
 
                 final Component pngComponent = (new TranslatableComponent("nicephore.screenshot.png")).withStyle(ChatFormatting.UNDERLINE).withStyle((style)
