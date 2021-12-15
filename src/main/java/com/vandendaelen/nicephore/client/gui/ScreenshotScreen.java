@@ -8,6 +8,7 @@ import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.FilterListener;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -30,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ScreenshotScreen extends Screen {
@@ -120,15 +123,23 @@ public class ScreenshotScreen extends Screen {
         if (!screenshots.isEmpty()) {
             this.addRenderableWidget(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
             this.addRenderableWidget(new Button(this.width / 2 + 60, this.height / 2 + 75, 20, 20, new TextComponent(">"), button -> modIndex(1)));
-            this.addRenderableWidget(new Button(this.width / 2 - 52, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.copy"), button -> {
+
+            Button copyButton = new Button(this.width / 2 - 52, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.copy"), button -> {
                 final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
                 try {
                     final File screenshot = screenshots.get(index);
-                    imageToClipBoard.copyImage(ImageIO.read(screenshot), screenshot);
+                    imageToClipBoard.copyImage(ImageIO.read(screenshot));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }));
+            });
+
+            copyButton.active = !Minecraft.ON_OSX && Objects.equals(System.getProperty("java.awt.headless"), "false");
+            if(!copyButton.isActive() && (mouseX >= (double)copyButton.x && mouseY >= (double)copyButton.y && mouseX < (double)(copyButton.x + copyButton.getWidth()) && mouseY < (double)(copyButton.y + copyButton.getHeight()))) {
+                renderComponentTooltip(matrixStack, List.of(new TranslatableComponent("nicephore.gui.screenshots.copy.unable").withStyle(ChatFormatting.RED)), mouseX, mouseY);
+            }
+            this.addRenderableWidget(copyButton);
+
             this.addRenderableWidget(new Button(this.width / 2 + 3, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.delete"), button -> deleteScreenshot(screenshots.get(index))));
         }
 

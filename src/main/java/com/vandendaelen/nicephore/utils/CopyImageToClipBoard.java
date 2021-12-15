@@ -28,26 +28,19 @@ public class CopyImageToClipBoard implements ClipboardOwner {
     public void setLastScreenshot(File screenshot){
         lastScreenshot = screenshot;
     }
-    public boolean copyImage(BufferedImage bi, File screenshot) {
-        if (Minecraft.ON_OSX) {
-            MacOSCompat.doCopyMacOS(screenshot.getPath());
+    public boolean copyImage(BufferedImage bi) {
+        if (!Minecraft.ON_OSX && Objects.equals(System.getProperty("java.awt.headless"), "false")){
+            final TransferableImage trans = new TransferableImage(bi);
+            final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+            c.setContents( trans, this );
+            return true;
         }
-        else {
-            if (Objects.equals(System.getProperty("java.awt.headless"), "false")){
-                final TransferableImage trans = new TransferableImage(bi);
-                final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-                c.setContents( trans, this );
-            }
-            else {
-                return false;
-            }
-        }
-        return true;
+        return false;
     }
 
     public boolean copyLastScreenshot() throws IOException {
         if ( lastScreenshot != null ) {
-            return copyImage(ImageIO.read(lastScreenshot), lastScreenshot);
+            return copyImage(ImageIO.read(lastScreenshot));
         }
         return false;
     }

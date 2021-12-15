@@ -16,6 +16,7 @@
   "nicephore.gui.screenshots.pages": "%s of %s screenshots",
   "nicephore.gui.gallery.pages": "Page %s of %s",
   "nicephore.gui.screenshots.copy": "Copy",
+  "nicephore.gui.screenshots.copy.unable": "The copy button has been disabled because your system does not allow access to the clipboard",
   "nicephore.gui.screenshots.delete": "Delete",
   "nicephore.gui.delete": "Delete a screenshot?",
   "nicephore.gui.delete.question": "Do you really want to remove the screenshot %s?",

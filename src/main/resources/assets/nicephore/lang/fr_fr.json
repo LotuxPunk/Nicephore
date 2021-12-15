@@ -16,6 +16,7 @@
   "nicephore.gui.screenshots.pages": "%s sur %s captures d'écran",
   "nicephore.gui.gallery.pages": "Page %s sur %s",
   "nicephore.gui.screenshots.copy": "Copier",
+  "nicephore.gui.screenshots.copy.unable": "Le button \"Copier\" à été désactivé car votre système n'autorise pas l'accès au presse-papier",
   "nicephore.gui.screenshots.delete": "Supprimer",
   "nicephore.gui.delete": "Supprimer une capture d'écran ?",
   "nicephore.gui.delete.question": "Voulez-vous vraiment supprimer la capture d'écran %s ?",
