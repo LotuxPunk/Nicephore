@@ -102,6 +102,7 @@ public class ScreenshotScreen extends Screen {
     private void changeFilter(){
         ScreenshotFilter nextFilter = NicephoreConfig.Client.getScreenshotFilter().next();
         NicephoreConfig.Client.setScreenshotFilter(nextFilter);
+        init();
 
         if (listener != null){
             listener.onFilterChange(nextFilter);
