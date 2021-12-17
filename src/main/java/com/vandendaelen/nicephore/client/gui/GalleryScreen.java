@@ -1,8 +1,9 @@
-package com.vandendaelen.nicephore.gui;
+package com.vandendaelen.nicephore.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
+import com.vandendaelen.nicephore.utils.FilterListener;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.ScreenshotFilter;
 import com.vandendaelen.nicephore.utils.Util;
@@ -16,18 +17,20 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GalleryScreen extends Screen {
+public class GalleryScreen extends Screen implements FilterListener {
     private static final TranslationTextComponent TITLE = new TranslationTextComponent("nicephore.gui.screenshots");
     private static final File SCREENSHOTS_DIR = new File(Minecraft.getInstance().gameDirectory, "screenshots");
     private static ArrayList<DynamicTexture> SCREENSHOT_TEXTURES = new ArrayList<>();
@@ -35,7 +38,6 @@ public class GalleryScreen extends Screen {
     private ArrayList<List<File>> pagesOfScreenshots;
     private int index;
     private float aspectRatio;
-    private boolean dirty;
 
     private static final int ROW = 2;
     private static final int COLUMN = 4;
@@ -44,7 +46,6 @@ public class GalleryScreen extends Screen {
     public GalleryScreen(int index) {
         super(TITLE);
         this.index = index;
-        this.dirty = true;
     }
 
     public GalleryScreen(){
@@ -63,12 +64,18 @@ public class GalleryScreen extends Screen {
         aspectRatio = 1.7777F;
 
         if (!screenshots.isEmpty()) {
-            try {
-                BufferedImage bimg = ImageIO.read(screenshots.get(index));
-                final int width = bimg.getWidth();
-                final int height = bimg.getHeight();
-                bimg.getGraphics().dispose();
-                aspectRatio = (float) (width / (double) height);
+
+            try(ImageInputStream in = ImageIO.createImageInputStream(screenshots.get(index))){
+                final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
+                if (readers.hasNext()) {
+                    ImageReader reader = readers.next();
+                    try {
+                        reader.setInput(in);
+                        aspectRatio = reader.getWidth(0)/ (float) reader.getHeight(0);
+                    } finally {
+                        reader.dispose();
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -85,6 +92,7 @@ public class GalleryScreen extends Screen {
             }
         }
     }
+
     private void changeFilter(){
         ScreenshotFilter nextFilter = NicephoreConfig.Client.getScreenshotFilter().next();
         NicephoreConfig.Client.setScreenshotFilter(nextFilter);
@@ -110,38 +118,38 @@ public class GalleryScreen extends Screen {
 
         if (pagesOfScreenshots.isEmpty()){
             drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslationTextComponent("nicephore.screenshots.empty"), centerX, 20, Color.RED.getRGB());
-            return;
+        }
+        else {
+            final List<File> currentPage = pagesOfScreenshots.get(index);
+            if (currentPage.stream().allMatch(File::exists)){
+                SCREENSHOT_TEXTURES.forEach(TEXTURE -> {
+
+                    final int imageIndex = SCREENSHOT_TEXTURES.indexOf(TEXTURE);
+                    final String name = currentPage.get(imageIndex).getName();
+                    final StringTextComponent text = new StringTextComponent(StringUtils.abbreviate(name, 13));
+
+                    int x = centerX - (15 - (imageIndex % 4) * 10) - (2 - (imageIndex % 4)) * imageWidth;
+                    int y = 50 + (imageIndex / 4 * (imageHeight + 30));
+
+                    RenderSystem.bindTexture(TEXTURE.getId());
+                    RenderSystem.enableBlend();
+                    blit(matrixStack, x, y, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+                    RenderSystem.disableBlend();
+
+                    drawExtensionBadge(matrixStack, FilenameUtils.getExtension(name), x - 10, y + 14);
+                    this.addButton(new Button(x, y + 5 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                });
+
+                drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslationTextComponent("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, this.height / 2 + 105, Color.WHITE.getRGB());
+            }
         }
 
-        final List<File> currentPage = pagesOfScreenshots.get(index);
-        if (currentPage.stream().allMatch(File::exists)){
-            SCREENSHOT_TEXTURES.forEach(TEXTURE -> {
-
-                final int imageIndex = SCREENSHOT_TEXTURES.indexOf(TEXTURE);
-                final String name = currentPage.get(imageIndex).getName();
-                final StringTextComponent text = new StringTextComponent(StringUtils.abbreviate(name, 13));
-
-                int x = centerX - (15 - (imageIndex % 4) * 10) - (2 - (imageIndex % 4)) * imageWidth;
-                int y = 50 + (imageIndex / 4 * (imageHeight + 30));
-
-                RenderSystem.bindTexture(TEXTURE.getId());
-                RenderSystem.enableBlend();
-                blit(matrixStack, x, y, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                RenderSystem.disableBlend();
-
-                drawExtensionBadge(matrixStack, FilenameUtils.getExtension(name), x - 10, y + 14);
-                this.addButton(new Button(x, y + 5 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
-            });
-
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslationTextComponent("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, this.height / 2 + 105, Color.WHITE.getRGB());
-        }
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     private void drawExtensionBadge(MatrixStack matrixStack, String extension, int x, int y) {
         if (NicephoreConfig.Client.getScreenshotFilter() == ScreenshotFilter.BOTH){
             drawString(matrixStack, Minecraft.getInstance().font, extension.toUpperCase(), x + 12, y - 12, Color.WHITE.getRGB());
-            //renderTooltip(matrixStack, new StringTextComponent(extension.toUpperCase()), x, y);
         }
     }
 
@@ -158,12 +166,11 @@ public class GalleryScreen extends Screen {
                 index = 0;
             }
         }
-        dirty = true;
         init();
     }
 
     private void openScreenshotScreen(int value){
-        Minecraft.getInstance().pushGuiLayer(new ScreenshotScreen(value, index));
+        Minecraft.getInstance().pushGuiLayer(new ScreenshotScreen(value, index, this));
     }
 
     private int getIndex(){
@@ -174,9 +181,6 @@ public class GalleryScreen extends Screen {
     }
 
     private void closeScreen(String textComponentId) {
-        SCREENSHOT_TEXTURES.forEach(DynamicTexture::close);
-        SCREENSHOT_TEXTURES.clear();
-
         this.onClose();
         PlayerHelper.sendHotbarMessage(new TranslationTextComponent(textComponentId));
     }
@@ -184,5 +188,18 @@ public class GalleryScreen extends Screen {
     public static boolean canBeShow(){
         return SCREENSHOTS_DIR.exists() && SCREENSHOTS_DIR.list().length > 0;
     }
-}
 
+    @Override
+    public void onClose() {
+        SCREENSHOT_TEXTURES.forEach(DynamicTexture::close);
+        SCREENSHOT_TEXTURES.clear();
+
+        super.onClose();
+    }
+
+    @Override
+    public void onFilterChange(ScreenshotFilter filter) {
+        NicephoreConfig.Client.setScreenshotFilter(filter);
+        init();
+    }
+}

@@ -1,30 +1,48 @@
 package com.vandendaelen.nicephore.utils;
 
+import net.minecraft.client.Minecraft;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class CopyImageToClipBoard implements ClipboardOwner {
     private static File lastScreenshot = null;
+    private static CopyImageToClipBoard instance;
 
-    public static void setLastScreenshot(File screenshot){
+    public static CopyImageToClipBoard getInstance() {
+        if (instance == null){
+            instance = new CopyImageToClipBoard();
+        }
+        return instance;
+    }
+
+    public void setLastScreenshot(File screenshot){
         lastScreenshot = screenshot;
     }
-    public void copyImage(BufferedImage bi) {
-        final TransferableImage trans = new TransferableImage(bi);
-        final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        c.setContents( trans, this );
+    public boolean copyImage(BufferedImage bi) {
+        if (!Minecraft.ON_OSX && Objects.equals(System.getProperty("java.awt.headless"), "false")){
+            final TransferableImage trans = new TransferableImage(bi);
+            final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+            c.setContents( trans, this );
+            return true;
+        }
+        return false;
     }
 
-    public void copyLastScreenshot() throws IOException {
+    public boolean copyLastScreenshot() throws IOException {
         if ( lastScreenshot != null ) {
-            copyImage(ImageIO.read(lastScreenshot));
-        } else {
-            throw new IOException("No screenshot taken");
+            return copyImage(ImageIO.read(lastScreenshot));
         }
+        return false;
     }
 
     public void lostOwnership( Clipboard clip, Transferable trans ) {

@@ -1,9 +1,9 @@
 package com.vandendaelen.nicephore;
 
+import com.vandendaelen.nicephore.client.event.ClientEvents;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
-import com.vandendaelen.nicephore.event.ClientEvents;
 import com.vandendaelen.nicephore.thread.InitThread;
-import net.minecraftforge.api.distmarker.Dist;
+import com.vandendaelen.nicephore.utils.Util;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -26,7 +26,10 @@ public final class Nicephore {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, NicephoreConfig.CLIENT_SPEC);
         MinecraftForge.EVENT_BUS.register(this);
-        System.setProperty("java.awt.headless", "false");
+
+        if (Util.getOS() == Util.OS.WINDOWS){
+            System.setProperty("java.awt.headless", "false");
+        }
 
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> "", (a, b) -> true));
     }
