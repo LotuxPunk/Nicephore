@@ -30,9 +30,14 @@ public class CopyImageToClipBoard implements ClipboardOwner {
     }
     public boolean copyImage(BufferedImage bi) {
         if (!Minecraft.ON_OSX && Objects.equals(System.getProperty("java.awt.headless"), "false")){
-            final TransferableImage trans = new TransferableImage(bi);
-            final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-            c.setContents( trans, this );
+            try {
+                final TransferableImage trans = new TransferableImage(bi);
+                final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+                c.setContents( trans, this );
+            } catch (HeadlessException e) {
+                e.printStackTrace();
+                return false;
+            }
             return true;
         }
         return false;
