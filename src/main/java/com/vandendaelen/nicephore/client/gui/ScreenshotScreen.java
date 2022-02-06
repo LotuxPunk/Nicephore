@@ -6,6 +6,7 @@ import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.enums.ScreenshotFilter;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.FilterListener;
+import com.vandendaelen.nicephore.enums.OperatingSystems;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.ChatFormatting;
@@ -32,7 +33,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ScreenshotScreen extends Screen {
@@ -127,15 +127,11 @@ public class ScreenshotScreen extends Screen {
 
             Button copyButton = new Button(this.width / 2 - 52, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.copy"), button -> {
                 final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
-                try {
-                    final File screenshot = screenshots.get(index);
-                    imageToClipBoard.copyImage(ImageIO.read(screenshot));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                final File screenshot = screenshots.get(index);
+                imageToClipBoard.copyImage(screenshot);
             });
 
-            copyButton.active = !Minecraft.ON_OSX && Objects.equals(System.getProperty("java.awt.headless"), "false");
+            copyButton.active = OperatingSystems.getOS().getManager() != null;
             if(!copyButton.isActive() && (mouseX >= (double)copyButton.x && mouseY >= (double)copyButton.y && mouseX < (double)(copyButton.x + copyButton.getWidth()) && mouseY < (double)(copyButton.y + copyButton.getHeight()))) {
                 renderComponentTooltip(matrixStack, List.of(new TranslatableComponent("nicephore.gui.screenshots.copy.unable").withStyle(ChatFormatting.RED)), mouseX, mouseY);
             }

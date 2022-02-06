@@ -3,7 +3,7 @@ package com.vandendaelen.nicephore;
 import com.vandendaelen.nicephore.client.event.ClientEvents;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.thread.InitThread;
-import com.vandendaelen.nicephore.utils.Util;
+import com.vandendaelen.nicephore.enums.OperatingSystems;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -27,7 +27,7 @@ public final class Nicephore {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, NicephoreConfig.CLIENT_SPEC);
         MinecraftForge.EVENT_BUS.register(this);
 
-        if (Util.getOS() == Util.OS.WINDOWS){
+        if (OperatingSystems.getOS() == OperatingSystems.WINDOWS) {
             System.setProperty("java.awt.headless", "false");
         }
 

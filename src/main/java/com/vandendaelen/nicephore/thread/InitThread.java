@@ -3,8 +3,8 @@ package com.vandendaelen.nicephore.thread;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.vandendaelen.nicephore.enums.OperatingSystems;
 import com.vandendaelen.nicephore.utils.Reference;
-import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.io.FileUtils;
 
@@ -135,7 +135,7 @@ public final class InitThread extends Thread {
         final Gson gson = new Gson();
         final Type collectionType = new TypeToken<Collection<Response>>() {}.getType();
         final Collection<Response> responses = gson.fromJson(reader, collectionType);
-        final Optional<Response> response = responses.stream().filter(response1 -> response1.platform.equals(Util.getOS().name())).findFirst();
+        final Optional<Response> response = responses.stream().filter(response1 -> response1.platform.equals(OperatingSystems.getOS().name())).findFirst();
         return response;
     }
 
