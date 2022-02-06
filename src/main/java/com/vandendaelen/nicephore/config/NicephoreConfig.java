@@ -1,7 +1,7 @@
 package com.vandendaelen.nicephore.config;
 
+import com.vandendaelen.nicephore.utils.OperatingSystems;
 import com.vandendaelen.nicephore.utils.ScreenshotFilter;
-import com.vandendaelen.nicephore.utils.Util;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -27,7 +27,7 @@ public final class NicephoreConfig {
             optimisedOutput = builder
                     .comment("Enable to allow Nicephore to losslessly optimise the PNG and JPEG screenshots for smaller sized progressive files that are of identical quality to the files before optimisation.", "Note: Enabling this will cause screenshots to take slightly longer to save as an optimisation step will have to be run first.", "Tip: In the rare case that a screenshot PNG is corrupted, run \"oxipng --fix (filename).png\" to attempt to fix it.")
                     .worldRestart()
-                    .define("optimiseScreenshots", Util.getOS().equals(Util.OS.WINDOWS));
+                    .define("optimiseScreenshots", OperatingSystems.getOS().equals(OperatingSystems.WINDOWS));
 
             showOptimisationStatus = builder
                     .comment("If enabled, a message will appear above your hotbar telling you that has optimisation started and another when finished. Useful for very slow computers.")
@@ -57,7 +57,7 @@ public final class NicephoreConfig {
 
             makeJPEGs = builder
                     .comment("Enable to allow Nicephore to make lossy JPEGs of your screenshots for easier online sharing. Disable to only allow PNGs.", "Note that PNGs will still be made regardless of this option.")
-                    .define("makeJPEGs", Util.getOS().equals(Util.OS.WINDOWS));
+                    .define("makeJPEGs", OperatingSystems.getOS().equals(OperatingSystems.WINDOWS));
 
             builder.pop();
 

@@ -3,12 +3,18 @@ package com.vandendaelen.nicephore.thread;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.vandendaelen.nicephore.utils.OperatingSystems;
 import com.vandendaelen.nicephore.utils.Reference;
-import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.file.Files;
@@ -19,7 +25,7 @@ import java.util.zip.ZipInputStream;
 
 public final class InitThread extends Thread {
 
-    private boolean optimiseConfig;
+    private final boolean optimiseConfig;
 
     private static final File
             DESTINATION = new File(Minecraft.getInstance().gameDirectory.getAbsolutePath(), String.format("mods%snicephore", File.separator)),
@@ -136,7 +142,7 @@ public final class InitThread extends Thread {
         final Gson gson = new Gson();
         final Type collectionType = new TypeToken<Collection<Response>>() {}.getType();
         final Collection<Response> responses = gson.fromJson(reader, collectionType);
-        final Optional<Response> response = responses.stream().filter(response1 -> response1.platform.equals(Util.getOS().name())).findFirst();
+        final Optional<Response> response = responses.stream().filter(response1 -> response1.platform.equals(OperatingSystems.getOS().name())).findFirst();
         return response;
     }
 

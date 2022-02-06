@@ -126,12 +126,8 @@ public class ScreenshotScreen extends Screen {
 
             Button copyButton = new Button(this.width / 2 - 52, this.height / 2 + 75, 50, 20, new TranslationTextComponent("nicephore.gui.screenshots.copy"), button -> {
                 final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
-                try {
-                    final File screenshot = screenshots.get(index);
-                    imageToClipBoard.copyImage(ImageIO.read(screenshot));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                final File screenshot = screenshots.get(index);
+                imageToClipBoard.copyImage(screenshot);
             });
 
             copyButton.active = !Minecraft.ON_OSX && Objects.equals(System.getProperty("java.awt.headless"), "false");
