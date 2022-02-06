@@ -14,7 +14,7 @@ public class WindowsClipboardManagerImpl implements ClipboardManager {
     }
 
     @Override
-    public void clipboardImage(File screenshot) {
+    public boolean clipboardImage(File screenshot) {
         final String command = "[Reflection.Assembly]::LoadWithPartialName('System.Drawing');\n" +
                 "[Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms');\n" +
                 "\n" +
@@ -23,8 +23,10 @@ public class WindowsClipboardManagerImpl implements ClipboardManager {
                 "$img = [System.Drawing.Image]::Fromfile($file);\n" +
                 "[System.Windows.Forms.Clipboard]::SetImage($img);";
 
-        final Thread clipboardThread = new Thread(() -> session.executeCommand(command));
-        clipboardThread.start();
+        return !session.executeCommand(command).isError();
+
+//        final Thread clipboardThread = new Thread(() -> session.executeCommand(command));
+//        clipboardThread.start();
     }
 
     public static WindowsClipboardManagerImpl getInstance() {
