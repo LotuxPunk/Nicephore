@@ -12,11 +12,13 @@ public class MacOSClipboardManagerImpl implements ClipboardManager {
 
     @Override
     public boolean clipboardImage(File screenshot) {
-        final String[] components = screenshot.getName().split("\\.");
-        final long count = components.length;
-        final String extension = Arrays.stream(components).skip(count - 1).findFirst().get();
+        /*
+         final String[] components = screenshot.getName().split("\\.");
+         final long count = components.length;
+         final String extension = Arrays.stream(components).skip(count - 1).findFirst().get();
+        */
 
-        final String[] cmd = { "osascript", "-e", String.format("'set the clipboard to (read (POSIX file \"%s\") as %s picture)'", screenshot.getAbsolutePath(), extension.toUpperCase())};
+        final String[] cmd = { "osascript", "-e", String.format("tell app \"Finder\" to set the clipboard to ( POSIX file \"%s\" )", screenshot.getAbsolutePath())};
 
         try {
             Runtime.getRuntime().exec(cmd);
