@@ -27,8 +27,11 @@ public class CopyImageToClipBoard implements ClipboardOwner {
     }
 
     public boolean copyImage(File screenshot) {
-        OperatingSystems.getOS().getManager().clipboardImage(screenshot);
-        return true;
+        if (OperatingSystems.getOS().getManager() != null) {
+            OperatingSystems.getOS().getManager().clipboardImage(screenshot);
+            return true;
+        }
+        return false;
     }
 
     public boolean copyLastScreenshot() throws IOException {

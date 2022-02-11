@@ -5,7 +5,7 @@ import com.vandendaelen.nicephore.Nicephore;
 import com.vandendaelen.nicephore.client.gui.GalleryScreen;
 import com.vandendaelen.nicephore.client.gui.ScreenshotScreen;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
-import com.vandendaelen.nicephore.thread.JPEGThread;
+import com.vandendaelen.nicephore.thread.ScreenshotThread;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.KeyMapping;
@@ -77,7 +77,7 @@ public final class ClientEvents {
 
     @SubscribeEvent
     public static void onScreenshot(ScreenshotEvent event) {
-        final JPEGThread thread = new JPEGThread(event.getImage(), event.getScreenshotFile());
+        final ScreenshotThread thread = new ScreenshotThread(event.getImage(), event.getScreenshotFile());
         thread.start();
 
         if (NicephoreConfig.Client.getScreenshotCustomMessage()) {

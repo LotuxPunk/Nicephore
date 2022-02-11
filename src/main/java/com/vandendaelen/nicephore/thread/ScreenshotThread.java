@@ -23,11 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 
-public final class JPEGThread extends Thread {
+public final class ScreenshotThread extends Thread {
     private final NativeImage image;
     private final File screenshot;
 
-    public JPEGThread(NativeImage image, File screenshot) {
+    public ScreenshotThread(NativeImage image, File screenshot) {
         this.image = image;
         this.screenshot = screenshot;
     }
