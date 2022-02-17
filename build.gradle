@@ -23,7 +23,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-version = '1.18.x-1.2.0'
+version = '1.18.x-1.2.1'
 group = 'com.vandendaelen' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'nicephore'
 
