@@ -95,13 +95,12 @@ public final class ScreenshotThread extends Thread {
 
             CopyImageToClipBoard.getInstance().setLastScreenshot(screenshot);
 
-            if (NicephoreConfig.Client.getScreenshotCustomMessage()){
+            if (NicephoreConfig.Client.getScreenshotCustomMessage()) {
 
-                if (NicephoreConfig.Client.getScreenshotToClipboard()){
-                    if (CopyImageToClipBoard.getInstance().copyLastScreenshot()){
+                if (NicephoreConfig.Client.getScreenshotToClipboard()) {
+                    if (CopyImageToClipBoard.getInstance().copyLastScreenshot()) {
                         PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.success").withStyle(ChatFormatting.GREEN));
-                    }
-                    else {
+                    } else {
                         PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.error").withStyle(ChatFormatting.RED));
                     }
                 }

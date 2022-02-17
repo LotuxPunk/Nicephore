@@ -1,7 +1,7 @@
 package com.vandendaelen.nicephore.config;
 
-import com.vandendaelen.nicephore.enums.ScreenshotFilter;
 import com.vandendaelen.nicephore.enums.OperatingSystems;
+import com.vandendaelen.nicephore.enums.ScreenshotFilter;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -53,7 +53,7 @@ public final class NicephoreConfig {
 
             compression = builder
                     .comment("JPEG compression level, the higher the number, the better the quality.", "Note that 1.0 is *not* lossless as JPEG is a lossy-only format, use the PNG files instead if you want lossless.")
-                    .defineInRange("compression", 0.9, 0.0,1.0);
+                    .defineInRange("compression", 0.9, 0.0, 1.0);
 
             makeJPEGs = builder
                     .comment("Enable to allow Nicephore to make lossy JPEGs of your screenshots for easier online sharing. Disable to only allow PNGs.", "Note that PNGs will still be made regardless of this option.")
@@ -69,16 +69,41 @@ public final class NicephoreConfig {
 
             builder.pop();
         }
+
         public static float getCompressionLevel() {
             return CLIENT.compression.get().floatValue();
         }
-        public static boolean getJPEGToggle() { return CLIENT.makeJPEGs.get(); }
-        public static boolean getOptimisedOutputToggle() { return CLIENT.optimisedOutput.get(); }
-        public static boolean getShouldShowOptStatus() { return CLIENT.showOptimisationStatus.get(); }
-        public static boolean getScreenshotToClipboard() { return CLIENT.screenshotToClipboard.get(); }
-        public static boolean getScreenshotCustomMessage() { return CLIENT.screenshotCustomMessage.get(); }
-        public static byte getPNGOptimisationLevel() { return CLIENT.pngOptimisationLevel.get().byteValue(); }
-        public static ScreenshotFilter getScreenshotFilter() { return CLIENT.screenshotFilter.get(); }
-        public static void setScreenshotFilter(ScreenshotFilter filter) { CLIENT.screenshotFilter.set(filter); }
+
+        public static boolean getJPEGToggle() {
+            return CLIENT.makeJPEGs.get();
+        }
+
+        public static boolean getOptimisedOutputToggle() {
+            return CLIENT.optimisedOutput.get();
+        }
+
+        public static boolean getShouldShowOptStatus() {
+            return CLIENT.showOptimisationStatus.get();
+        }
+
+        public static boolean getScreenshotToClipboard() {
+            return CLIENT.screenshotToClipboard.get();
+        }
+
+        public static boolean getScreenshotCustomMessage() {
+            return CLIENT.screenshotCustomMessage.get();
+        }
+
+        public static byte getPNGOptimisationLevel() {
+            return CLIENT.pngOptimisationLevel.get().byteValue();
+        }
+
+        public static ScreenshotFilter getScreenshotFilter() {
+            return CLIENT.screenshotFilter.get();
+        }
+
+        public static void setScreenshotFilter(ScreenshotFilter filter) {
+            CLIENT.screenshotFilter.set(filter);
+        }
     }
 }

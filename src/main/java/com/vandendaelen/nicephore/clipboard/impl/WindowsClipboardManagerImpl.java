@@ -13,10 +13,16 @@ public class WindowsClipboardManagerImpl implements ClipboardManager {
     public WindowsClipboardManagerImpl() {
         if (Util.getPlatform() == Util.OS.WINDOWS) {
             this.session = PowerShell.openSession();
-        }
-        else {
+        } else {
             this.session = null;
         }
+    }
+
+    public static WindowsClipboardManagerImpl getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new WindowsClipboardManagerImpl();
+        }
+        return INSTANCE;
     }
 
     @Override
@@ -30,12 +36,5 @@ public class WindowsClipboardManagerImpl implements ClipboardManager {
                 "[System.Windows.Forms.Clipboard]::SetImage($img);";
 
         return !session.executeCommand(command).isError();
-    }
-
-    public static WindowsClipboardManagerImpl getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new WindowsClipboardManagerImpl();
-        }
-        return INSTANCE;
     }
 }

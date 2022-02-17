@@ -39,10 +39,10 @@ public class ScreenshotScreen extends Screen {
     private static final TranslatableComponent TITLE = new TranslatableComponent("nicephore.gui.screenshots");
     private static final File SCREENSHOTS_DIR = new File(Minecraft.getInstance().gameDirectory, "screenshots");
     private static DynamicTexture SCREENSHOT_TEXTURE;
+    private final int galleryScreenPage;
     private ArrayList<File> screenshots;
     private int index;
     private float aspectRatio;
-    private final int galleryScreenPage;
     private FilterListener listener;
 
     public ScreenshotScreen(int index, int galleryScreenPage, FilterListener listener) {
@@ -60,6 +60,22 @@ public class ScreenshotScreen extends Screen {
         this(0, -1, null);
     }
 
+    public static boolean canBeShow() {
+        return SCREENSHOTS_DIR.exists() && SCREENSHOTS_DIR.list().length > 0;
+    }
+
+    private static String getFileSizeMegaBytes(File file) {
+        final double size = FileUtils.sizeOf(file);
+        final NumberFormat formatter = new DecimalFormat("#0.00");
+        final int MB_SIZE = 1024 * 1024;
+        final int KB_SIZE = 1024;
+
+        if (size > MB_SIZE) {
+            return MessageFormat.format("{0} MB", formatter.format((double) FileUtils.sizeOf(file) / MB_SIZE));
+        }
+        return MessageFormat.format("{0} KB", formatter.format((double) FileUtils.sizeOf(file) / KB_SIZE));
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -71,13 +87,13 @@ public class ScreenshotScreen extends Screen {
         aspectRatio = 1.7777F;
 
         if (!screenshots.isEmpty()) {
-            try(ImageInputStream in = ImageIO.createImageInputStream(screenshots.get(index))){
+            try (ImageInputStream in = ImageIO.createImageInputStream(screenshots.get(index))) {
                 final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
                 if (readers.hasNext()) {
                     ImageReader reader = readers.next();
                     try {
                         reader.setInput(in);
-                        aspectRatio = (float)(reader.getWidth(0)/ (float) reader.getHeight(0));
+                        aspectRatio = (float) (reader.getWidth(0) / (float) reader.getHeight(0));
                     } finally {
                         reader.dispose();
                     }
@@ -86,7 +102,7 @@ public class ScreenshotScreen extends Screen {
                 e.printStackTrace();
             }
 
-            if (SCREENSHOT_TEXTURE != null){
+            if (SCREENSHOT_TEXTURE != null) {
                 SCREENSHOT_TEXTURE.close();
             }
 
@@ -99,12 +115,13 @@ public class ScreenshotScreen extends Screen {
             }
         }
     }
-    private void changeFilter(){
+
+    private void changeFilter() {
         ScreenshotFilter nextFilter = NicephoreConfig.Client.getScreenshotFilter().next();
         NicephoreConfig.Client.setScreenshotFilter(nextFilter);
         init();
 
-        if (listener != null){
+        if (listener != null) {
             listener.onFilterChange(nextFilter);
         }
     }
@@ -135,7 +152,7 @@ public class ScreenshotScreen extends Screen {
             });
 
             copyButton.active = OperatingSystems.getOS().getManager() != null;
-            if(!copyButton.isActive() && (mouseX >= (double)copyButton.x && mouseY >= (double)copyButton.y && mouseX < (double)(copyButton.x + copyButton.getWidth()) && mouseY < (double)(copyButton.y + copyButton.getHeight()))) {
+            if (!copyButton.isActive() && (mouseX >= (double) copyButton.x && mouseY >= (double) copyButton.y && mouseX < (double) (copyButton.x + copyButton.getWidth()) && mouseY < (double) (copyButton.y + copyButton.getHeight()))) {
                 renderComponentTooltip(matrixStack, List.of(new TranslatableComponent("nicephore.gui.screenshots.copy.unable").withStyle(ChatFormatting.RED)), mouseX, mouseY);
             }
             this.addRenderableWidget(copyButton);
@@ -143,12 +160,11 @@ public class ScreenshotScreen extends Screen {
             this.addRenderableWidget(new Button(this.width / 2 + 3, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.delete"), button -> deleteScreenshot(screenshots.get(index))));
         }
 
-        if (screenshots.isEmpty()){
+        if (screenshots.isEmpty()) {
             drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.screenshots.empty"), centerX, 20, Color.RED.getRGB());
-        }
-        else {
+        } else {
             final File currentScreenshot = screenshots.get(index);
-            if (currentScreenshot.exists()){
+            if (currentScreenshot.exists()) {
 
                 RenderSystem.setShaderTexture(0, SCREENSHOT_TEXTURE.getId());
                 RenderSystem.enableBlend();
@@ -163,28 +179,26 @@ public class ScreenshotScreen extends Screen {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
-    private void modIndex(int value){
+    private void modIndex(int value) {
         final int max = screenshots.size();
-        if (index + value >= 0 && index + value < max){
+        if (index + value >= 0 && index + value < max) {
             index += value;
-        }
-        else {
-            if (index + value < 0){
+        } else {
+            if (index + value < 0) {
                 index = max - 1;
-            }
-            else {
+            } else {
                 index = 0;
             }
         }
         init();
     }
 
-    private void deleteScreenshot(File file){
+    private void deleteScreenshot(File file) {
         Minecraft.getInstance().pushGuiLayer(new DeleteConfirmScreen(file, galleryScreenPage > -1 ? new GalleryScreen(this.galleryScreenPage) : new ScreenshotScreen(index)));
     }
 
-    private int getIndex(){
-        if (index >= screenshots.size() || index < 0){
+    private int getIndex() {
+        if (index >= screenshots.size() || index < 0) {
             index = screenshots.size() - 1;
         }
         return index;
@@ -195,25 +209,9 @@ public class ScreenshotScreen extends Screen {
         PlayerHelper.sendHotbarMessage(new TranslatableComponent(textComponentId));
     }
 
-    public static boolean canBeShow(){
-        return SCREENSHOTS_DIR.exists() && SCREENSHOTS_DIR.list().length > 0;
-    }
-
-    private static String getFileSizeMegaBytes(File file) {
-        final double size = FileUtils.sizeOf(file);
-        final NumberFormat formatter = new DecimalFormat("#0.00");
-        final int MB_SIZE = 1024 * 1024;
-        final int KB_SIZE = 1024;
-
-        if (size > MB_SIZE){
-            return MessageFormat.format("{0} MB", formatter.format((double) FileUtils.sizeOf(file) / MB_SIZE));
-        }
-        return MessageFormat.format("{0} KB", formatter.format((double) FileUtils.sizeOf(file) / KB_SIZE));
-    }
-
     @Override
     public void onClose() {
-        if (SCREENSHOT_TEXTURE != null){
+        if (SCREENSHOT_TEXTURE != null) {
             SCREENSHOT_TEXTURE.close();
         }
 

@@ -26,7 +26,7 @@ public final class Nicephore {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, NicephoreConfig.CLIENT_SPEC);
         MinecraftForge.EVENT_BUS.register(this);
 
-        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,() -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {

@@ -9,10 +9,17 @@ public class MacOSClipboardManagerImpl implements ClipboardManager {
 
     private static MacOSClipboardManagerImpl INSTANCE;
 
+    public static MacOSClipboardManagerImpl getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new MacOSClipboardManagerImpl();
+        }
+        return INSTANCE;
+    }
+
     @Override
     public boolean clipboardImage(File screenshot) {
 
-        final String[] cmd = { "osascript", "-e", String.format("tell app \"Finder\" to set the clipboard to ( POSIX file \"%s\" )", screenshot.getAbsolutePath())};
+        final String[] cmd = {"osascript", "-e", String.format("tell app \"Finder\" to set the clipboard to ( POSIX file \"%s\" )", screenshot.getAbsolutePath())};
 
         try {
             Runtime.getRuntime().exec(cmd);
@@ -21,12 +28,5 @@ public class MacOSClipboardManagerImpl implements ClipboardManager {
             return false;
         }
         return true;
-    }
-
-    public static MacOSClipboardManagerImpl getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new MacOSClipboardManagerImpl();
-        }
-        return INSTANCE;
     }
 }

@@ -51,20 +51,18 @@ public final class ClientEvents {
             }
         }
 
-        if (GUI_SCREENSHOT_KEY.consumeClick()){
-            if (ScreenshotScreen.canBeShow()){
+        if (GUI_SCREENSHOT_KEY.consumeClick()) {
+            if (ScreenshotScreen.canBeShow()) {
                 Minecraft.getInstance().setScreen(new ScreenshotScreen());
-            }
-            else {
+            } else {
                 PlayerHelper.sendHotbarMessage(new TranslatableComponent("nicephore.screenshots.empty"));
             }
         }
 
-        if (GUI_GALLERY_KEY.consumeClick()){
-            if (GalleryScreen.canBeShow()){
+        if (GUI_GALLERY_KEY.consumeClick()) {
+            if (GalleryScreen.canBeShow()) {
                 Minecraft.getInstance().setScreen(new GalleryScreen());
-            }
-            else {
+            } else {
                 PlayerHelper.sendHotbarMessage(new TranslatableComponent("nicephore.screenshots.empty"));
             }
         }

@@ -11,8 +11,8 @@ public enum OperatingSystems {
     MAC(MacOSClipboardManagerImpl.getInstance()),
     SOLARIS(null);
 
-    private final ClipboardManager manager;
     private static OperatingSystems OS;
+    private final ClipboardManager manager;
 
     OperatingSystems(ClipboardManager instance) {
         this.manager = instance;
