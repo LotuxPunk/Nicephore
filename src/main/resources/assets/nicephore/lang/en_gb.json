@@ -8,7 +8,7 @@
   "nicephore.gui.gallery.pages": "Page %s of %s",
   "nicephore.gui.screenshots": "Screenshots",
   "nicephore.gui.screenshots.copy": "Copy",
-  "nicephore.gui.screenshots.copy.unable": "The copy button has been disabled because your system does not allow access to the clipboard",
+  "nicephore.gui.screenshots.copy.unable": "The copy button has been disabled because your system isn't supported yet.",
   "nicephore.gui.screenshots.delete": "Delete",
   "nicephore.gui.screenshots.pages": "%s of %s screenshots",
   "nicephore.keybinds.category": "Nicephore",
