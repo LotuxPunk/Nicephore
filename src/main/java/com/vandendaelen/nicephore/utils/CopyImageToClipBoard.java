@@ -9,7 +9,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
-import java.io.IOException;
 
 public class CopyImageToClipBoard implements ClipboardOwner {
     private static File lastScreenshot = null;
@@ -34,7 +33,7 @@ public class CopyImageToClipBoard implements ClipboardOwner {
         return false;
     }
 
-    public boolean copyLastScreenshot() throws IOException {
+    public boolean copyLastScreenshot() {
         if (lastScreenshot != null) {
             return copyImage(lastScreenshot);
         }

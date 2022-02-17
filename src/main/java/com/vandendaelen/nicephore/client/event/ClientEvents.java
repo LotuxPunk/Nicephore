@@ -22,8 +22,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import org.lwjgl.glfw.GLFW;
 
-import java.io.IOException;
-
 @EventBusSubscriber(value = Dist.CLIENT, modid = Nicephore.MODID)
 public final class ClientEvents {
     public static KeyMapping COPY_KEY;
@@ -46,12 +44,9 @@ public final class ClientEvents {
     @SubscribeEvent
     public static void onKey(final InputEvent.KeyInputEvent event) {
         if (COPY_KEY.consumeClick()) {
-            final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
-            try {
-                imageToClipBoard.copyLastScreenshot();
+            if (CopyImageToClipBoard.getInstance().copyLastScreenshot()) {
                 PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.success"));
-            } catch (IOException e) {
-                Nicephore.LOGGER.error(e.getMessage());
+            } else {
                 PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.error"));
             }
         }

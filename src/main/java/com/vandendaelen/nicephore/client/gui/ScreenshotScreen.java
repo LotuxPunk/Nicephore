@@ -3,10 +3,10 @@ package com.vandendaelen.nicephore.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
+import com.vandendaelen.nicephore.enums.OperatingSystems;
 import com.vandendaelen.nicephore.enums.ScreenshotFilter;
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.FilterListener;
-import com.vandendaelen.nicephore.enums.OperatingSystems;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.ChatFormatting;
@@ -126,9 +126,12 @@ public class ScreenshotScreen extends Screen {
             this.addRenderableWidget(new Button(this.width / 2 + 60, this.height / 2 + 75, 20, 20, new TextComponent(">"), button -> modIndex(1)));
 
             Button copyButton = new Button(this.width / 2 - 52, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.copy"), button -> {
-                final CopyImageToClipBoard imageToClipBoard = new CopyImageToClipBoard();
                 final File screenshot = screenshots.get(index);
-                imageToClipBoard.copyImage(screenshot);
+                if (CopyImageToClipBoard.getInstance().copyImage(screenshot)) {
+                    PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.success"));
+                } else {
+                    PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.error"));
+                }
             });
 
             copyButton.active = OperatingSystems.getOS().getManager() != null;
