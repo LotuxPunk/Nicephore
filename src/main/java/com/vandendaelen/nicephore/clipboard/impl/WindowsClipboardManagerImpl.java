@@ -30,9 +30,6 @@ public class WindowsClipboardManagerImpl implements ClipboardManager {
                 "[System.Windows.Forms.Clipboard]::SetImage($img);";
 
         return !session.executeCommand(command).isError();
-
-//        final Thread clipboardThread = new Thread(() -> session.executeCommand(command));
-//        clipboardThread.start();
     }
 
     public static WindowsClipboardManagerImpl getInstance() {
