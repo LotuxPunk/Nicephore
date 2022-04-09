@@ -33,9 +33,9 @@ import java.util.stream.Collectors;
 public class GalleryScreen extends Screen implements FilterListener {
     private static final TranslatableComponent TITLE = new TranslatableComponent("nicephore.gui.screenshots");
     private static final File SCREENSHOTS_DIR = new File(Minecraft.getInstance().gameDirectory, "screenshots");
-    private static final int ROW = 2;
-    private static final int COLUMN = 4;
-    private static final int IMAGES_TO_DISPLAY = ROW * COLUMN;
+    private final int ROW = getRows();
+    private final int COLUMN = 4;
+    private final int IMAGES_TO_DISPLAY = ROW * COLUMN;
     private static ArrayList<DynamicTexture> SCREENSHOT_TEXTURES = new ArrayList<>();
     private ArrayList<File> screenshots;
     private ArrayList<List<File>> pagesOfScreenshots;
@@ -53,6 +53,13 @@ public class GalleryScreen extends Screen implements FilterListener {
 
     public static boolean canBeShow() {
         return SCREENSHOTS_DIR.exists() && SCREENSHOTS_DIR.list().length > 0;
+    }
+
+    private static int getRows() {
+        if (Minecraft.getInstance().getWindow().getGuiScale() >= 3.0) {
+            return 2;
+        }
+        return 3;
     }
 
     @Override
@@ -107,6 +114,8 @@ public class GalleryScreen extends Screen implements FilterListener {
         final int centerX = this.width / 2;
         final int imageWidth = (int) (this.width * 1.0 / 5);
         final int imageHeight = (int) (imageWidth / aspectRatio);
+        final int bottomLine = this.minecraft.getWindow().getGuiScaledHeight() - 30;
+
 
         this.renderBackground(matrixStack);
 
@@ -115,8 +124,8 @@ public class GalleryScreen extends Screen implements FilterListener {
         this.addRenderableWidget(new Button(this.width - 60, 10, 50, 20, new TranslatableComponent("nicephore.screenshot.exit"), button -> onClose()));
 
         if (!screenshots.isEmpty()) {
-            this.addRenderableWidget(new Button(this.width / 2 - 80, this.height / 2 + 100, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
-            this.addRenderableWidget(new Button(this.width / 2 + 60, this.height / 2 + 100, 20, 20, new TextComponent(">"), button -> modIndex(1)));
+            this.addRenderableWidget(new Button(this.width / 2 - 80, bottomLine, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
+            this.addRenderableWidget(new Button(this.width / 2 + 60, bottomLine, 20, 20, new TextComponent(">"), button -> modIndex(1)));
         }
 
         if (pagesOfScreenshots.isEmpty()) {
@@ -142,7 +151,7 @@ public class GalleryScreen extends Screen implements FilterListener {
                     this.addRenderableWidget(new Button(x, y + 5 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
                 });
 
-                drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, this.height / 2 + 105, Color.WHITE.getRGB());
+                drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, bottomLine + 5, Color.WHITE.getRGB());
             }
         }
 

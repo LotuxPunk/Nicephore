@@ -128,21 +128,22 @@ public class ScreenshotScreen extends Screen {
 
     @Override
     public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        final int centerX = this.width / 2;
-        final int width = (int) (this.width * 0.5);
-        final int height = (int) (width / aspectRatio);
+        final int centerX = this.minecraft.getWindow().getGuiScaledWidth() / 2;
+        final int pictureMidWith = (int) (this.minecraft.getWindow().getGuiScaledWidth() * 0.5 * 1.2);
+        final int pictureHeight = (int) (pictureMidWith / aspectRatio);
+        final int bottomLine = this.minecraft.getWindow().getGuiScaledHeight() - 30;
 
         this.renderBackground(matrixStack);
 
         this.clearWidgets();
         this.addRenderableWidget(new Button(10, 10, 100, 20, new TranslatableComponent("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name()), button -> changeFilter()));
-        this.addRenderableWidget(new Button(this.width - 60, 10, 50, 20, new TranslatableComponent("nicephore.screenshot.exit"), button -> onClose()));
+        this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() - 60, 10, 50, 20, new TranslatableComponent("nicephore.screenshot.exit"), button -> onClose()));
 
         if (!screenshots.isEmpty()) {
-            this.addRenderableWidget(new Button(this.width / 2 - 80, this.height / 2 + 75, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
-            this.addRenderableWidget(new Button(this.width / 2 + 60, this.height / 2 + 75, 20, 20, new TextComponent(">"), button -> modIndex(1)));
+            this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() / 2 - 80, bottomLine, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
+            this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() / 2 + 60, bottomLine, 20, 20, new TextComponent(">"), button -> modIndex(1)));
 
-            Button copyButton = new Button(this.width / 2 - 52, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.copy"), button -> {
+            Button copyButton = new Button(this.minecraft.getWindow().getGuiScaledWidth() / 2 - 52, bottomLine, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.copy"), button -> {
                 final File screenshot = screenshots.get(index);
                 if (CopyImageToClipBoard.getInstance().copyImage(screenshot)) {
                     PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.success"));
@@ -157,7 +158,7 @@ public class ScreenshotScreen extends Screen {
             }
             this.addRenderableWidget(copyButton);
 
-            this.addRenderableWidget(new Button(this.width / 2 + 3, this.height / 2 + 75, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.delete"), button -> deleteScreenshot(screenshots.get(index))));
+            this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() / 2 + 3, bottomLine, 50, 20, new TranslatableComponent("nicephore.gui.screenshots.delete"), button -> deleteScreenshot(screenshots.get(index))));
         }
 
         if (screenshots.isEmpty()) {
@@ -168,7 +169,7 @@ public class ScreenshotScreen extends Screen {
 
                 RenderSystem.setShaderTexture(0, SCREENSHOT_TEXTURE.getId());
                 RenderSystem.enableBlend();
-                blit(matrixStack, centerX - width / 2, 50, 0, 0, width, height, width, height);
+                blit(matrixStack, centerX - (int) (pictureMidWith) / 2, 50, 0, 0, pictureMidWith, pictureHeight, pictureMidWith, pictureHeight);
                 RenderSystem.disableBlend();
 
                 drawCenteredString(matrixStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.screenshots.pages", index + 1, screenshots.size()), centerX, 20, Color.WHITE.getRGB());
