@@ -5,6 +5,7 @@ buildscript {
         // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
         maven { url = 'https://maven.minecraftforge.net' }
         maven { url = 'https://maven.parchmentmc.org' }
+        maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
         mavenCentral()
         gradlePluginPortal()
     }
@@ -12,6 +13,7 @@ buildscript {
         classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.parchmentmc:librarian:1.+'
+        classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
     }
 }
 
@@ -22,6 +24,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: "org.spongepowered.mixin"
 
 version = '1.18.x-1.2.1'
 group = 'com.vandendaelen' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -33,7 +36,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
     //mappings channel: 'official', version: '1.18.1'
-    mappings channel: 'parchment', version: '2021.12.13-nightly-SNAPSHOT-1.18.1'
+    mappings channel: 'parchment', version: '2022.03.13-1.18.2'
 
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
@@ -122,17 +125,31 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.18.1-39.0.5'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.0.19'
     implementation 'com.profesorfalken:jPowerShell:3.1.1'
     shade 'com.profesorfalken:jPowerShell:3.1.1'
     library 'com.profesorfalken:jPowerShell:3.1.1'
 
+    implementation 'com.drewnoakes:metadata-extractor:2.17.0'
+    shade 'com.drewnoakes:metadata-extractor:2.17.0'
+    library 'com.drewnoakes:metadata-extractor:2.17.0'
+
+    implementation fg.deobf("curse.maven:ksyxis-537533:3502166")
+
+    // Mixin
+    annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
