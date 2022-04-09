@@ -7,6 +7,7 @@
   "nicephore.gui.delete.yes": "Oui",
   "nicephore.gui.gallery.pages": "Page %s sur %s",
   "nicephore.gui.screenshots": "Captures d'écran",
+  "nicephore.gui.settings": "Paramètres",
   "nicephore.gui.screenshots.copy": "Copier",
   "nicephore.gui.screenshots.copy.unable": "Le button \"Copier\" à été désactivé car votre système n'est actuellement pas supporté par cette fonctionnalité",
   "nicephore.gui.screenshots.delete": "Supprimer",
@@ -29,5 +30,9 @@
   "nicephore.screenshot.reducedOptions": "[%s] [%s]",
   "nicephore.screenshot.success": "Capture d'écran effectuée - %s",
   "nicephore.screenshots.empty": "Le dossier \"screenshots\" est vide",
-  "nicephore.screenshots.loading.error": "Une erreur s'est produite à l'ouverture d'un fichier"
+  "nicephore.screenshots.loading.error": "Une erreur s'est produite à l'ouverture d'un fichier",
+  "nicephore.screenshot.showOptimisationStatus": "Afficher l'état d'optimisation: %s",
+  "nicephore.screenshot.makeJPEGs": "Créer une copie de la capture d'écran au format JPEG: %s",
+  "nicephore.screenshot.screenshotCustomMessage": "Afficher un message personnalisé: %s",
+  "nicephore.screenshot.setScreenshotToClipboard": "Placer la capture d'écran dans le presse-papiers: %s"
 }

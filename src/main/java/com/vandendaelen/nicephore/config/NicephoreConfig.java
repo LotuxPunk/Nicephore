@@ -78,6 +78,10 @@ public final class NicephoreConfig {
             return CLIENT.makeJPEGs.get();
         }
 
+        public static void setJPEGToggle(boolean value) {
+            CLIENT.makeJPEGs.set(value);
+        }
+
         public static boolean getOptimisedOutputToggle() {
             return CLIENT.optimisedOutput.get();
         }
@@ -86,12 +90,24 @@ public final class NicephoreConfig {
             return CLIENT.showOptimisationStatus.get();
         }
 
+        public static void setShouldShowOptStatus(boolean value) {
+            CLIENT.showOptimisationStatus.set(value);
+        }
+
         public static boolean getScreenshotToClipboard() {
             return CLIENT.screenshotToClipboard.get();
         }
 
+        public static void setScreenshotToClipboard(boolean value) {
+            CLIENT.screenshotToClipboard.set(value);
+        }
+
         public static boolean getScreenshotCustomMessage() {
             return CLIENT.screenshotCustomMessage.get();
+        }
+
+        public static void setScreenshotCustomMessage(boolean value) {
+            CLIENT.screenshotCustomMessage.set(value);
         }
 
         public static byte getPNGOptimisationLevel() {

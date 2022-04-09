@@ -122,6 +122,7 @@ public class GalleryScreen extends Screen implements FilterListener {
         this.clearWidgets();
         this.addRenderableWidget(new Button(10, 10, 100, 20, new TranslatableComponent("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name()), button -> changeFilter()));
         this.addRenderableWidget(new Button(this.width - 60, 10, 50, 20, new TranslatableComponent("nicephore.screenshot.exit"), button -> onClose()));
+        this.addRenderableWidget(new Button(this.width - 120, 10, 50, 20, new TranslatableComponent("nicephore.gui.settings"), button -> openSettingsScreen()));
 
         if (!screenshots.isEmpty()) {
             this.addRenderableWidget(new Button(this.width / 2 - 80, bottomLine, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
@@ -180,6 +181,10 @@ public class GalleryScreen extends Screen implements FilterListener {
 
     private void openScreenshotScreen(int value) {
         Minecraft.getInstance().pushGuiLayer(new ScreenshotScreen(value, index, this));
+    }
+
+    private void openSettingsScreen() {
+        Minecraft.getInstance().pushGuiLayer(new SettingsScreen());
     }
 
     private int getIndex() {

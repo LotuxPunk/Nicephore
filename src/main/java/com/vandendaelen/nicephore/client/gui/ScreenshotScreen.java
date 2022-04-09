@@ -138,6 +138,7 @@ public class ScreenshotScreen extends Screen {
         this.clearWidgets();
         this.addRenderableWidget(new Button(10, 10, 100, 20, new TranslatableComponent("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name()), button -> changeFilter()));
         this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() - 60, 10, 50, 20, new TranslatableComponent("nicephore.screenshot.exit"), button -> onClose()));
+        this.addRenderableWidget(new Button(this.width - 120, 10, 50, 20, new TranslatableComponent("nicephore.gui.settings"), button -> openSettingsScreen()));
 
         if (!screenshots.isEmpty()) {
             this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() / 2 - 80, bottomLine, 20, 20, new TextComponent("<"), button -> modIndex(-1)));
@@ -196,6 +197,10 @@ public class ScreenshotScreen extends Screen {
 
     private void deleteScreenshot(File file) {
         Minecraft.getInstance().pushGuiLayer(new DeleteConfirmScreen(file, galleryScreenPage > -1 ? new GalleryScreen(this.galleryScreenPage) : new ScreenshotScreen(index)));
+    }
+
+    private void openSettingsScreen() {
+        Minecraft.getInstance().pushGuiLayer(new SettingsScreen());
     }
 
     private int getIndex() {
