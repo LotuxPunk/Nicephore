@@ -20,14 +20,13 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.vandendaelen.nicephore.utils.Util.getBatchOfFiles;
+import static com.vandendaelen.nicephore.utils.Util.getNumberOfFiles;
 
 public class GalleryScreen extends Screen implements FilterListener {
     private static final Component TITLE = Component.translatable("nicephore.gui.screenshots");
@@ -36,8 +35,7 @@ public class GalleryScreen extends Screen implements FilterListener {
     private final int COLUMN = 4;
     private final int IMAGES_TO_DISPLAY = ROW * COLUMN;
     private static ArrayList<DynamicTexture> SCREENSHOT_TEXTURES = new ArrayList<>();
-    private ArrayList<File> screenshots;
-    private ArrayList<List<File>> pagesOfScreenshots;
+    private List<File> screenshots;
     private int index;
     private float aspectRatio;
 
@@ -51,7 +49,7 @@ public class GalleryScreen extends Screen implements FilterListener {
     }
 
     public static boolean canBeShow() {
-        return SCREENSHOTS_DIR.exists() && SCREENSHOTS_DIR.list().length > 0;
+        return SCREENSHOTS_DIR.exists();
     }
 
     private static int getRows() {
@@ -61,14 +59,15 @@ public class GalleryScreen extends Screen implements FilterListener {
         return 3;
     }
 
+    private long getNumberOfPages() {
+        return Math.round(getNumberOfFiles(SCREENSHOTS_DIR) / (double) IMAGES_TO_DISPLAY);
+    }
+
     @Override
     protected void init() {
         super.init();
 
-        FilenameFilter filter = NicephoreConfig.Client.getScreenshotFilter().getPredicate();
-
-        screenshots = (ArrayList<File>) Arrays.stream(SCREENSHOTS_DIR.listFiles(filter)).sorted(Comparator.comparingLong(File::lastModified).reversed()).collect(Collectors.toList());
-        pagesOfScreenshots = (ArrayList<List<File>>) Util.batches(screenshots, IMAGES_TO_DISPLAY).collect(Collectors.toList());
+        screenshots = getBatchOfFiles(((long) IMAGES_TO_DISPLAY * index), IMAGES_TO_DISPLAY, SCREENSHOTS_DIR);
         index = getIndex();
         aspectRatio = 1.7777F;
 
@@ -92,7 +91,7 @@ public class GalleryScreen extends Screen implements FilterListener {
             SCREENSHOT_TEXTURES.forEach(DynamicTexture::close);
             SCREENSHOT_TEXTURES.clear();
 
-            List<File> filesToLoad = pagesOfScreenshots.get(index);
+            List<File> filesToLoad = screenshots;
             if (!filesToLoad.isEmpty()) {
                 filesToLoad.forEach(file -> SCREENSHOT_TEXTURES.add(Util.fileToTexture(file)));
             } else {
@@ -128,15 +127,14 @@ public class GalleryScreen extends Screen implements FilterListener {
             this.addRenderableWidget(new Button(this.width / 2 + 60, bottomLine, 20, 20, Component.literal(">"), button -> modIndex(1)));
         }
 
-        if (pagesOfScreenshots.isEmpty()) {
+        if (screenshots.isEmpty()) {
             drawCenteredString(matrixStack, Minecraft.getInstance().font, Component.translatable("nicephore.screenshots.empty"), centerX, 50, Color.RED.getRGB());
         } else {
-            final List<File> currentPage = pagesOfScreenshots.get(index);
-            if (currentPage.stream().allMatch(File::exists)) {
+            if (screenshots.stream().allMatch(File::exists)) {
                 SCREENSHOT_TEXTURES.forEach(TEXTURE -> {
 
                     final int imageIndex = SCREENSHOT_TEXTURES.indexOf(TEXTURE);
-                    final String name = currentPage.get(imageIndex).getName();
+                    final String name = screenshots.get(imageIndex).getName();
                     final Component text = Component.literal(StringUtils.abbreviate(name, 13));
 
                     int x = centerX - (15 - (imageIndex % 4) * 10) - (2 - (imageIndex % 4)) * imageWidth;
@@ -148,10 +146,10 @@ public class GalleryScreen extends Screen implements FilterListener {
                     RenderSystem.disableBlend();
 
                     drawExtensionBadge(matrixStack, FilenameUtils.getExtension(name), x - 10, y + 14);
-                    this.addRenderableWidget(new Button(x, y + 5 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(currentPage.get(imageIndex)))));
+                    this.addRenderableWidget(new Button(x, y + 5 + imageHeight, imageWidth, 20, text, button -> openScreenshotScreen(screenshots.indexOf(screenshots.get(imageIndex)))));
                 });
 
-                drawCenteredString(matrixStack, Minecraft.getInstance().font, Component.translatable("nicephore.gui.gallery.pages", index + 1, pagesOfScreenshots.size()), centerX, bottomLine + 5, Color.WHITE.getRGB());
+                drawCenteredString(matrixStack, Minecraft.getInstance().font, Component.translatable("nicephore.gui.gallery.pages", index + 1, getNumberOfPages()), centerX, bottomLine + 5, Color.WHITE.getRGB());
             }
         }
 
@@ -165,12 +163,12 @@ public class GalleryScreen extends Screen implements FilterListener {
     }
 
     private void modIndex(int value) {
-        final int max = pagesOfScreenshots.size();
+        final long max = getNumberOfPages();
         if (index + value >= 0 && index + value < max) {
             index += value;
         } else {
             if (index + value < 0) {
-                index = max - 1;
+                index = (int) max - 1;
             } else {
                 index = 0;
             }
@@ -187,8 +185,9 @@ public class GalleryScreen extends Screen implements FilterListener {
     }
 
     private int getIndex() {
-        if (index >= pagesOfScreenshots.size() || index < 0) {
-            index = pagesOfScreenshots.size() - 1;
+        var numberOfPages = getNumberOfPages();
+        if (index >= numberOfPages || index < 0) {
+            index = (int) numberOfPages - 1;
         }
         return index;
     }

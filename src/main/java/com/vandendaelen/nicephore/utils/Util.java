@@ -1,6 +1,7 @@
 package com.vandendaelen.nicephore.utils;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.vandendaelen.nicephore.config.NicephoreConfig;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 
 import javax.imageio.ImageIO;
@@ -13,6 +14,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -65,6 +70,34 @@ public class Util {
             } else {
                 throw new IllegalArgumentException("Can't open stream for this image");
             }
+        }
+    }
+
+    public static List<File> getBatchOfFiles(long toSkip, long toTake, File directory) {
+        try (Stream<Path> stream = Files.list(directory.toPath())) {
+            final var filter = NicephoreConfig.Client.getScreenshotFilter().getPredicate();
+            return stream
+                    .filter(path -> !Files.isDirectory(path) && filter.accept(path.toFile(), path.getFileName().toString()))
+                    .sequential()
+                    .map(Path::toFile)
+                    .sorted(Comparator.comparingLong(File::lastModified).reversed())
+                    .skip(toSkip)
+                    .limit(toTake)
+                    .toList();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    public static long getNumberOfFiles(File directory) {
+        try (Stream<Path> stream = Files.list(directory.toPath())) {
+            return stream
+                    .filter(path -> !Files.isDirectory(path))
+                    .count();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0L;
         }
     }
 }
