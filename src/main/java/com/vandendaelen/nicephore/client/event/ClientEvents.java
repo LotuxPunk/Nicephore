@@ -10,8 +10,7 @@ import com.vandendaelen.nicephore.utils.CopyImageToClipBoard;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.InputEvent;
@@ -45,9 +44,9 @@ public final class ClientEvents {
     public static void onKey(final InputEvent.KeyInputEvent event) {
         if (COPY_KEY.consumeClick()) {
             if (CopyImageToClipBoard.getInstance().copyLastScreenshot()) {
-                PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.success"));
+                PlayerHelper.sendMessage(Component.translatable("nicephore.clipboard.success"));
             } else {
-                PlayerHelper.sendMessage(new TranslatableComponent("nicephore.clipboard.error"));
+                PlayerHelper.sendMessage(Component.translatable("nicephore.clipboard.error"));
             }
         }
 
@@ -55,7 +54,7 @@ public final class ClientEvents {
             if (ScreenshotScreen.canBeShow()) {
                 Minecraft.getInstance().setScreen(new ScreenshotScreen());
             } else {
-                PlayerHelper.sendHotbarMessage(new TranslatableComponent("nicephore.screenshots.empty"));
+                PlayerHelper.sendHotbarMessage(Component.translatable("nicephore.screenshots.empty"));
             }
         }
 
@@ -63,7 +62,7 @@ public final class ClientEvents {
             if (GalleryScreen.canBeShow()) {
                 Minecraft.getInstance().setScreen(new GalleryScreen());
             } else {
-                PlayerHelper.sendHotbarMessage(new TranslatableComponent("nicephore.screenshots.empty"));
+                PlayerHelper.sendHotbarMessage(Component.translatable("nicephore.screenshots.empty"));
             }
         }
     }
@@ -74,7 +73,7 @@ public final class ClientEvents {
         thread.start();
 
         if (NicephoreConfig.Client.getScreenshotCustomMessage()) {
-            event.setResultMessage(new TextComponent(""));
+            event.setResultMessage(Component.literal(""));
         }
     }
 

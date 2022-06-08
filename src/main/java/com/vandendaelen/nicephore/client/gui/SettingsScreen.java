@@ -5,12 +5,12 @@ import com.vandendaelen.nicephore.config.NicephoreConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 import java.awt.*;
 
 public class SettingsScreen extends Screen {
-    private static final TranslatableComponent TITLE = new TranslatableComponent("nicephore.gui.settings");
+    private static final Component TITLE = Component.translatable("nicephore.gui.settings");
 
     protected SettingsScreen() {
         super(TITLE);
@@ -22,14 +22,14 @@ public class SettingsScreen extends Screen {
         final int centerX = this.width / 2;
         final int startingLine = this.width / 2 - 150;
 
-        drawCenteredString(pPoseStack, Minecraft.getInstance().font, new TranslatableComponent("nicephore.gui.settings"), centerX, 35, Color.WHITE.getRGB());
+        drawCenteredString(pPoseStack, Minecraft.getInstance().font, Component.translatable("nicephore.gui.settings"), centerX, 35, Color.WHITE.getRGB());
 
         this.clearWidgets();
-        this.addRenderableWidget(new Button(this.width - 60, 10, 50, 20, new TranslatableComponent("nicephore.screenshot.exit"), button -> onClose()));
-        this.addRenderableWidget(new Button(startingLine, 60, 300, 20, new TranslatableComponent("nicephore.screenshot.showOptimisationStatus", NicephoreConfig.Client.getShouldShowOptStatus() ? "ON" : "OFF"), button -> changeShowOptimisationStatus(!NicephoreConfig.Client.getShouldShowOptStatus())));
-        this.addRenderableWidget(new Button(startingLine, 90, 300, 20, new TranslatableComponent("nicephore.screenshot.makeJPEGs", NicephoreConfig.Client.getJPEGToggle() ? "ON" : "OFF"), button -> changeMakeJPEGs(!NicephoreConfig.Client.getJPEGToggle())));
-        this.addRenderableWidget(new Button(startingLine, 120, 300, 20, new TranslatableComponent("nicephore.screenshot.screenshotCustomMessage", NicephoreConfig.Client.getScreenshotCustomMessage() ? "ON" : "OFF"), button -> changeScreenshotCustomMessage(!NicephoreConfig.Client.getScreenshotCustomMessage())));
-        this.addRenderableWidget(new Button(startingLine, 150, 300, 20, new TranslatableComponent("nicephore.screenshot.setScreenshotToClipboard", NicephoreConfig.Client.getScreenshotToClipboard() ? "ON" : "OFF"), button -> changeScreenshotToClipboard(!NicephoreConfig.Client.getScreenshotToClipboard())));
+        this.addRenderableWidget(new Button(this.width - 60, 10, 50, 20, Component.translatable("nicephore.screenshot.exit"), button -> onClose()));
+        this.addRenderableWidget(new Button(startingLine, 60, 300, 20, Component.translatable("nicephore.screenshot.showOptimisationStatus", NicephoreConfig.Client.getShouldShowOptStatus() ? "ON" : "OFF"), button -> changeShowOptimisationStatus(!NicephoreConfig.Client.getShouldShowOptStatus())));
+        this.addRenderableWidget(new Button(startingLine, 90, 300, 20, Component.translatable("nicephore.screenshot.makeJPEGs", NicephoreConfig.Client.getJPEGToggle() ? "ON" : "OFF"), button -> changeMakeJPEGs(!NicephoreConfig.Client.getJPEGToggle())));
+        this.addRenderableWidget(new Button(startingLine, 120, 300, 20, Component.translatable("nicephore.screenshot.screenshotCustomMessage", NicephoreConfig.Client.getScreenshotCustomMessage() ? "ON" : "OFF"), button -> changeScreenshotCustomMessage(!NicephoreConfig.Client.getScreenshotCustomMessage())));
+        this.addRenderableWidget(new Button(startingLine, 150, 300, 20, Component.translatable("nicephore.screenshot.setScreenshotToClipboard", NicephoreConfig.Client.getScreenshotToClipboard() ? "ON" : "OFF"), button -> changeScreenshotToClipboard(!NicephoreConfig.Client.getScreenshotToClipboard())));
 
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
     }

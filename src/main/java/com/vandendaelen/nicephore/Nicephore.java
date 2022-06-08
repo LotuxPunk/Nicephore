@@ -1,5 +1,6 @@
 package com.vandendaelen.nicephore;
 
+import com.mojang.logging.LogUtils;
 import com.vandendaelen.nicephore.client.event.ClientEvents;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import com.vandendaelen.nicephore.thread.InitThread;
@@ -11,13 +12,12 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkConstants;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 @Mod(Nicephore.MODID)
 public final class Nicephore {
     // Directly reference a log4j logger.
-    public static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MODID = "nicephore";
     public static final String MOD_NAME = "Nicephore";
 
