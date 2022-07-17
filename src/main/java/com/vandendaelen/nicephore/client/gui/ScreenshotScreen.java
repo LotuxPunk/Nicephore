@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -126,7 +127,7 @@ public class ScreenshotScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@NotNull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         final int centerX = this.minecraft.getWindow().getGuiScaledWidth() / 2;
         final int pictureMidWith = (int) (this.minecraft.getWindow().getGuiScaledWidth() * 0.5 * 1.2);
         final int pictureHeight = (int) (pictureMidWith / aspectRatio);
