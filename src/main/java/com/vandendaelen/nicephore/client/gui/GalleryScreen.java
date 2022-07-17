@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -60,7 +61,7 @@ public class GalleryScreen extends Screen implements FilterListener {
     }
 
     private long getNumberOfPages() {
-        return Math.round(getNumberOfFiles(SCREENSHOTS_DIR) / (double) IMAGES_TO_DISPLAY);
+        return (long) Math.ceil(getNumberOfFiles(SCREENSHOTS_DIR) / (double) IMAGES_TO_DISPLAY);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class GalleryScreen extends Screen implements FilterListener {
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@NotNull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         final int centerX = this.width / 2;
         final int imageWidth = (int) (this.width * 1.0 / 5);
         final int imageHeight = (int) (imageWidth / aspectRatio);
@@ -186,7 +187,7 @@ public class GalleryScreen extends Screen implements FilterListener {
 
     private int getIndex() {
         var numberOfPages = getNumberOfPages();
-        if (index >= numberOfPages || index < 0) {
+        if (index > numberOfPages || index < 0) {
             index = (int) numberOfPages - 1;
         }
         return index;
