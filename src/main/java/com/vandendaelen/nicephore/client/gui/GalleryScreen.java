@@ -61,7 +61,7 @@ public class GalleryScreen extends Screen implements FilterListener {
     }
 
     private long getNumberOfPages() {
-        return Math.round(getNumberOfFiles(SCREENSHOTS_DIR) / (double) IMAGES_TO_DISPLAY);
+        return (long) Math.ceil(getNumberOfFiles(SCREENSHOTS_DIR) / (double) IMAGES_TO_DISPLAY);
     }
 
     @Override
@@ -187,11 +187,8 @@ public class GalleryScreen extends Screen implements FilterListener {
 
     private int getIndex() {
         var numberOfPages = getNumberOfPages();
-        if (index >= numberOfPages || index < 0) {
+        if (index > numberOfPages || index < 0) {
             index = (int) numberOfPages - 1;
-        }
-        if (index < 0) {
-            index = 0;
         }
         return index;
     }
