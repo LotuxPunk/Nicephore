@@ -7,12 +7,26 @@ import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import org.lwjgl.glfw.GLFW;
 
-public class KeyMappings {
-    public static final KeyMapping COPY_KEY = new KeyMapping(Nicephore.MODID + ".keybinds.copy", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_C), Nicephore.MOD_NAME);
-    public static final KeyMapping GUI_SCREENSHOT_KEY = new KeyMapping(Nicephore.MODID + ".keybinds.screenshots.gui", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_S), Nicephore.MOD_NAME);
-    public static final KeyMapping GUI_GALLERY_KEY = new KeyMapping(Nicephore.MODID + ".keybinds.gallery.gui", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, getKey(GLFW.GLFW_KEY_G), Nicephore.MOD_NAME);
+public enum KeyMappings {
+    COPY_KEY("copy", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, GLFW.GLFW_KEY_C),
+    GUI_SCREENSHOT_KEY("screenshots.gui", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, GLFW.GLFW_KEY_S),
+    GUI_GALLERY_KEY("gallery.gui", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, GLFW.GLFW_KEY_G);
+
+    private final KeyMapping key;
+
+    KeyMappings(String localizationKey, KeyConflictContext context, KeyModifier modifier, int key) {
+        this.key = new KeyMapping(Nicephore.MODID + ".keybinds." + localizationKey, context, modifier, getKey(key), Nicephore.MOD_NAME);
+    }
+
+    public boolean consumeClick() {
+        return getKey().consumeClick();
+    }
 
     private static InputConstants.Key getKey(final int key) {
         return InputConstants.Type.KEYSYM.getOrCreate(key);
+    }
+
+    public KeyMapping getKey() {
+        return key;
     }
 }
