@@ -136,30 +136,30 @@ public class ScreenshotScreen extends Screen {
         this.renderBackground(matrixStack);
 
         this.clearWidgets();
-        this.addRenderableWidget(new Button(10, 10, 100, 20, Component.translatable("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name()), button -> changeFilter()));
-        this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() - 60, 10, 50, 20, Component.translatable("nicephore.screenshot.exit"), button -> onClose()));
-        this.addRenderableWidget(new Button(this.width - 120, 10, 50, 20, Component.translatable("nicephore.gui.settings"), button -> openSettingsScreen()));
+        this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name()), button -> changeFilter()).bounds(10, 10, 100, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.exit"), button -> onClose()).bounds(this.minecraft.getWindow().getGuiScaledWidth() - 60, 10, 50, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("nicephore.gui.settings"), button -> openSettingsScreen()).bounds(this.width - 120, 10, 50, 20).build());
 
         if (!screenshots.isEmpty()) {
-            this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() / 2 - 80, bottomLine, 20, 20, Component.literal("<"), button -> modIndex(-1)));
-            this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() / 2 + 60, bottomLine, 20, 20, Component.literal(">"), button -> modIndex(1)));
+            this.addRenderableWidget(Button.builder(Component.literal("<"), button -> modIndex(-1)).bounds(this.minecraft.getWindow().getGuiScaledWidth() / 2 - 80, bottomLine, 20, 20).build());
+            this.addRenderableWidget(Button.builder(Component.literal(">"), button -> modIndex(1)).bounds(this.minecraft.getWindow().getGuiScaledWidth() / 2 + 60, bottomLine, 20, 20).build());
 
-            Button copyButton = new Button(this.minecraft.getWindow().getGuiScaledWidth() / 2 - 52, bottomLine, 50, 20, Component.translatable("nicephore.gui.screenshots.copy"), button -> {
+            Button copyButton = Button.builder(Component.translatable("nicephore.gui.screenshots.copy"), button -> {
                 final File screenshot = screenshots.get(index);
                 if (CopyImageToClipBoard.getInstance().copyImage(screenshot)) {
                     PlayerHelper.sendMessage(Component.translatable("nicephore.clipboard.success"));
                 } else {
                     PlayerHelper.sendMessage(Component.translatable("nicephore.clipboard.error"));
                 }
-            });
+            }).bounds(this.minecraft.getWindow().getGuiScaledWidth() / 2 - 52, bottomLine, 50, 20).build();
 
             copyButton.active = OperatingSystems.getOS().getManager() != null;
-            if (!copyButton.isActive() && (mouseX >= (double) copyButton.x && mouseY >= (double) copyButton.y && mouseX < (double) (copyButton.x + copyButton.getWidth()) && mouseY < (double) (copyButton.y + copyButton.getHeight()))) {
+            if (!copyButton.isActive() && (mouseX >= (double) copyButton.getX() && mouseY >= (double) copyButton.getY() && mouseX < (double) (copyButton.getX() + copyButton.getWidth()) && mouseY < (double) (copyButton.getY() + copyButton.getHeight()))) {
                 renderComponentTooltip(matrixStack, List.of(Component.translatable("nicephore.gui.screenshots.copy.unable").withStyle(ChatFormatting.RED)), mouseX, mouseY);
             }
             this.addRenderableWidget(copyButton);
 
-            this.addRenderableWidget(new Button(this.minecraft.getWindow().getGuiScaledWidth() / 2 + 3, bottomLine, 50, 20, Component.translatable("nicephore.gui.screenshots.delete"), button -> deleteScreenshot(screenshots.get(index))));
+            this.addRenderableWidget(Button.builder(Component.translatable("nicephore.gui.screenshots.delete"), button -> deleteScreenshot(screenshots.get(index))).bounds(this.minecraft.getWindow().getGuiScaledWidth() / 2 + 3, bottomLine, 50, 20).build());
         }
 
         if (screenshots.isEmpty()) {

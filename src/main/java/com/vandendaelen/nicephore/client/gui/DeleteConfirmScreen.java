@@ -26,8 +26,7 @@ public class DeleteConfirmScreen extends Screen {
     protected void init() {
         super.init();
 
-        this.clearWidgets();
-        this.addRenderableWidget(new Button(this.width / 2 - 35, this.height / 2 + 30, 30, 20, Component.translatable("nicephore.gui.delete.yes"), button -> {
+        var confirmButton = Button.builder(Component.translatable("nicephore.gui.delete.yes"), button -> {
             deleteScreenshot();
 
             if (instanceToOpenIfDeleted != null) {
@@ -35,10 +34,13 @@ public class DeleteConfirmScreen extends Screen {
             } else {
                 onClose();
             }
-        }));
-        this.addRenderableWidget(new Button(this.width / 2 + 5, this.height / 2 + 30, 30, 20, Component.translatable("nicephore.gui.delete.no"), button -> {
-            onClose();
-        }));
+        }).bounds(this.width / 2 - 35, this.height / 2 + 30, 30, 20).build();
+
+        var denyButton = Button.builder(Component.translatable("nicephore.gui.delete.no"), button -> onClose()).bounds(this.width / 2 + 5, this.height / 2 + 30, 30, 20).build();
+
+        this.clearWidgets();
+        this.addRenderableWidget(confirmButton);
+        this.addRenderableWidget(denyButton);
 
     }
 

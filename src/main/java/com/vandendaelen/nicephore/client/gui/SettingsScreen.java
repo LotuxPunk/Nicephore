@@ -26,11 +26,11 @@ public class SettingsScreen extends Screen {
         drawCenteredString(pPoseStack, Minecraft.getInstance().font, Component.translatable("nicephore.gui.settings"), centerX, 35, Color.WHITE.getRGB());
 
         this.clearWidgets();
-        this.addRenderableWidget(new Button(this.width - 60, 10, 50, 20, Component.translatable("nicephore.screenshot.exit"), button -> onClose()));
-        this.addRenderableWidget(new Button(startingLine, 60, 300, 20, Component.translatable("nicephore.screenshot.showOptimisationStatus", NicephoreConfig.Client.getShouldShowOptStatus() ? "ON" : "OFF"), button -> changeShowOptimisationStatus(!NicephoreConfig.Client.getShouldShowOptStatus())));
-        this.addRenderableWidget(new Button(startingLine, 90, 300, 20, Component.translatable("nicephore.screenshot.makeJPEGs", NicephoreConfig.Client.getJPEGToggle() ? "ON" : "OFF"), button -> changeMakeJPEGs(!NicephoreConfig.Client.getJPEGToggle())));
-        this.addRenderableWidget(new Button(startingLine, 120, 300, 20, Component.translatable("nicephore.screenshot.screenshotCustomMessage", NicephoreConfig.Client.getScreenshotCustomMessage() ? "ON" : "OFF"), button -> changeScreenshotCustomMessage(!NicephoreConfig.Client.getScreenshotCustomMessage())));
-        this.addRenderableWidget(new Button(startingLine, 150, 300, 20, Component.translatable("nicephore.screenshot.setScreenshotToClipboard", NicephoreConfig.Client.getScreenshotToClipboard() ? "ON" : "OFF"), button -> changeScreenshotToClipboard(!NicephoreConfig.Client.getScreenshotToClipboard())));
+        this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.exit"), button -> onClose()).bounds(this.width - 60, 10, 50, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.showOptimisationStatus", NicephoreConfig.Client.getShouldShowOptStatus() ? "ON" : "OFF"), button -> changeShowOptimisationStatus(!NicephoreConfig.Client.getShouldShowOptStatus())).bounds(startingLine, 60, 300, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.makeJPEGs", NicephoreConfig.Client.getJPEGToggle() ? "ON" : "OFF"), button -> changeMakeJPEGs(!NicephoreConfig.Client.getJPEGToggle())).bounds(startingLine, 90, 300, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.screenshotCustomMessage", NicephoreConfig.Client.getScreenshotCustomMessage() ? "ON" : "OFF"), button -> changeScreenshotCustomMessage(!NicephoreConfig.Client.getScreenshotCustomMessage())).bounds(startingLine, 120, 300, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.setScreenshotToClipboard", NicephoreConfig.Client.getScreenshotToClipboard() ? "ON" : "OFF"), button -> changeScreenshotToClipboard(!NicephoreConfig.Client.getScreenshotToClipboard())).bounds(startingLine, 150, 300, 20).build());
 
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
     }
