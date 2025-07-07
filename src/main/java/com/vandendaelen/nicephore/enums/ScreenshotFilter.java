@@ -7,7 +7,7 @@ public enum ScreenshotFilter {
     PNG((dir, name) -> name.endsWith(".png")),
     BOTH((dir, name) -> name.endsWith(".jpg") || name.endsWith(".png"));
 
-    private FilenameFilter predicate;
+    private final FilenameFilter predicate;
 
     ScreenshotFilter(FilenameFilter predicate) {
         this.predicate = predicate;

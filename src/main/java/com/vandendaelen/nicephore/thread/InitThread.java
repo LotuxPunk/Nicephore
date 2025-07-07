@@ -25,7 +25,7 @@ import java.util.zip.ZipInputStream;
 
 public final class InitThread extends Thread {
 
-    private boolean optimiseConfig;
+    private final boolean optimiseConfig;
 
     public InitThread(boolean optimiseConfig) {
         this.optimiseConfig = optimiseConfig;

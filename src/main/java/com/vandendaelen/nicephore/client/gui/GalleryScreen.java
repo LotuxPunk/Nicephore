@@ -35,7 +35,7 @@ public class GalleryScreen extends Screen implements FilterListener {
     private final int ROW = getRows();
     private final int COLUMN = 4;
     private final int IMAGES_TO_DISPLAY = ROW * COLUMN;
-    private static ArrayList<DynamicTexture> SCREENSHOT_TEXTURES = new ArrayList<>();
+    private static final ArrayList<DynamicTexture> SCREENSHOT_TEXTURES = new ArrayList<>();
     private List<File> screenshots;
     private int index;
     private float aspectRatio;

@@ -43,7 +43,7 @@ public class ScreenshotScreen extends Screen {
     private ArrayList<File> screenshots;
     private int index;
     private float aspectRatio;
-    private FilterListener listener;
+    private final FilterListener listener;
 
     public ScreenshotScreen(int index, int galleryScreenPage, FilterListener listener) {
         super(TITLE);
