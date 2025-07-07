@@ -1,14 +1,14 @@
 package com.vandendaelen.nicephore.client.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vandendaelen.nicephore.config.NicephoreConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class SettingsScreen extends Screen {
     private static final Component TITLE = Component.translatable("nicephore.gui.settings");
@@ -18,12 +18,12 @@ public class SettingsScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        this.renderBackground(pPoseStack);
+    public void render(@NotNull GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        this.renderBackground(guiGraphics);
         final int centerX = this.width / 2;
         final int startingLine = this.width / 2 - 150;
 
-        drawCenteredString(pPoseStack, Minecraft.getInstance().font, Component.translatable("nicephore.gui.settings"), centerX, 35, Color.WHITE.getRGB());
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("nicephore.gui.settings"), centerX, 35, Color.WHITE.getRGB());
 
         this.clearWidgets();
         this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.exit"), button -> onClose()).bounds(this.width - 60, 10, 50, 20).build());
@@ -32,7 +32,7 @@ public class SettingsScreen extends Screen {
         this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.screenshotCustomMessage", NicephoreConfig.Client.getScreenshotCustomMessage() ? "ON" : "OFF"), button -> changeScreenshotCustomMessage(!NicephoreConfig.Client.getScreenshotCustomMessage())).bounds(startingLine, 120, 300, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.setScreenshotToClipboard", NicephoreConfig.Client.getScreenshotToClipboard() ? "ON" : "OFF"), button -> changeScreenshotToClipboard(!NicephoreConfig.Client.getScreenshotToClipboard())).bounds(startingLine, 150, 300, 20).build());
 
-        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+        super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
     }
 
     private void changeShowOptimisationStatus(boolean value) {

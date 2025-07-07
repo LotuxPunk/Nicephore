@@ -2,13 +2,13 @@ plugins {
     id 'java'
     id 'eclipse'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-version = '1.19.4-1.0.3'
+version = '1.20.1-1.0.3'
 group = 'com.vandendaelen'
 base {
     archivesName = 'nicephore'
@@ -19,7 +19,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'parchment', version: '2023.06.26-1.19.4'
+    mappings channel: 'parchment', version: '2023.09.03-1.20.1'
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
     runs {
@@ -73,7 +73,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.4.0'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.4.0'
     implementation 'com.profesorfalken:jPowerShell:3.1.1'
     shade 'com.profesorfalken:jPowerShell:3.1.1'
     library 'com.profesorfalken:jPowerShell:3.1.1'
@@ -109,7 +109,7 @@ tasks.named('jar', Jar) {
 }
 
 shadowJar {
-    archiveClassifier.set("")
+    archiveClassifier.set('fat')
     configurations = [project.configurations.shade]
 
     manifest.from(MANIFEST)

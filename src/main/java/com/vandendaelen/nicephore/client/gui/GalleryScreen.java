@@ -8,9 +8,11 @@ import com.vandendaelen.nicephore.utils.FilterListener;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import com.vandendaelen.nicephore.utils.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -109,13 +111,13 @@ public class GalleryScreen extends Screen implements FilterListener {
     }
 
     @Override
-    public void render(@NotNull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         final int centerX = this.width / 2;
         final int imageWidth = (int) (this.width * 1.0 / 5);
         final int imageHeight = (int) (imageWidth / aspectRatio);
         final int bottomLine = this.minecraft.getWindow().getGuiScaledHeight() - 30;
 
-        this.renderBackground(matrixStack);
+        this.renderBackground(guiGraphics);
 
         this.clearWidgets();
         this.addRenderableWidget(Button.builder(Component.translatable("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name()), button -> changeFilter()).bounds(10, 10, 100, 20).build());
@@ -128,11 +130,11 @@ public class GalleryScreen extends Screen implements FilterListener {
         }
 
         if (screenshots.isEmpty()) {
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, Component.translatable("nicephore.screenshots.empty"), centerX, 50, Color.RED.getRGB());
+            guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("nicephore.screenshots.empty"), centerX, 50, Color.RED.getRGB());
         } else {
             if (screenshots.stream().allMatch(File::exists)) {
+                TextureManager tm = this.minecraft.getTextureManager();
                 SCREENSHOT_TEXTURES.forEach(TEXTURE -> {
-
                     final int imageIndex = SCREENSHOT_TEXTURES.indexOf(TEXTURE);
                     final String name = screenshots.get(imageIndex).getName();
                     final Component text = Component.literal(StringUtils.abbreviate(name, 13));
@@ -140,25 +142,22 @@ public class GalleryScreen extends Screen implements FilterListener {
                     int x = centerX - (15 - (imageIndex % 4) * 10) - (2 - (imageIndex % 4)) * imageWidth;
                     int y = 50 + (imageIndex / 4 * (imageHeight + 30));
 
-                    RenderSystem.setShaderTexture(0, TEXTURE.getId());
-                    RenderSystem.enableBlend();
-                    blit(matrixStack, x, y, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                    RenderSystem.disableBlend();
+                    guiGraphics.blit(tm.register("screenshot_" + TEXTURE.getId(), TEXTURE), x, y, 0, 0, imageWidth, imageHeight);
 
-                    drawExtensionBadge(matrixStack, FilenameUtils.getExtension(name), x - 10, y + 14);
+                    drawExtensionBadge(guiGraphics, FilenameUtils.getExtension(name), x - 10, y + 14);
                     this.addRenderableWidget(Button.builder(text, button -> openScreenshotScreen(screenshots.indexOf(screenshots.get(imageIndex)))).bounds(x, y + 5 + imageHeight, imageWidth, 20).build());
                 });
 
-                drawCenteredString(matrixStack, Minecraft.getInstance().font, Component.translatable("nicephore.gui.gallery.pages", index + 1, getNumberOfPages()), centerX, bottomLine + 5, Color.WHITE.getRGB());
+                guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("nicephore.gui.gallery.pages", index + 1, getNumberOfPages()), centerX, bottomLine + 5, Color.WHITE.getRGB());
             }
         }
 
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
-    private void drawExtensionBadge(PoseStack matrixStack, String extension, int x, int y) {
+    private void drawExtensionBadge(GuiGraphics guiGraphics, String extension, int x, int y) {
         if (NicephoreConfig.Client.getScreenshotFilter() == ScreenshotFilter.BOTH) {
-            drawString(matrixStack, Minecraft.getInstance().font, extension.toUpperCase(), x + 12, y - 12, Color.WHITE.getRGB());
+            guiGraphics.drawString(Minecraft.getInstance().font, extension.toUpperCase(), x + 12, y - 12, Color.WHITE.getRGB());
         }
     }
 

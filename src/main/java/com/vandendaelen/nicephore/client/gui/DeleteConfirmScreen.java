@@ -1,8 +1,8 @@
 package com.vandendaelen.nicephore.client.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.vandendaelen.nicephore.utils.PlayerHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -45,11 +45,11 @@ public class DeleteConfirmScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
-        drawCenteredString(matrixStack, Minecraft.getInstance().font, Component.translatable("nicephore.gui.delete.question", file.getName()), this.width / 2, this.height / 2 - 20, Color.RED.getRGB());
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("nicephore.gui.delete.question", file.getName()), this.width / 2, this.height / 2 - 20, Color.RED.getRGB());
     }
 
     private void deleteScreenshot() {
