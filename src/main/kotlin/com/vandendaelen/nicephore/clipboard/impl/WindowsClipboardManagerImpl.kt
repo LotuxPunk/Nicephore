@@ -6,10 +6,12 @@ import net.minecraft.Util
 import java.io.File
 
 class WindowsClipboardManagerImpl private constructor() : ClipboardManager {
-    private val session: PowerShell? = if (Util.getPlatform() == Util.OS.WINDOWS) {
-        PowerShell.openSession()
-    } else {
-        null
+    private val session: PowerShell? by lazy {
+        if (Util.getPlatform() == Util.OS.WINDOWS) {
+            PowerShell.openSession()
+        } else {
+            null
+        }
     }
 
     override fun clipboardImage(screenshot: File): Boolean {

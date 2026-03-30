@@ -138,6 +138,7 @@ class InitThread(private val optimiseConfig: Boolean) : Thread() {
         private fun unzip(zipFilePath: String, destDir: String) {
             val dir = File(destDir)
             if (!dir.exists()) dir.mkdirs()
+            val destDirPath = dir.canonicalPath
             val buffer = ByteArray(1024)
             try {
                 FileInputStream(zipFilePath).use { fis ->
@@ -146,6 +147,10 @@ class InitThread(private val optimiseConfig: Boolean) : Thread() {
                         while (ze != null) {
                             val fileName = ze.name
                             val newFile = File(destDir + File.separator + fileName)
+                            // Protect against Zip Slip
+                            if (!newFile.canonicalPath.startsWith(destDirPath + File.separator)) {
+                                throw IOException("Entry is outside of the target dir: $fileName")
+                            }
                             println("Unzipping to ${newFile.absolutePath}")
                             File(newFile.parent).mkdirs()
                             FileOutputStream(newFile).use { fos ->

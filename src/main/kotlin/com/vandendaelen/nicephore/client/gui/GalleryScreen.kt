@@ -26,7 +26,7 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
     private var aspectRatio: Float = 1.7777f
 
     private fun getNumberOfPages(): Long {
-        return Math.ceil(Util.getNumberOfFiles(SCREENSHOTS_DIR) / imagesToDisplay.toDouble()).toLong()
+        return kotlin.math.ceil(Util.getNumberOfFiles(SCREENSHOTS_DIR) / imagesToDisplay.toDouble()).toLong()
     }
 
     override fun init() {
