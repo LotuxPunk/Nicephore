@@ -1,0 +1,25 @@
+package com.vandendaelen.nicephore.clipboard.impl
+
+import com.vandendaelen.nicephore.clipboard.ClipboardManager
+import java.io.File
+import java.io.IOException
+
+class MacOSClipboardManagerImpl private constructor() : ClipboardManager {
+    override fun clipboardImage(screenshot: File): Boolean {
+        val cmd = arrayOf(
+            "osascript", "-e",
+            "tell app \"Finder\" to set the clipboard to ( POSIX file \"${screenshot.absolutePath}\" )"
+        )
+        return try {
+            Runtime.getRuntime().exec(cmd)
+            true
+        } catch (e: IOException) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    companion object {
+        val instance: MacOSClipboardManagerImpl by lazy { MacOSClipboardManagerImpl() }
+    }
+}
