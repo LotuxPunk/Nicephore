@@ -9,7 +9,7 @@ import com.vandendaelen.nicephore.utils.PlayerHelper
 import com.vandendaelen.nicephore.utils.Util
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.renderer.texture.DynamicTexture
@@ -84,14 +84,14 @@ class ScreenshotScreen @JvmOverloads constructor(
         listener?.onFilterChange(nextFilter)
     }
 
-    override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         val mc = this.minecraft!!
         val centerX = mc.window.guiScaledWidth / 2
         val pictureMidWidth = (mc.window.guiScaledWidth * 0.5 * 1.2).toInt()
         val pictureHeight = (pictureMidWidth / aspectRatio).toInt()
         val bottomLine = mc.window.guiScaledHeight - 30
 
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks)
+        this.extractBackground(guiGraphics, mouseX, mouseY, partialTicks)
 
         this.clearWidgets()
         this.addRenderableWidget(
@@ -131,7 +131,7 @@ class ScreenshotScreen @JvmOverloads constructor(
                 mouseX >= copyButton.x && mouseY >= copyButton.y &&
                 mouseX < copyButton.x + copyButton.width && mouseY < copyButton.y + copyButton.height
             ) {
-                guiGraphics.renderComponentTooltip(
+                guiGraphics.componentTooltip(
                     Minecraft.getInstance().font,
                     listOf(Component.translatable("nicephore.gui.screenshots.copy.unable").withStyle(ChatFormatting.RED)),
                     mouseX, mouseY
@@ -146,7 +146,7 @@ class ScreenshotScreen @JvmOverloads constructor(
         }
 
         if (screenshots.isEmpty()) {
-            guiGraphics.drawCenteredString(
+            guiGraphics.centeredText(
                 Minecraft.getInstance().font,
                 Component.translatable("nicephore.screenshots.empty"),
                 centerX, 20, Color.RED.rgb
@@ -161,12 +161,12 @@ class ScreenshotScreen @JvmOverloads constructor(
                     pictureMidWidth, pictureHeight, pictureMidWidth, pictureHeight
                 )
 
-                guiGraphics.drawCenteredString(
+                guiGraphics.centeredText(
                     Minecraft.getInstance().font,
                     Component.translatable("nicephore.gui.screenshots.pages", index + 1, screenshots.size),
                     centerX, 20, Color.WHITE.rgb
                 )
-                guiGraphics.drawCenteredString(
+                guiGraphics.centeredText(
                     Minecraft.getInstance().font,
                     Component.literal(MessageFormat.format("{0} ({1})", currentScreenshot.name, getFileSizeMegaBytes(currentScreenshot))),
                     centerX, 35, Color.WHITE.rgb
@@ -174,7 +174,7 @@ class ScreenshotScreen @JvmOverloads constructor(
             }
         }
 
-        super.render(guiGraphics, mouseX, mouseY, partialTicks)
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks)
     }
 
     private fun modIndex(value: Int) {

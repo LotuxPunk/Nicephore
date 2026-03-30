@@ -2,7 +2,7 @@ package com.vandendaelen.nicephore.client.gui
 
 import com.vandendaelen.nicephore.utils.PlayerHelper
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
@@ -35,11 +35,11 @@ class DeleteConfirmScreen(
         this.addRenderableWidget(denyButton)
     }
 
-    override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks)
-        super.render(guiGraphics, mouseX, mouseY, partialTicks)
+    override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
+        this.extractBackground(guiGraphics, mouseX, mouseY, partialTicks)
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks)
 
-        guiGraphics.drawCenteredString(
+        guiGraphics.centeredText(
             Minecraft.getInstance().font,
             Component.translatable("nicephore.gui.delete.question", file.name),
             this.width / 2, this.height / 2 - 20, Color.RED.rgb

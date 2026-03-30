@@ -6,7 +6,7 @@ import com.vandendaelen.nicephore.utils.FilterListener
 import com.vandendaelen.nicephore.utils.PlayerHelper
 import com.vandendaelen.nicephore.utils.Util
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.renderer.texture.DynamicTexture
@@ -72,13 +72,13 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
         init()
     }
 
-    override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         val centerX = this.width / 2
         val imageWidth = (this.width * 1.0 / 5).toInt()
         val imageHeight = (imageWidth / aspectRatio).toInt()
         val bottomLine = this.minecraft!!.window.guiScaledHeight - 30
 
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks)
+        this.extractBackground(guiGraphics, mouseX, mouseY, partialTicks)
 
         this.clearWidgets()
         this.addRenderableWidget(
@@ -106,7 +106,7 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
         }
 
         if (screenshots.isEmpty()) {
-            guiGraphics.drawCenteredString(
+            guiGraphics.centeredText(
                 Minecraft.getInstance().font,
                 Component.translatable("nicephore.screenshots.empty"),
                 centerX, 50, Color.RED.rgb
@@ -133,7 +133,7 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
                     )
                 }
 
-                guiGraphics.drawCenteredString(
+                guiGraphics.centeredText(
                     Minecraft.getInstance().font,
                     Component.translatable("nicephore.gui.gallery.pages", index + 1, getNumberOfPages()),
                     centerX, bottomLine + 5, Color.WHITE.rgb
@@ -141,12 +141,12 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
             }
         }
 
-        super.render(guiGraphics, mouseX, mouseY, partialTicks)
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks)
     }
 
-    private fun drawExtensionBadge(guiGraphics: GuiGraphics, extension: String, x: Int, y: Int) {
+    private fun drawExtensionBadge(guiGraphics: GuiGraphicsExtractor, extension: String, x: Int, y: Int) {
         if (NicephoreConfig.Client.getScreenshotFilter() == ScreenshotFilter.BOTH) {
-            guiGraphics.drawString(Minecraft.getInstance().font, extension.uppercase(), x + 12, y - 12, Color.WHITE.rgb)
+            guiGraphics.text(Minecraft.getInstance().font, extension.uppercase(), x + 12, y - 12, Color.WHITE.rgb)
         }
     }
 

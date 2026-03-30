@@ -2,7 +2,7 @@ package com.vandendaelen.nicephore.client.gui
 
 import com.vandendaelen.nicephore.config.NicephoreConfig
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
@@ -10,12 +10,12 @@ import java.awt.Color
 
 class SettingsScreen : Screen(TITLE) {
 
-    override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks)
+    override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
+        this.extractBackground(guiGraphics, mouseX, mouseY, partialTicks)
         val centerX = this.width / 2
         val startingLine = this.width / 2 - 150
 
-        guiGraphics.drawCenteredString(
+        guiGraphics.centeredText(
             Minecraft.getInstance().font,
             Component.translatable("nicephore.gui.settings"),
             centerX, 35, Color.WHITE.rgb
@@ -51,7 +51,7 @@ class SettingsScreen : Screen(TITLE) {
                 .bounds(startingLine, 150, 300, 20).build()
         )
 
-        super.render(guiGraphics, mouseX, mouseY, partialTicks)
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks)
     }
 
     private fun changeShowOptimisationStatus(value: Boolean) {
