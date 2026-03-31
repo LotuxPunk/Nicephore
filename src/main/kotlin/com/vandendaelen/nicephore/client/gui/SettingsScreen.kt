@@ -9,9 +9,55 @@ import java.awt.Color
 
 class SettingsScreen : AbstractNicephoreScreen(TITLE) {
 
+    override fun init() {
+        super.init()
+        refreshWidgets()
+    }
+
+    override fun buildWidgets() {
+        val startingLine = this.width / 2 - 150
+
+        this.addRenderableWidget(
+            Button.builder(Component.translatable("nicephore.screenshot.exit")) { onClose() }
+                .bounds(this.width - PADDING - 50, PADDING, 50, BUTTON_HEIGHT).build()
+        )
+        this.addRenderableWidget(
+            Button.builder(
+                Component.translatable("nicephore.screenshot.showOptimisationStatus", if (NicephoreConfig.Client.getShouldShowOptStatus()) "ON" else "OFF")
+            ) { toggleSetting { NicephoreConfig.Client.setShouldShowOptStatus(!NicephoreConfig.Client.getShouldShowOptStatus()) } }
+                .bounds(startingLine, 60, 300, BUTTON_HEIGHT).build()
+        )
+        this.addRenderableWidget(
+            Button.builder(
+                Component.translatable("nicephore.screenshot.makeJPEGs", if (NicephoreConfig.Client.getJPEGToggle()) "ON" else "OFF")
+            ) { toggleSetting { NicephoreConfig.Client.setJPEGToggle(!NicephoreConfig.Client.getJPEGToggle()) } }
+                .bounds(startingLine, 90, 300, BUTTON_HEIGHT).build()
+        )
+        this.addRenderableWidget(
+            Button.builder(
+                Component.translatable("nicephore.screenshot.screenshotCustomMessage", if (NicephoreConfig.Client.getScreenshotCustomMessage()) "ON" else "OFF")
+            ) { toggleSetting { NicephoreConfig.Client.setScreenshotCustomMessage(!NicephoreConfig.Client.getScreenshotCustomMessage()) } }
+                .bounds(startingLine, 120, 300, BUTTON_HEIGHT).build()
+        )
+        this.addRenderableWidget(
+            Button.builder(
+                Component.translatable("nicephore.screenshot.setScreenshotToClipboard", if (NicephoreConfig.Client.getScreenshotToClipboard()) "ON" else "OFF")
+            ) { toggleSetting { NicephoreConfig.Client.setScreenshotToClipboard(!NicephoreConfig.Client.getScreenshotToClipboard()) } }
+                .bounds(startingLine, 150, 300, BUTTON_HEIGHT).build()
+        )
+
+        val currentColumns = NicephoreConfig.Client.getGalleryColumns()
+        val label = if (currentColumns == 0) "Auto" else "$currentColumns"
+        this.addRenderableWidget(
+            Button.builder(
+                Component.translatable("nicephore.settings.galleryColumns", label)
+            ) { cycleGalleryColumns() }
+                .bounds(startingLine, 180, 300, BUTTON_HEIGHT).build()
+        )
+    }
+
     override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         val centerX = this.width / 2
-        val startingLine = this.width / 2 - 150
 
         guiGraphics.centeredText(
             Minecraft.getInstance().font,
@@ -19,53 +65,23 @@ class SettingsScreen : AbstractNicephoreScreen(TITLE) {
             centerX, 35, Color.WHITE.rgb
         )
 
-        this.clearWidgets()
-        this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.screenshot.exit")) { onClose() }
-                .bounds(this.width - 60, 10, 50, 20).build()
-        )
-        this.addRenderableWidget(
-            Button.builder(
-                Component.translatable("nicephore.screenshot.showOptimisationStatus", if (NicephoreConfig.Client.getShouldShowOptStatus()) "ON" else "OFF")
-            ) { changeShowOptimisationStatus(!NicephoreConfig.Client.getShouldShowOptStatus()) }
-                .bounds(startingLine, 60, 300, 20).build()
-        )
-        this.addRenderableWidget(
-            Button.builder(
-                Component.translatable("nicephore.screenshot.makeJPEGs", if (NicephoreConfig.Client.getJPEGToggle()) "ON" else "OFF")
-            ) { changeMakeJPEGs(!NicephoreConfig.Client.getJPEGToggle()) }
-                .bounds(startingLine, 90, 300, 20).build()
-        )
-        this.addRenderableWidget(
-            Button.builder(
-                Component.translatable("nicephore.screenshot.screenshotCustomMessage", if (NicephoreConfig.Client.getScreenshotCustomMessage()) "ON" else "OFF")
-            ) { changeScreenshotCustomMessage(!NicephoreConfig.Client.getScreenshotCustomMessage()) }
-                .bounds(startingLine, 120, 300, 20).build()
-        )
-        this.addRenderableWidget(
-            Button.builder(
-                Component.translatable("nicephore.screenshot.setScreenshotToClipboard", if (NicephoreConfig.Client.getScreenshotToClipboard()) "ON" else "OFF")
-            ) { changeScreenshotToClipboard(!NicephoreConfig.Client.getScreenshotToClipboard()) }
-                .bounds(startingLine, 150, 300, 20).build()
-        )
-
         super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks)
     }
 
-    private fun changeShowOptimisationStatus(value: Boolean) {
-        NicephoreConfig.Client.setShouldShowOptStatus(value)
+    private fun toggleSetting(action: () -> Unit) {
+        action()
+        refreshWidgets()
     }
 
-    private fun changeMakeJPEGs(value: Boolean) {
-        NicephoreConfig.Client.setJPEGToggle(value)
-    }
-
-    private fun changeScreenshotCustomMessage(value: Boolean) {
-        NicephoreConfig.Client.setScreenshotCustomMessage(value)
-    }
-
-    private fun changeScreenshotToClipboard(value: Boolean) {
-        NicephoreConfig.Client.setScreenshotToClipboard(value)
+    private fun cycleGalleryColumns() {
+        val current = NicephoreConfig.Client.getGalleryColumns()
+        val next = when (current) {
+            0 -> 2
+            in 2..5 -> current + 1
+            else -> 0
+        }
+        NicephoreConfig.Client.setGalleryColumns(next)
+        refreshWidgets()
     }
 
     companion object {

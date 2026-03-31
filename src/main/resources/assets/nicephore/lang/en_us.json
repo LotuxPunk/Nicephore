@@ -36,5 +36,6 @@
   "nicephore.screenshot.showOptimisationStatus": "Display optimization status: %s",
   "nicephore.screenshot.makeJPEGs": "Make a duplicate of the screenshot as JPEG: %s",
   "nicephore.screenshot.screenshotCustomMessage": "Display a customized message on screenshot taken: %s",
-  "nicephore.screenshot.setScreenshotToClipboard": "Place the screenshot to the clipboard automatically: %s"
+  "nicephore.screenshot.setScreenshotToClipboard": "Place the screenshot to the clipboard automatically: %s",
+  "nicephore.settings.galleryColumns": "Gallery Columns: %s"
 }
