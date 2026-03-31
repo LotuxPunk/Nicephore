@@ -18,7 +18,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.neoforge.client.event.InputEvent
 import net.neoforged.neoforge.client.event.ScreenshotEvent
 
-@EventBusSubscriber(value = [Dist.CLIENT], modid = Nicephore.MODID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(value = [Dist.CLIENT], modid = Nicephore.MODID)
 object ClientGameBusEvents {
     @SubscribeEvent
     @JvmStatic
@@ -60,7 +60,7 @@ object ClientGameBusEvents {
     }
 }
 
-@EventBusSubscriber(value = [Dist.CLIENT], modid = Nicephore.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(value = [Dist.CLIENT], modid = Nicephore.MODID)
 object ClientSetupEvents {
     @SubscribeEvent
     @JvmStatic

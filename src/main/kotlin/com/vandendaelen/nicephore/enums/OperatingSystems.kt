@@ -3,7 +3,7 @@ package com.vandendaelen.nicephore.enums
 import com.vandendaelen.nicephore.clipboard.ClipboardManager
 import com.vandendaelen.nicephore.clipboard.impl.MacOSClipboardManagerImpl
 import com.vandendaelen.nicephore.clipboard.impl.WindowsClipboardManagerImpl
-import net.minecraft.Util
+import net.minecraft.util.Util
 
 enum class OperatingSystems(val manager: ClipboardManager?) {
     WINDOWS(WindowsClipboardManagerImpl.instance),

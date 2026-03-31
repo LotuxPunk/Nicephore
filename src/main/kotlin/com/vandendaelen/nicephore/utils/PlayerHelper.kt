@@ -5,10 +5,14 @@ import net.minecraft.network.chat.Component
 
 object PlayerHelper {
     fun sendMessage(message: Component) {
-        Minecraft.getInstance().player?.displayClientMessage(message, false)
+        Minecraft.getInstance().execute {
+            Minecraft.getInstance().player?.sendSystemMessage(message)
+        }
     }
 
     fun sendHotbarMessage(message: Component) {
-        Minecraft.getInstance().player?.displayClientMessage(message, true)
+        Minecraft.getInstance().execute {
+            Minecraft.getInstance().player?.sendOverlayMessage(message)
+        }
     }
 }

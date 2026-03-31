@@ -2,7 +2,6 @@ package com.vandendaelen.nicephore.client.gui
 
 import com.vandendaelen.nicephore.config.NicephoreConfig
 import com.vandendaelen.nicephore.enums.OperatingSystems
-import com.vandendaelen.nicephore.enums.ScreenshotFilter
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard
 import com.vandendaelen.nicephore.utils.FilterListener
 import com.vandendaelen.nicephore.utils.PlayerHelper
@@ -11,28 +10,26 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 import org.apache.commons.io.FileUtils
 import java.awt.Color
 import java.io.File
-import java.io.IOException
 import java.text.DecimalFormat
 import java.text.MessageFormat
 import java.text.NumberFormat
 import java.util.Comparator
-import java.util.stream.Collectors
-import javax.imageio.ImageIO
 
 class ScreenshotScreen @JvmOverloads constructor(
     private var index: Int = 0,
     private val galleryScreenPage: Int = -1,
     private val listener: FilterListener? = null
-) : Screen(TITLE) {
+) : AbstractNicephoreScreen(TITLE) {
 
     private var screenshots: ArrayList<File> = ArrayList()
-    private var aspectRatio: Float = 1.7777f
+    private var aspectRatio: Float = 16f / 9f
 
     override fun init() {
         super.init()
@@ -44,27 +41,10 @@ class ScreenshotScreen @JvmOverloads constructor(
                 ?: emptyList()
         )
 
-        index = getIndex()
-        aspectRatio = 1.7777f
+        index = clampIndex(index, screenshots.size)
+        aspectRatio = if (screenshots.isNotEmpty()) readAspectRatio(screenshots[index]) else 16f / 9f
 
         if (screenshots.isNotEmpty()) {
-            try {
-                ImageIO.createImageInputStream(screenshots[index]).use { imageIn ->
-                    val readers = ImageIO.getImageReaders(imageIn)
-                    if (readers.hasNext()) {
-                        val reader = readers.next()
-                        try {
-                            reader.setInput(imageIn)
-                            aspectRatio = reader.getWidth(0) / reader.getHeight(0).toFloat()
-                        } finally {
-                            reader.dispose()
-                        }
-                    }
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-
             screenshotTexture?.close()
 
             val fileToLoad = screenshots[index]
@@ -77,45 +57,17 @@ class ScreenshotScreen @JvmOverloads constructor(
         }
     }
 
-    private fun changeFilter() {
-        val nextFilter = NicephoreConfig.Client.getScreenshotFilter().next()
-        NicephoreConfig.Client.setScreenshotFilter(nextFilter)
-        init()
-        listener?.onFilterChange(nextFilter)
-    }
-
     override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        val mc = this.minecraft!!
-        val centerX = mc.window.guiScaledWidth / 2
-        val pictureMidWidth = (mc.window.guiScaledWidth * 0.5 * 1.2).toInt()
+        val centerX = this.width / 2
+        val pictureMidWidth = (this.width * 0.5 * 1.2).toInt()
         val pictureHeight = (pictureMidWidth / aspectRatio).toInt()
-        val bottomLine = mc.window.guiScaledHeight - 30
-
-        this.extractBackground(guiGraphics, mouseX, mouseY, partialTicks)
+        val bottomLine = this.minecraft.window.guiScaledHeight - 30
 
         this.clearWidgets()
-        this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name)) { changeFilter() }
-                .bounds(10, 10, 100, 20).build()
-        )
-        this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.screenshot.exit")) { onClose() }
-                .bounds(mc.window.guiScaledWidth - 60, 10, 50, 20).build()
-        )
-        this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.gui.settings")) { openSettingsScreen() }
-                .bounds(this.width - 120, 10, 50, 20).build()
-        )
+        addToolbarButtons { cycleFilter(listener) }
 
         if (screenshots.isNotEmpty()) {
-            this.addRenderableWidget(
-                Button.builder(Component.literal("<")) { modIndex(-1) }
-                    .bounds(mc.window.guiScaledWidth / 2 - 80, bottomLine, 20, 20).build()
-            )
-            this.addRenderableWidget(
-                Button.builder(Component.literal(">")) { modIndex(1) }
-                    .bounds(mc.window.guiScaledWidth / 2 + 60, bottomLine, 20, 20).build()
-            )
+            addNavigationButtons(centerX, bottomLine, { modIndex(-1) }, { modIndex(1) })
 
             val copyButton = Button.builder(Component.translatable("nicephore.gui.screenshots.copy")) {
                 val screenshot = screenshots[index]
@@ -124,14 +76,14 @@ class ScreenshotScreen @JvmOverloads constructor(
                 } else {
                     PlayerHelper.sendMessage(Component.translatable("nicephore.clipboard.error"))
                 }
-            }.bounds(mc.window.guiScaledWidth / 2 - 52, bottomLine, 50, 20).build()
+            }.bounds(centerX - 52, bottomLine, 50, 20).build()
 
             copyButton.active = OperatingSystems.getOS().manager != null
             if (!copyButton.isActive &&
                 mouseX >= copyButton.x && mouseY >= copyButton.y &&
                 mouseX < copyButton.x + copyButton.width && mouseY < copyButton.y + copyButton.height
             ) {
-                guiGraphics.componentTooltip(
+                guiGraphics.setComponentTooltipForNextFrame(
                     Minecraft.getInstance().font,
                     listOf(Component.translatable("nicephore.gui.screenshots.copy.unable").withStyle(ChatFormatting.RED)),
                     mouseX, mouseY
@@ -141,7 +93,7 @@ class ScreenshotScreen @JvmOverloads constructor(
 
             this.addRenderableWidget(
                 Button.builder(Component.translatable("nicephore.gui.screenshots.delete")) { deleteScreenshot(screenshots[index]) }
-                    .bounds(mc.window.guiScaledWidth / 2 + 3, bottomLine, 50, 20).build()
+                    .bounds(centerX + 3, bottomLine, 50, 20).build()
             )
         }
 
@@ -154,9 +106,12 @@ class ScreenshotScreen @JvmOverloads constructor(
         } else {
             val currentScreenshot = screenshots[index]
             if (currentScreenshot.exists()) {
-                val tm = mc.textureManager
+                val tm = this.minecraft.textureManager
+                val textureId = Identifier.withDefaultNamespace("nicephore_screenshot")
+                tm.register(textureId, screenshotTexture!!)
                 guiGraphics.blit(
-                    tm.register("screenshot", screenshotTexture!!),
+                    RenderPipelines.GUI_TEXTURED,
+                    textureId,
                     centerX - pictureMidWidth / 2, 50, 0f, 0f,
                     pictureMidWidth, pictureHeight, pictureMidWidth, pictureHeight
                 )
@@ -178,12 +133,7 @@ class ScreenshotScreen @JvmOverloads constructor(
     }
 
     private fun modIndex(value: Int) {
-        val max = screenshots.size
-        if (index + value in 0 until max) {
-            index += value
-        } else {
-            index = if (index + value < 0) max - 1 else 0
-        }
+        index = wrapIndex(index, value, screenshots.size)
         init()
     }
 
@@ -196,22 +146,6 @@ class ScreenshotScreen @JvmOverloads constructor(
         )
     }
 
-    private fun openSettingsScreen() {
-        Minecraft.getInstance().pushGuiLayer(SettingsScreen())
-    }
-
-    private fun getIndex(): Int {
-        if (index >= screenshots.size || index < 0) {
-            index = screenshots.size - 1
-        }
-        return index
-    }
-
-    private fun closeScreen(textComponentId: String) {
-        this.onClose()
-        PlayerHelper.sendHotbarMessage(Component.translatable(textComponentId))
-    }
-
     override fun onClose() {
         screenshotTexture?.close()
         super.onClose()
@@ -219,7 +153,6 @@ class ScreenshotScreen @JvmOverloads constructor(
 
     companion object {
         private val TITLE = Component.translatable("nicephore.gui.screenshots")
-        private val SCREENSHOTS_DIR = File(Minecraft.getInstance().gameDirectory, "screenshots")
         private var screenshotTexture: DynamicTexture? = null
 
         fun canBeShow(): Boolean {

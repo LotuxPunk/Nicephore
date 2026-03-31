@@ -2,7 +2,7 @@ package com.vandendaelen.nicephore.clipboard.impl
 
 import com.profesorfalken.jpowershell.PowerShell
 import com.vandendaelen.nicephore.clipboard.ClipboardManager
-import net.minecraft.Util
+import net.minecraft.util.Util
 import java.io.File
 
 class WindowsClipboardManagerImpl private constructor() : ClipboardManager {

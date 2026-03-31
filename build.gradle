@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.141'
     id 'idea'
-    id 'org.jetbrains.kotlin.jvm' version '2.1.20'
+    id 'org.jetbrains.kotlin.jvm' version '2.3.20'
 }
 
 version = mod_version
@@ -68,8 +68,8 @@ dependencies {
     }
 
     // Bundle Kotlin stdlib since we're not using KotlinForForge
-    jarJar('org.jetbrains.kotlin:kotlin-stdlib:[2.1.20,2.2.0)') {
-        version { prefer '2.1.20' }
+    jarJar('org.jetbrains.kotlin:kotlin-stdlib:[2.3.20,2.4.0)') {
+        version { prefer '2.3.20' }
     }
 }
 
@@ -107,6 +107,7 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+
 
 idea {
     module {

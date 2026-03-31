@@ -7,7 +7,7 @@ import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent
 
-@EventBusSubscriber(value = [Dist.CLIENT], modid = Nicephore.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(value = [Dist.CLIENT], modid = Nicephore.MODID)
 object ClientModBusEvents {
     @SubscribeEvent
     @JvmStatic

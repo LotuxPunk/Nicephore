@@ -21,7 +21,7 @@ object Util {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        return DynamicTexture(nativeImage)
+        return DynamicTexture({ "nicephore_screenshot" }, nativeImage!!)
     }
 
     fun <T> batches(source: List<T>, length: Int): Stream<List<T>> {

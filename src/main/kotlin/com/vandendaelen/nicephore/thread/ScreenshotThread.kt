@@ -11,9 +11,9 @@ import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
+import java.nio.file.Files
 import java.text.MessageFormat
 import javax.imageio.IIOImage
 import javax.imageio.ImageIO
@@ -27,8 +27,14 @@ class ScreenshotThread(
 
     override fun run() {
         try {
-            val bais = ByteArrayInputStream(image.asByteArray())
-            val png = ImageIO.read(bais)
+            val tempFile = Files.createTempFile("nicephore_", ".png")
+            try {
+                image.writeToFile(tempFile)
+            } finally {
+                image.close()
+            }
+            val png = ImageIO.read(tempFile.toFile())
+            Files.deleteIfExists(tempFile)
             val jpegFile = File(screenshot.parentFile, screenshot.name.replace("png", "jpg"))
             val result = BufferedImage(png.width, png.height, BufferedImage.TYPE_INT_RGB)
             result.createGraphics().drawImage(png, 0, 0, Color.WHITE, null)
@@ -95,19 +101,19 @@ class ScreenshotThread(
                 val pngComponent = Component.translatable("nicephore.screenshot.png")
                     .withStyle(ChatFormatting.UNDERLINE)
                     .withStyle { style ->
-                        style.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.absolutePath))
+                        style.withClickEvent(ClickEvent.OpenFile(screenshot.absolutePath))
                     }
 
                 val jpgComponent = Component.translatable("nicephore.screenshot.jpg")
                     .withStyle(ChatFormatting.UNDERLINE)
                     .withStyle { style ->
-                        style.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_FILE, jpegFile.absolutePath))
+                        style.withClickEvent(ClickEvent.OpenFile(jpegFile.absolutePath))
                     }
 
                 val folderComponent = Component.translatable("nicephore.screenshot.folder")
                     .withStyle(ChatFormatting.UNDERLINE)
                     .withStyle { style ->
-                        style.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_FILE, screenshot.parent))
+                        style.withClickEvent(ClickEvent.OpenFile(screenshot.parent))
                     }
 
                 PlayerHelper.sendMessage(

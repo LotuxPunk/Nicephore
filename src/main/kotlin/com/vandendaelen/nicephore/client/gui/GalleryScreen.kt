@@ -3,27 +3,25 @@ package com.vandendaelen.nicephore.client.gui
 import com.vandendaelen.nicephore.config.NicephoreConfig
 import com.vandendaelen.nicephore.enums.ScreenshotFilter
 import com.vandendaelen.nicephore.utils.FilterListener
-import com.vandendaelen.nicephore.utils.PlayerHelper
 import com.vandendaelen.nicephore.utils.Util
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.StringUtils
 import java.awt.Color
 import java.io.File
-import java.io.IOException
-import javax.imageio.ImageIO
 
-class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener {
+class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE), FilterListener {
     private val row: Int = getRows()
     private val column: Int = 4
     private val imagesToDisplay: Int = row * column
     private var screenshots: List<File> = emptyList()
-    private var aspectRatio: Float = 1.7777f
+    private var aspectRatio: Float = 16f / 9f
 
     private fun getNumberOfPages(): Long {
         return kotlin.math.ceil(Util.getNumberOfFiles(SCREENSHOTS_DIR) / imagesToDisplay.toDouble()).toLong()
@@ -33,27 +31,10 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
         super.init()
 
         screenshots = Util.getBatchOfFiles((imagesToDisplay.toLong() * index), imagesToDisplay.toLong(), SCREENSHOTS_DIR)
-        index = getIndex()
-        aspectRatio = 1.7777f
+        index = clampIndex(index, getNumberOfPages().toInt())
+        aspectRatio = if (screenshots.isNotEmpty()) readAspectRatio(screenshots[0]) else 16f / 9f
 
         if (screenshots.isNotEmpty()) {
-            try {
-                ImageIO.createImageInputStream(screenshots[0]).use { imageIn ->
-                    val readers = ImageIO.getImageReaders(imageIn)
-                    if (readers.hasNext()) {
-                        val reader = readers.next()
-                        try {
-                            reader.setInput(imageIn)
-                            aspectRatio = reader.getWidth(0) / reader.getHeight(0).toFloat()
-                        } finally {
-                            reader.dispose()
-                        }
-                    }
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-
             screenshotTextures.forEach { it.close() }
             screenshotTextures.clear()
 
@@ -66,43 +47,17 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
         }
     }
 
-    private fun changeFilter() {
-        val nextFilter = NicephoreConfig.Client.getScreenshotFilter().next()
-        NicephoreConfig.Client.setScreenshotFilter(nextFilter)
-        init()
-    }
-
     override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         val centerX = this.width / 2
         val imageWidth = (this.width * 1.0 / 5).toInt()
         val imageHeight = (imageWidth / aspectRatio).toInt()
-        val bottomLine = this.minecraft!!.window.guiScaledHeight - 30
-
-        this.extractBackground(guiGraphics, mouseX, mouseY, partialTicks)
+        val bottomLine = this.minecraft.window.guiScaledHeight - 30
 
         this.clearWidgets()
-        this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name)) { changeFilter() }
-                .bounds(10, 10, 100, 20).build()
-        )
-        this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.screenshot.exit")) { onClose() }
-                .bounds(this.width - 60, 10, 50, 20).build()
-        )
-        this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.gui.settings")) { openSettingsScreen() }
-                .bounds(this.width - 120, 10, 50, 20).build()
-        )
+        addToolbarButtons { cycleFilter() }
 
         if (screenshots.isNotEmpty()) {
-            this.addRenderableWidget(
-                Button.builder(Component.literal("<")) { modIndex(-1) }
-                    .bounds(this.width / 2 - 80, bottomLine, 20, 20).build()
-            )
-            this.addRenderableWidget(
-                Button.builder(Component.literal(">")) { modIndex(1) }
-                    .bounds(this.width / 2 + 60, bottomLine, 20, 20).build()
-            )
+            addNavigationButtons(centerX, bottomLine, { modIndex(-1) }, { modIndex(1) })
         }
 
         if (screenshots.isEmpty()) {
@@ -113,7 +68,7 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
             )
         } else {
             if (screenshots.all { it.exists() }) {
-                val tm = this.minecraft!!.textureManager
+                val tm = this.minecraft.textureManager
                 screenshotTextures.forEachIndexed { imageIndex, texture ->
                     val name = screenshots[imageIndex].name
                     val text = Component.literal(StringUtils.abbreviate(name, 13))
@@ -121,9 +76,12 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
                     val x = centerX - (15 - (imageIndex % 4) * 10) - (2 - (imageIndex % 4)) * imageWidth
                     val y = 50 + (imageIndex / 4 * (imageHeight + 30))
 
+                    val textureId = Identifier.withDefaultNamespace("nicephore_gallery_$imageIndex")
+                    tm.register(textureId, texture)
                     guiGraphics.blit(
-                        tm.register("screenshot_${texture.id}", texture),
-                        x, y, 0f, 0f, imageWidth, imageHeight
+                        RenderPipelines.GUI_TEXTURED,
+                        textureId,
+                        x, y, 0f, 0f, imageWidth, imageHeight, imageWidth, imageHeight
                     )
 
                     drawExtensionBadge(guiGraphics, FilenameUtils.getExtension(name), x - 10, y + 14)
@@ -151,34 +109,12 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
     }
 
     private fun modIndex(value: Int) {
-        val max = getNumberOfPages()
-        if (index + value >= 0 && index + value < max) {
-            index += value
-        } else {
-            index = if (index + value < 0) (max - 1).toInt() else 0
-        }
+        index = wrapIndex(index, value, getNumberOfPages().toInt())
         init()
     }
 
     private fun openScreenshotScreen(value: Int) {
         Minecraft.getInstance().pushGuiLayer(ScreenshotScreen(value, index, this))
-    }
-
-    private fun openSettingsScreen() {
-        Minecraft.getInstance().pushGuiLayer(SettingsScreen())
-    }
-
-    private fun getIndex(): Int {
-        val numberOfPages = getNumberOfPages()
-        if (index > numberOfPages || index < 0) {
-            index = (numberOfPages - 1).toInt()
-        }
-        return index
-    }
-
-    private fun closeScreen(textComponentId: String) {
-        this.onClose()
-        PlayerHelper.sendHotbarMessage(Component.translatable(textComponentId))
     }
 
     override fun onClose() {
@@ -194,7 +130,6 @@ class GalleryScreen(private var index: Int = 0) : Screen(TITLE), FilterListener 
 
     companion object {
         private val TITLE = Component.translatable("nicephore.gui.screenshots")
-        private val SCREENSHOTS_DIR = File(Minecraft.getInstance().gameDirectory, "screenshots")
         private val screenshotTextures = ArrayList<DynamicTexture>()
 
         private fun getRows(): Int {

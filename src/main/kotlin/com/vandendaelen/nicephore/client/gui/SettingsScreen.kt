@@ -4,14 +4,12 @@ import com.vandendaelen.nicephore.config.NicephoreConfig
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import java.awt.Color
 
-class SettingsScreen : Screen(TITLE) {
+class SettingsScreen : AbstractNicephoreScreen(TITLE) {
 
     override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        this.extractBackground(guiGraphics, mouseX, mouseY, partialTicks)
         val centerX = this.width / 2
         val startingLine = this.width / 2 - 150
 

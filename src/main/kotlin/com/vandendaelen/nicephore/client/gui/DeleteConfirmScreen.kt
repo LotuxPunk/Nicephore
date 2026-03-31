@@ -12,7 +12,7 @@ import java.io.File
 class DeleteConfirmScreen(
     private val file: File,
     private val instanceToOpenIfDeleted: Screen?
-) : Screen(Component.translatable("nicephore.gui.delete")) {
+) : AbstractNicephoreScreen(Component.translatable("nicephore.gui.delete")) {
 
     override fun init() {
         super.init()
@@ -36,14 +36,13 @@ class DeleteConfirmScreen(
     }
 
     override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        this.extractBackground(guiGraphics, mouseX, mouseY, partialTicks)
-        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks)
-
         guiGraphics.centeredText(
             Minecraft.getInstance().font,
             Component.translatable("nicephore.gui.delete.question", file.name),
             this.width / 2, this.height / 2 - 20, Color.RED.rgb
         )
+
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks)
     }
 
     private fun deleteScreenshot() {
