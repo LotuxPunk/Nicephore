@@ -1,5 +1,6 @@
 package com.vandendaelen.nicephore.clipboard.impl
 
+import com.vandendaelen.nicephore.Nicephore
 import com.vandendaelen.nicephore.clipboard.ClipboardManager
 import java.io.File
 import java.io.IOException
@@ -14,7 +15,7 @@ class MacOSClipboardManagerImpl private constructor() : ClipboardManager {
             Runtime.getRuntime().exec(cmd)
             true
         } catch (e: IOException) {
-            e.printStackTrace()
+            Nicephore.LOGGER.error("Failed to copy screenshot to macOS clipboard", e)
             false
         }
     }

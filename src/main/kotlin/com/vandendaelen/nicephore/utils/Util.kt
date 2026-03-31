@@ -48,7 +48,7 @@ object Util {
                     .toList()
             }
         } catch (e: IOException) {
-            e.printStackTrace()
+            Nicephore.LOGGER.warn("Failed to list screenshot files in {}", directory.absolutePath, e)
             emptyList()
         }
     }
@@ -59,7 +59,7 @@ object Util {
                 stream.filter { path -> !Files.isDirectory(path) }.count()
             }
         } catch (e: IOException) {
-            e.printStackTrace()
+            Nicephore.LOGGER.warn("Failed to count files in {}", directory.absolutePath, e)
             0L
         }
     }

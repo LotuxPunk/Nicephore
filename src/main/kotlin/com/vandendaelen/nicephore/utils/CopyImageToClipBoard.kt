@@ -1,5 +1,6 @@
 package com.vandendaelen.nicephore.utils
 
+import com.vandendaelen.nicephore.Nicephore
 import com.vandendaelen.nicephore.enums.OperatingSystems
 import java.awt.datatransfer.ClipboardOwner
 import java.awt.datatransfer.DataFlavor
@@ -30,7 +31,7 @@ object CopyImageToClipBoard : ClipboardOwner {
     }
 
     override fun lostOwnership(clip: Clipboard, trans: Transferable) {
-        println("Lost Clipboard Ownership")
+        Nicephore.LOGGER.debug("Lost clipboard ownership")
     }
 
     private class TransferableImage(private val image: Image) : Transferable {

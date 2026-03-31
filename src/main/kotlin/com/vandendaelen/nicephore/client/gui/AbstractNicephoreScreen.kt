@@ -1,5 +1,6 @@
 package com.vandendaelen.nicephore.client.gui
 
+import com.vandendaelen.nicephore.Nicephore
 import com.vandendaelen.nicephore.config.NicephoreConfig
 import com.vandendaelen.nicephore.utils.FilterListener
 import com.vandendaelen.nicephore.utils.PlayerHelper
@@ -51,7 +52,7 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
                 }
             }
         } catch (e: IOException) {
-            e.printStackTrace()
+            Nicephore.LOGGER.warn("Failed to read aspect ratio from {}", file.name, e)
         }
         return DEFAULT_ASPECT_RATIO
     }
