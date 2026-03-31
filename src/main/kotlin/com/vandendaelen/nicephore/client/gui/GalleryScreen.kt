@@ -56,7 +56,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
 
         if (screenshots.isNotEmpty()) {
             loader.setOnLoadComplete { refreshWidgets() }
-            loader.loadBatch(screenshots, "gallery")
+            loader.loadBatch(screenshots, "gallery", useThumbnails = true)
         }
 
         refreshWidgets()
