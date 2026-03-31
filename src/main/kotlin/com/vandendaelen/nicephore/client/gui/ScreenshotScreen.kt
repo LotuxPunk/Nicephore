@@ -82,8 +82,7 @@ class ScreenshotScreen @JvmOverloads constructor(
     override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         val centerX = this.width / 2
         val maxAvailableHeight = this.height - IMAGE_TOP - BOTTOM_BAR_HEIGHT - PADDING
-        val maxImageWidth = this.width - 2 * SIDE_PADDING
-        val widthFromScreen = maxImageWidth.coerceAtMost(MAX_IMAGE_WIDTH)
+        val widthFromScreen = this.width - 2 * SIDE_PADDING
         val heightFromWidth = (widthFromScreen / aspectRatio).toInt()
         val pictureHeight = heightFromWidth.coerceAtMost(maxAvailableHeight)
         val pictureMidWidth = if (heightFromWidth > maxAvailableHeight) {
@@ -179,7 +178,6 @@ class ScreenshotScreen @JvmOverloads constructor(
     companion object {
         private val TITLE = Component.translatable("nicephore.gui.screenshots")
         private const val SIDE_PADDING = 40
-        private const val MAX_IMAGE_WIDTH = 800
         private const val IMAGE_TOP = 50
 
         fun canBeShow(): Boolean {

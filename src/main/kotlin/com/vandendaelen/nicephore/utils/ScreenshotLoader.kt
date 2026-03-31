@@ -84,7 +84,16 @@ class ScreenshotLoader {
 
     private fun readImageFromDisk(file: File): NativeImage? {
         return try {
-            FileInputStream(file).use { NativeImage.read(it) }
+            if (file.extension.lowercase() == "png") {
+                FileInputStream(file).use { NativeImage.read(it) }
+            } else {
+                // NativeImage only reads PNG; convert JPEG/other formats via ImageIO
+                val buffered = javax.imageio.ImageIO.read(file)
+                    ?: throw IOException("ImageIO.read returned null for ${file.name}")
+                val baos = java.io.ByteArrayOutputStream()
+                javax.imageio.ImageIO.write(buffered, "png", baos)
+                NativeImage.read(java.io.ByteArrayInputStream(baos.toByteArray()))
+            }
         } catch (e: IOException) {
             Nicephore.LOGGER.error("Failed to load screenshot: ${file.name}", e)
             null
