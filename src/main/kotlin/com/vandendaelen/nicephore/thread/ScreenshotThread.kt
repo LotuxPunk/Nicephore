@@ -61,8 +61,7 @@ class ScreenshotThread(
                         val p = Runtime.getRuntime().exec(MessageFormat.format(Reference.Command.ECT, ect, jpegFile))
                         p.waitFor()
                     } catch (e: Exception) {
-                        Nicephore.LOGGER.warn("Unable to optimise screenshot JPEG with ECT. Is it missing from the mods folder?")
-                        Nicephore.LOGGER.warn(e.message)
+                        Nicephore.LOGGER.warn("ECT not found or failed, skipping JPEG optimization", e)
                     }
                 }
 
@@ -74,8 +73,7 @@ class ScreenshotThread(
                     )
                     p.waitFor()
                 } catch (e: Exception) {
-                    Nicephore.LOGGER.warn("Unable to optimise screenshot PNG with Oxipng. Is it missing from the mods folder?")
-                    Nicephore.LOGGER.warn(e.message)
+                    Nicephore.LOGGER.warn("oxipng not found or failed, skipping PNG optimization", e)
                 }
 
                 if (shouldShowOptStatus) {
