@@ -16,23 +16,26 @@ class DeleteConfirmScreen(
 
     override fun init() {
         super.init()
+        refreshWidgets()
+    }
 
-        val confirmButton = Button.builder(Component.translatable("nicephore.gui.delete.yes")) {
-            deleteScreenshot()
-            if (instanceToOpenIfDeleted != null) {
-                Minecraft.getInstance().setScreen(instanceToOpenIfDeleted)
-            } else {
+    override fun buildWidgets() {
+        this.addRenderableWidget(
+            Button.builder(Component.translatable("nicephore.gui.delete.yes")) {
+                deleteScreenshot()
+                if (instanceToOpenIfDeleted != null) {
+                    Minecraft.getInstance().setScreen(instanceToOpenIfDeleted)
+                } else {
+                    onClose()
+                }
+            }.bounds(this.width / 2 - 35, this.height / 2 + 30, 30, BUTTON_HEIGHT).build()
+        )
+
+        this.addRenderableWidget(
+            Button.builder(Component.translatable("nicephore.gui.delete.no")) {
                 onClose()
-            }
-        }.bounds(this.width / 2 - 35, this.height / 2 + 30, 30, 20).build()
-
-        val denyButton = Button.builder(Component.translatable("nicephore.gui.delete.no")) {
-            onClose()
-        }.bounds(this.width / 2 + 5, this.height / 2 + 30, 30, 20).build()
-
-        this.clearWidgets()
-        this.addRenderableWidget(confirmButton)
-        this.addRenderableWidget(denyButton)
+            }.bounds(this.width / 2 + 5, this.height / 2 + 30, 30, BUTTON_HEIGHT).build()
+        )
     }
 
     override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
