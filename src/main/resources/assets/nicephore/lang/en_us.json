@@ -30,6 +30,8 @@
   "nicephore.screenshot.reducedOptions": "[%s] [%s]",
   "nicephore.screenshot.success": "Screenshot saved: %s",
   "nicephore.screenshots.empty": "Screenshots folder is empty",
+  "nicephore.screenshots.error": "Error",
+  "nicephore.screenshots.loading": "Loading...",
   "nicephore.screenshots.loading.error": "An error occured on file loading",
   "nicephore.screenshot.showOptimisationStatus": "Display optimization status: %s",
   "nicephore.screenshot.makeJPEGs": "Make a duplicate of the screenshot as JPEG: %s",
