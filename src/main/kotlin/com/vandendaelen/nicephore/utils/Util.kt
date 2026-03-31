@@ -1,6 +1,7 @@
 package com.vandendaelen.nicephore.utils
 
 import com.mojang.blaze3d.platform.NativeImage
+import com.vandendaelen.nicephore.Nicephore
 import com.vandendaelen.nicephore.config.NicephoreConfig
 import net.minecraft.client.renderer.texture.DynamicTexture
 import java.io.File
@@ -13,15 +14,14 @@ import java.util.stream.IntStream
 import java.util.stream.Stream
 
 object Util {
-    fun fileToTexture(file: File): DynamicTexture {
-        var nativeImage: NativeImage? = null
-        try {
-            val inputStream = FileInputStream(file)
-            nativeImage = NativeImage.read(inputStream)
+    fun fileToTexture(file: File): DynamicTexture? {
+        return try {
+            val nativeImage = FileInputStream(file).use { NativeImage.read(it) }
+            DynamicTexture({ "nicephore_${file.nameWithoutExtension}" }, nativeImage)
         } catch (e: IOException) {
-            e.printStackTrace()
+            Nicephore.LOGGER.error("Failed to load screenshot texture: ${file.name}", e)
+            null
         }
-        return DynamicTexture({ "nicephore_screenshot" }, nativeImage!!)
     }
 
     fun <T> batches(source: List<T>, length: Int): Stream<List<T>> {

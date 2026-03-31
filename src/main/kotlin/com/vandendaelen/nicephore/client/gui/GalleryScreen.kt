@@ -39,7 +39,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
             screenshotTextures.clear()
 
             if (screenshots.isNotEmpty()) {
-                screenshots.forEach { file -> screenshotTextures.add(Util.fileToTexture(file)) }
+                screenshots.forEach { file -> Util.fileToTexture(file)?.let { screenshotTextures.add(it) } }
             } else {
                 closeScreen("nicephore.screenshots.loading.error")
                 return
