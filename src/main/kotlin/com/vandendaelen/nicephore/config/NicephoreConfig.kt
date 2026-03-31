@@ -23,6 +23,7 @@ object NicephoreConfig {
         val screenshotCustomMessage: ModConfigSpec.BooleanValue
         val pngOptimisationLevel: ModConfigSpec.IntValue
         val screenshotFilter: ModConfigSpec.EnumValue<ScreenshotFilter>
+        val galleryColumns: ModConfigSpec.IntValue
 
         init {
             builder.push("Client settings")
@@ -56,6 +57,13 @@ object NicephoreConfig {
             screenshotFilter = builder
                 .comment("Only show the PNG, JPEG or JPEG/PNG on the screenshot GUI")
                 .defineEnum("screenshotFilter", ScreenshotFilter.BOTH)
+
+            galleryColumns = builder
+                .comment(
+                    "Number of columns in the gallery grid.",
+                    "Set to 0 for automatic (based on screen width). Valid range: 0, 2-6."
+                )
+                .defineInRange("galleryColumns", 0, 0, 6)
 
             builder.pop()
 
@@ -124,6 +132,12 @@ object NicephoreConfig {
 
             fun setScreenshotFilter(filter: ScreenshotFilter) {
                 NicephoreConfig.CLIENT.screenshotFilter.set(filter)
+            }
+
+            fun getGalleryColumns(): Int = NicephoreConfig.CLIENT.galleryColumns.get()
+
+            fun setGalleryColumns(value: Int) {
+                NicephoreConfig.CLIENT.galleryColumns.set(value)
             }
         }
     }
