@@ -121,7 +121,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                                 x, y, 0f, 0f, imageWidth, imageHeight, imageWidth, imageHeight
                             )
                         }
-                        drawExtensionBadge(guiGraphics, FilenameUtils.getExtension(file.name), x, y + PADDING)
+                        drawExtensionBadge(guiGraphics, FilenameUtils.getExtension(file.name), x + 2, y + imageHeight - 12)
                     }
                     ScreenshotLoader.LoadState.LOADING -> {
                         guiGraphics.centeredText(
@@ -152,7 +152,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
 
     private fun drawExtensionBadge(guiGraphics: GuiGraphicsExtractor, extension: String, x: Int, y: Int) {
         if (NicephoreConfig.Client.getScreenshotFilter() == ScreenshotFilter.BOTH) {
-            guiGraphics.text(Minecraft.getInstance().font, extension.uppercase(), x + 2, y - 12, Color.WHITE.rgb)
+            guiGraphics.text(Minecraft.getInstance().font, extension.uppercase(), x, y, Color.WHITE.rgb)
         }
     }
 

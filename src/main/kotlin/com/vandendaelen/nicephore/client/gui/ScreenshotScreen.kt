@@ -81,9 +81,16 @@ class ScreenshotScreen @JvmOverloads constructor(
 
     override fun extractRenderState(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         val centerX = this.width / 2
+        val maxAvailableHeight = this.height - IMAGE_TOP - BOTTOM_BAR_HEIGHT - PADDING
         val maxImageWidth = this.width - 2 * SIDE_PADDING
-        val pictureMidWidth = maxImageWidth.coerceAtMost(MAX_IMAGE_WIDTH)
-        val pictureHeight = (pictureMidWidth / aspectRatio).toInt()
+        val widthFromScreen = maxImageWidth.coerceAtMost(MAX_IMAGE_WIDTH)
+        val heightFromWidth = (widthFromScreen / aspectRatio).toInt()
+        val pictureHeight = heightFromWidth.coerceAtMost(maxAvailableHeight)
+        val pictureMidWidth = if (heightFromWidth > maxAvailableHeight) {
+            (maxAvailableHeight * aspectRatio).toInt()
+        } else {
+            widthFromScreen
+        }
 
         if (screenshots.isEmpty()) {
             guiGraphics.centeredText(

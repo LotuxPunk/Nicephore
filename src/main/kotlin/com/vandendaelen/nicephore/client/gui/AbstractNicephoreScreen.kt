@@ -107,7 +107,7 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
 
         const val DEFAULT_ASPECT_RATIO = 16f / 9f
         const val PADDING = 10
-        const val TOOLBAR_HEIGHT = 30
+        const val TOOLBAR_HEIGHT = 40
         const val BUTTON_HEIGHT = 20
         const val BOTTOM_BAR_HEIGHT = 30
         const val TARGET_THUMBNAIL_WIDTH = 150
