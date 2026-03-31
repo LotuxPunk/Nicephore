@@ -18,6 +18,15 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
         this.extractTransparentBackground(guiGraphics)
     }
 
+    protected fun refreshWidgets() {
+        this.clearWidgets()
+        buildWidgets()
+    }
+
+    protected open fun buildWidgets() {
+        // Subclasses override to add their widgets
+    }
+
     protected fun closeScreen(textComponentId: String) {
         this.onClose()
         PlayerHelper.sendHotbarMessage(Component.translatable(textComponentId))
@@ -44,7 +53,7 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        return 16f / 9f
+        return DEFAULT_ASPECT_RATIO
     }
 
     protected fun wrapIndex(currentIndex: Int, delta: Int, max: Int): Int {
@@ -70,30 +79,37 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
     protected fun addToolbarButtons(onFilterChange: () -> Unit) {
         this.addRenderableWidget(
             Button.builder(Component.translatable("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name)) { onFilterChange() }
-                .bounds(10, 10, 100, 20).build()
+                .bounds(PADDING, PADDING, 100, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
             Button.builder(Component.translatable("nicephore.screenshot.exit")) { onClose() }
-                .bounds(this.width - 60, 10, 50, 20).build()
+                .bounds(this.width - PADDING - 50, PADDING, 50, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
             Button.builder(Component.translatable("nicephore.gui.settings")) { openSettingsScreen() }
-                .bounds(this.width - 120, 10, 50, 20).build()
+                .bounds(this.width - PADDING - 110, PADDING, 50, BUTTON_HEIGHT).build()
         )
     }
 
     protected fun addNavigationButtons(centerX: Int, bottomLine: Int, onPrev: () -> Unit, onNext: () -> Unit) {
         this.addRenderableWidget(
             Button.builder(Component.literal("<")) { onPrev() }
-                .bounds(centerX - 80, bottomLine, 20, 20).build()
+                .bounds(centerX - 80, bottomLine, 20, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
             Button.builder(Component.literal(">")) { onNext() }
-                .bounds(centerX + 60, bottomLine, 20, 20).build()
+                .bounds(centerX + 60, bottomLine, 20, BUTTON_HEIGHT).build()
         )
     }
 
     companion object {
         val SCREENSHOTS_DIR: File = File(Minecraft.getInstance().gameDirectory, "screenshots")
+
+        const val DEFAULT_ASPECT_RATIO = 16f / 9f
+        const val PADDING = 10
+        const val TOOLBAR_HEIGHT = 30
+        const val BUTTON_HEIGHT = 20
+        const val BOTTOM_BAR_HEIGHT = 30
+        const val TARGET_THUMBNAIL_WIDTH = 150
     }
 }
