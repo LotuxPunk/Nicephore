@@ -36,14 +36,15 @@ class ScreenshotLoader {
         return slots[index] ?: SlotState(LoadState.LOADING)
     }
 
-    fun loadBatch(files: List<File>, idPrefix: String) {
+    fun loadBatch(files: List<File>, idPrefix: String, useThumbnails: Boolean = false) {
         cancelAll()
         slots.clear()
 
         files.forEachIndexed { index, file ->
             slots[index] = SlotState(LoadState.LOADING)
             scope.launch {
-                val nativeImage = readImageFromDisk(file)
+                val fileToLoad = if (useThumbnails) ThumbnailCache.getThumbnail(file) else file
+                val nativeImage = readImageFromDisk(fileToLoad)
                 Minecraft.getInstance().execute {
                     if (nativeImage != null) {
                         val id = "${idPrefix}_$index"
