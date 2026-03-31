@@ -43,12 +43,14 @@ class ScreenshotLoader {
         files.forEachIndexed { index, file ->
             slots[index] = SlotState(LoadState.LOADING)
             scope.launch {
-                val result = loadFile(file, "${idPrefix}_$index")
+                val nativeImage = readImageFromDisk(file)
                 Minecraft.getInstance().execute {
-                    if (result != null) {
-                        val tm = Minecraft.getInstance().textureManager
-                        tm.register(result.textureId, result.texture)
-                        slots[index] = SlotState(LoadState.LOADED, result)
+                    if (nativeImage != null) {
+                        val id = "${idPrefix}_$index"
+                        val texture = DynamicTexture({ "nicephore_$id" }, nativeImage)
+                        val textureId = Identifier.withDefaultNamespace("nicephore_$id")
+                        Minecraft.getInstance().textureManager.register(textureId, texture)
+                        slots[index] = SlotState(LoadState.LOADED, LoadedTexture(texture, textureId))
                     } else {
                         slots[index] = SlotState(LoadState.ERROR)
                     }
@@ -64,12 +66,13 @@ class ScreenshotLoader {
         slots[0] = SlotState(LoadState.LOADING)
 
         scope.launch {
-            val result = loadFile(file, idPrefix)
+            val nativeImage = readImageFromDisk(file)
             Minecraft.getInstance().execute {
-                if (result != null) {
-                    val tm = Minecraft.getInstance().textureManager
-                    tm.register(result.textureId, result.texture)
-                    slots[0] = SlotState(LoadState.LOADED, result)
+                if (nativeImage != null) {
+                    val texture = DynamicTexture({ "nicephore_$idPrefix" }, nativeImage)
+                    val textureId = Identifier.withDefaultNamespace("nicephore_$idPrefix")
+                    Minecraft.getInstance().textureManager.register(textureId, texture)
+                    slots[0] = SlotState(LoadState.LOADED, LoadedTexture(texture, textureId))
                 } else {
                     slots[0] = SlotState(LoadState.ERROR)
                 }
@@ -78,12 +81,9 @@ class ScreenshotLoader {
         }
     }
 
-    private fun loadFile(file: File, id: String): LoadedTexture? {
+    private fun readImageFromDisk(file: File): NativeImage? {
         return try {
-            val nativeImage = FileInputStream(file).use { NativeImage.read(it) }
-            val texture = DynamicTexture({ "nicephore_$id" }, nativeImage)
-            val textureId = Identifier.withDefaultNamespace("nicephore_$id")
-            LoadedTexture(texture, textureId)
+            FileInputStream(file).use { NativeImage.read(it) }
         } catch (e: IOException) {
             Nicephore.LOGGER.error("Failed to load screenshot: ${file.name}", e)
             null
