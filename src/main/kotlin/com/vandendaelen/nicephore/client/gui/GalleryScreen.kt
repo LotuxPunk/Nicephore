@@ -122,6 +122,16 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                             )
                         }
                         drawExtensionBadge(guiGraphics, FilenameUtils.getExtension(file.name), x + 2, y + imageHeight - 12)
+                        // Hover info overlay
+                        if (mouseX >= x && mouseX < x + imageWidth && mouseY >= y && mouseY < y + imageHeight) {
+                            val overlayY = y + imageHeight - OVERLAY_HEIGHT
+                            guiGraphics.fill(x, overlayY, x + imageWidth, y + imageHeight, OVERLAY_COLOR)
+                            val font = Minecraft.getInstance().font
+                            val dateText = Util.formatFileDate(file)
+                            val sizeText = Util.formatFileSize(file)
+                            guiGraphics.text(font, dateText, x + 2, overlayY + 2, Color.WHITE.rgb)
+                            guiGraphics.text(font, sizeText, x + imageWidth - font.width(sizeText) - 2, overlayY + 2, Color.WHITE.rgb)
+                        }
                     }
                     ScreenshotLoader.LoadState.LOADING -> {
                         guiGraphics.centeredText(
@@ -177,6 +187,8 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
 
     companion object {
         private val TITLE = Component.translatable("nicephore.gui.screenshots")
+        private const val OVERLAY_HEIGHT = 12
+        private const val OVERLAY_COLOR = 0xAA000000.toInt()
 
         fun canBeShow(): Boolean {
             return SCREENSHOTS_DIR.exists()
