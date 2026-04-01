@@ -33,7 +33,7 @@ object ThumbnailCache {
     }
 
     private fun generateThumbnail(original: File, thumbFile: File): File {
-        try {
+        return try {
             val fullImage = ImageIO.read(original)
                 ?: throw IOException("ImageIO.read returned null for ${original.name}")
 
@@ -50,10 +50,10 @@ object ThumbnailCache {
             cacheDir.mkdirs()
             ImageIO.write(buffered, "png", thumbFile)
             Nicephore.LOGGER.debug("Generated thumbnail for {}", original.name)
+            thumbFile
         } catch (e: IOException) {
-            Nicephore.LOGGER.warn("Failed to generate thumbnail for {}", original.name, e)
+            Nicephore.LOGGER.warn("Failed to generate thumbnail for {}, falling back to original", original.name, e)
+            original
         }
-
-        return thumbFile
     }
 }

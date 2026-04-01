@@ -23,11 +23,6 @@ import org.apache.commons.lang3.StringUtils
 import java.awt.Color
 import java.io.File
 
-data class ScreenshotGroup(
-    val label: String,
-    val files: List<File>
-)
-
 class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE), FilterListener {
     private var allScreenshots: List<File> = emptyList()
     private var pageScreenshots: List<File> = emptyList()
@@ -37,46 +32,24 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
 
     private var selectionMode: Boolean = false
     private val selectedIndices: MutableSet<Int> = mutableSetOf()
-
-    private var columns: Int = 4
-    private var rows: Int = 3
-    private val imagesToDisplay: Int get() = rows * columns
-
-    private fun computeGrid() {
-        val configColumns = NicephoreConfig.Client.getGalleryColumns()
-        val availableWidth = this.width - 2 * PADDING
-        val availableHeight = this.height - TOOLBAR_HEIGHT - BOTTOM_BAR_HEIGHT - PADDING
-
-        columns = if (configColumns in 2..6) {
-            configColumns
-        } else {
-            (availableWidth / (TARGET_THUMBNAIL_WIDTH + PADDING)).coerceIn(2, 6)
-        }
-
-        val imageWidth = (availableWidth - (columns - 1) * PADDING) / columns
-        val imageHeight = (imageWidth / aspectRatio).toInt()
-        val slotHeight = imageHeight + BUTTON_HEIGHT + PADDING
-
-        rows = ((availableHeight) / slotHeight).coerceIn(1, 4)
-    }
+    private lateinit var grid: GridLayout
 
     private fun getNumberOfPages(): Int {
-        return kotlin.math.ceil(allScreenshots.size / imagesToDisplay.toDouble()).toInt().coerceAtLeast(1)
+        return kotlin.math.ceil(allScreenshots.size / grid.imagesToDisplay.toDouble()).toInt().coerceAtLeast(1)
     }
 
     override fun init() {
         super.init()
-        TrashManager.cleanupOldFiles()
         selectedIndices.clear()
 
-        computeGrid()
+        grid = computeGrid(this.width, this.height, aspectRatio, NicephoreConfig.Client.getGalleryColumns())
 
         val sortOrder = NicephoreConfig.Client.getSortOrder()
         allScreenshots = loadAllScreenshots(sortOrder)
         index = clampIndex(index, getNumberOfPages())
 
-        val skip = imagesToDisplay * index
-        pageScreenshots = allScreenshots.drop(skip).take(imagesToDisplay)
+        val skip = grid.imagesToDisplay * index
+        pageScreenshots = allScreenshots.drop(skip).take(grid.imagesToDisplay)
 
         aspectRatio = if (pageScreenshots.isNotEmpty()) readAspectRatio(pageScreenshots[0]) else DEFAULT_ASPECT_RATIO
 
@@ -182,18 +155,13 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
             val bottomLine = this.height - BOTTOM_BAR_HEIGHT
             addNavigationButtons(centerX, bottomLine, { modIndex(-1) }, { modIndex(1) })
 
-            val availableWidth = this.width - 2 * PADDING
-            val imageWidth = (availableWidth - (columns - 1) * PADDING) / columns
-            val imageHeight = (imageWidth / aspectRatio).toInt()
-
             var slotIndex = 0
             for (group in groups) {
                 for (file in group.files) {
-                    val col = slotIndex % columns
-                    val x = PADDING + col * (imageWidth + PADDING)
-                    val y = computeSlotY(slotIndex, imageHeight)
+                    val x = grid.slotX(slotIndex)
+                    val y = computeSlotY(slotIndex)
                     val name = file.name
-                    val text = Component.literal(StringUtils.abbreviate(name, imageWidth / 6))
+                    val text = Component.literal(StringUtils.abbreviate(name, grid.imageWidth / 6))
 
                     val capturedSlotIndex = slotIndex
                     this.addRenderableWidget(
@@ -203,7 +171,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                             } else {
                                 openScreenshotScreen(allScreenshots.indexOf(file))
                             }
-                        }.bounds(x, y + imageHeight + 2, imageWidth, BUTTON_HEIGHT).build()
+                        }.bounds(x, y + grid.imageHeight + 2, grid.imageWidth, BUTTON_HEIGHT).build()
                     )
                     slotIndex++
                 }
@@ -211,7 +179,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
         }
     }
 
-    private fun computeSlotY(slotIndex: Int, imageHeight: Int): Int {
+    private fun computeSlotY(slotIndex: Int): Int {
         var y = TOOLBAR_HEIGHT
         var slotsConsumed = 0
 
@@ -222,11 +190,11 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
             val groupSlotCount = group.files.size
             val slotsInThisGroup = slotIndex - slotsConsumed
             if (slotsInThisGroup < groupSlotCount) {
-                val rowInGroup = slotsInThisGroup / columns
-                return y + rowInGroup * (imageHeight + BUTTON_HEIGHT + PADDING)
+                val rowInGroup = slotsInThisGroup / grid.columns
+                return y + rowInGroup * grid.slotHeight
             }
-            val rowsInGroup = kotlin.math.ceil(groupSlotCount / columns.toDouble()).toInt()
-            y += rowsInGroup * (imageHeight + BUTTON_HEIGHT + PADDING)
+            val rowsInGroup = kotlin.math.ceil(groupSlotCount / grid.columns.toDouble()).toInt()
+            y += rowsInGroup * grid.slotHeight
             slotsConsumed += groupSlotCount
         }
         return y
@@ -243,15 +211,11 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                 centerX, TOOLBAR_HEIGHT + 20, Color.RED.rgb
             )
         } else {
-            val availableWidth = this.width - 2 * PADDING
-            val imageWidth = (availableWidth - (columns - 1) * PADDING) / columns
-            val imageHeight = (imageWidth / aspectRatio).toInt()
-
             var slotIndex = 0
 
             for (group in groups) {
                 if (group.label.isNotEmpty()) {
-                    val headerY = computeSlotY(slotIndex, imageHeight) - GROUP_HEADER_HEIGHT + PADDING
+                    val headerY = computeSlotY(slotIndex) - GROUP_HEADER_HEIGHT + PADDING
                     guiGraphics.centeredText(
                         Minecraft.getInstance().font,
                         Component.literal(group.label),
@@ -260,9 +224,8 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                 }
 
                 for (file in group.files) {
-                    val col = slotIndex % columns
-                    val x = PADDING + col * (imageWidth + PADDING)
-                    val y = computeSlotY(slotIndex, imageHeight)
+                    val x = grid.slotX(slotIndex)
+                    val y = computeSlotY(slotIndex)
 
                     val slot = loader.getSlotState(slotIndex)
                     when (slot.state) {
@@ -271,19 +234,19 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                                 guiGraphics.blit(
                                     RenderPipelines.GUI_TEXTURED,
                                     it.textureId,
-                                    x, y, 0f, 0f, imageWidth, imageHeight, imageWidth, imageHeight
+                                    x, y, 0f, 0f, grid.imageWidth, grid.imageHeight, grid.imageWidth, grid.imageHeight
                                 )
                             }
-                            drawExtensionBadge(guiGraphics, FilenameUtils.getExtension(file.name), x + 2, y + imageHeight - 12)
+                            drawExtensionBadge(guiGraphics, FilenameUtils.getExtension(file.name), x + 2, y + grid.imageHeight - 12)
 
-                            if (mouseX >= x && mouseX < x + imageWidth && mouseY >= y && mouseY < y + imageHeight) {
-                                val overlayY = y + imageHeight - OVERLAY_HEIGHT
-                                guiGraphics.fill(x, overlayY, x + imageWidth, y + imageHeight, OVERLAY_COLOR)
+                            if (mouseX >= x && mouseX < x + grid.imageWidth && mouseY >= y && mouseY < y + grid.imageHeight) {
+                                val overlayY = y + grid.imageHeight - OVERLAY_HEIGHT
+                                guiGraphics.fill(x, overlayY, x + grid.imageWidth, y + grid.imageHeight, OVERLAY_COLOR)
                                 val font = Minecraft.getInstance().font
                                 val dateText = Util.formatFileDate(file)
                                 val sizeText = Util.formatFileSize(file)
                                 guiGraphics.text(font, dateText, x + 2, overlayY + 2, Color.WHITE.rgb)
-                                guiGraphics.text(font, sizeText, x + imageWidth - font.width(sizeText) - 2, overlayY + 2, Color.WHITE.rgb)
+                                guiGraphics.text(font, sizeText, x + grid.imageWidth - font.width(sizeText) - 2, overlayY + 2, Color.WHITE.rgb)
                             }
 
                             if (selectionMode) {
@@ -300,14 +263,14 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                             guiGraphics.centeredText(
                                 Minecraft.getInstance().font,
                                 Component.translatable("nicephore.screenshots.loading"),
-                                x + imageWidth / 2, y + imageHeight / 2, Color.GRAY.rgb
+                                x + grid.imageWidth / 2, y + grid.imageHeight / 2, Color.GRAY.rgb
                             )
                         }
                         ScreenshotLoader.LoadState.ERROR -> {
                             guiGraphics.centeredText(
                                 Minecraft.getInstance().font,
                                 Component.translatable("nicephore.screenshots.error"),
-                                x + imageWidth / 2, y + imageHeight / 2, Color.RED.rgb
+                                x + grid.imageWidth / 2, y + grid.imageHeight / 2, Color.RED.rgb
                             )
                         }
                     }

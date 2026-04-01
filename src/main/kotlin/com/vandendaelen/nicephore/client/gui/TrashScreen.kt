@@ -17,36 +17,21 @@ class TrashScreen : AbstractNicephoreScreen(TITLE) {
     private var aspectRatio: Float = DEFAULT_ASPECT_RATIO
     private val loader = ScreenshotLoader()
 
-    private var columns: Int = 4
-    private var rows: Int = 3
-    private val imagesToDisplay: Int get() = rows * columns
+    private lateinit var grid: GridLayout
     private var pageIndex: Int = 0
 
-    private fun computeGrid() {
-        val availableWidth = this.width - 2 * PADDING
-        val availableHeight = this.height - TOOLBAR_HEIGHT - BOTTOM_BAR_HEIGHT - PADDING
-
-        columns = (availableWidth / (TARGET_THUMBNAIL_WIDTH + PADDING)).coerceIn(2, 6)
-
-        val imageWidth = (availableWidth - (columns - 1) * PADDING) / columns
-        val imageHeight = (imageWidth / aspectRatio).toInt()
-        val slotHeight = imageHeight + BUTTON_HEIGHT + PADDING
-
-        rows = ((availableHeight) / slotHeight).coerceIn(1, 4)
-    }
-
     private fun getNumberOfPages(): Int {
-        return kotlin.math.ceil(trashedFiles.size / imagesToDisplay.toDouble()).toInt().coerceAtLeast(1)
+        return kotlin.math.ceil(trashedFiles.size / grid.imagesToDisplay.toDouble()).toInt().coerceAtLeast(1)
     }
 
     override fun init() {
         super.init()
 
-        computeGrid()
+        grid = computeGrid(this.width, this.height, aspectRatio)
         trashedFiles = TrashManager.listTrash()
         pageIndex = clampIndex(pageIndex, getNumberOfPages())
 
-        val pageFiles = trashedFiles.drop(imagesToDisplay * pageIndex).take(imagesToDisplay)
+        val pageFiles = trashedFiles.drop(grid.imagesToDisplay * pageIndex).take(grid.imagesToDisplay)
         aspectRatio = if (pageFiles.isNotEmpty()) readAspectRatio(pageFiles[0]) else DEFAULT_ASPECT_RATIO
 
         if (pageFiles.isNotEmpty()) {
@@ -72,43 +57,27 @@ class TrashScreen : AbstractNicephoreScreen(TITLE) {
             )
         }
 
-        val pageFiles = trashedFiles.drop(imagesToDisplay * pageIndex).take(imagesToDisplay)
+        val pageFiles = trashedFiles.drop(grid.imagesToDisplay * pageIndex).take(grid.imagesToDisplay)
 
         if (pageFiles.isNotEmpty()) {
             val centerX = this.width / 2
             val bottomLine = this.height - BOTTOM_BAR_HEIGHT
 
             if (getNumberOfPages() > 1) {
-                this.addRenderableWidget(
-                    Button.builder(Component.literal("<")) { modPage(-1) }
-                        .bounds(centerX - 80, bottomLine, 20, BUTTON_HEIGHT).build()
-                )
-                this.addRenderableWidget(
-                    Button.builder(Component.literal(">")) { modPage(1) }
-                        .bounds(centerX + 60, bottomLine, 20, BUTTON_HEIGHT).build()
-                )
+                addNavigationButtons(centerX, bottomLine, { modPage(-1) }, { modPage(1) })
             }
 
-            val availableWidth = this.width - 2 * PADDING
-            val imageWidth = (availableWidth - (columns - 1) * PADDING) / columns
-            val imageHeight = (imageWidth / aspectRatio).toInt()
-
             pageFiles.forEachIndexed { slotIndex, file ->
-                val col = slotIndex % columns
-                val row = slotIndex / columns
-                val x = PADDING + col * (imageWidth + PADDING)
-                val y = TOOLBAR_HEIGHT + row * (imageHeight + BUTTON_HEIGHT * 2 + PADDING + 4)
+                val x = grid.slotX(slotIndex)
+                val y = grid.slotY(slotIndex)
 
-                // Restore button
                 this.addRenderableWidget(
                     Button.builder(Component.translatable("nicephore.gui.trash.restore")) { restoreFile(file) }
-                        .bounds(x, y + imageHeight + 2, imageWidth / 2 - 1, BUTTON_HEIGHT).build()
+                        .bounds(x, y + grid.imageHeight + 2, grid.imageWidth / 2 - 1, BUTTON_HEIGHT).build()
                 )
-
-                // Delete permanently button
                 this.addRenderableWidget(
                     Button.builder(Component.translatable("nicephore.gui.trash.delete")) { deletePermanently(file) }
-                        .bounds(x + imageWidth / 2 + 1, y + imageHeight + 2, imageWidth / 2 - 1, BUTTON_HEIGHT).build()
+                        .bounds(x + grid.imageWidth / 2 + 1, y + grid.imageHeight + 2, grid.imageWidth / 2 - 1, BUTTON_HEIGHT).build()
                 )
             }
         }
@@ -124,7 +93,7 @@ class TrashScreen : AbstractNicephoreScreen(TITLE) {
             centerX, TOOLBAR_HEIGHT - 10, Color.WHITE.rgb
         )
 
-        val pageFiles = trashedFiles.drop(imagesToDisplay * pageIndex).take(imagesToDisplay)
+        val pageFiles = trashedFiles.drop(grid.imagesToDisplay * pageIndex).take(grid.imagesToDisplay)
 
         if (pageFiles.isEmpty()) {
             guiGraphics.centeredText(
@@ -133,15 +102,9 @@ class TrashScreen : AbstractNicephoreScreen(TITLE) {
                 centerX, TOOLBAR_HEIGHT + 20, Color.GRAY.rgb
             )
         } else {
-            val availableWidth = this.width - 2 * PADDING
-            val imageWidth = (availableWidth - (columns - 1) * PADDING) / columns
-            val imageHeight = (imageWidth / aspectRatio).toInt()
-
             pageFiles.forEachIndexed { slotIndex, file ->
-                val col = slotIndex % columns
-                val row = slotIndex / columns
-                val x = PADDING + col * (imageWidth + PADDING)
-                val y = TOOLBAR_HEIGHT + row * (imageHeight + BUTTON_HEIGHT * 2 + PADDING + 4)
+                val x = grid.slotX(slotIndex)
+                val y = grid.slotY(slotIndex)
 
                 val slot = loader.getSlotState(slotIndex)
                 when (slot.state) {
@@ -150,31 +113,31 @@ class TrashScreen : AbstractNicephoreScreen(TITLE) {
                             guiGraphics.blit(
                                 RenderPipelines.GUI_TEXTURED,
                                 it.textureId,
-                                x, y, 0f, 0f, imageWidth, imageHeight, imageWidth, imageHeight
+                                x, y, 0f, 0f, grid.imageWidth, grid.imageHeight, grid.imageWidth, grid.imageHeight
                             )
                         }
 
-                        if (mouseX >= x && mouseX < x + imageWidth && mouseY >= y && mouseY < y + imageHeight) {
-                            val overlayY = y + imageHeight - 12
-                            guiGraphics.fill(x, overlayY, x + imageWidth, y + imageHeight, 0xAA000000.toInt())
+                        if (mouseX >= x && mouseX < x + grid.imageWidth && mouseY >= y && mouseY < y + grid.imageHeight) {
+                            val overlayY = y + grid.imageHeight - 12
+                            guiGraphics.fill(x, overlayY, x + grid.imageWidth, y + grid.imageHeight, 0xAA000000.toInt())
                             val font = Minecraft.getInstance().font
                             guiGraphics.text(font, Util.formatFileDate(file), x + 2, overlayY + 2, Color.WHITE.rgb)
                             val sizeText = Util.formatFileSize(file)
-                            guiGraphics.text(font, sizeText, x + imageWidth - font.width(sizeText) - 2, overlayY + 2, Color.WHITE.rgb)
+                            guiGraphics.text(font, sizeText, x + grid.imageWidth - font.width(sizeText) - 2, overlayY + 2, Color.WHITE.rgb)
                         }
                     }
                     ScreenshotLoader.LoadState.LOADING -> {
                         guiGraphics.centeredText(
                             Minecraft.getInstance().font,
                             Component.translatable("nicephore.screenshots.loading"),
-                            x + imageWidth / 2, y + imageHeight / 2, Color.GRAY.rgb
+                            x + grid.imageWidth / 2, y + grid.imageHeight / 2, Color.GRAY.rgb
                         )
                     }
                     ScreenshotLoader.LoadState.ERROR -> {
                         guiGraphics.centeredText(
                             Minecraft.getInstance().font,
                             Component.translatable("nicephore.screenshots.error"),
-                            x + imageWidth / 2, y + imageHeight / 2, Color.RED.rgb
+                            x + grid.imageWidth / 2, y + grid.imageHeight / 2, Color.RED.rgb
                         )
                     }
                 }

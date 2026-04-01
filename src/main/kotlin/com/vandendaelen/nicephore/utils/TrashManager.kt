@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 object TrashManager {
     private const val TRASH_DIR_NAME = ".nicephore_trash"
@@ -22,7 +21,7 @@ object TrashManager {
         return try {
             trashDir.mkdirs()
             val targetFile = getUniqueTrashFile(file.name)
-            Files.move(file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            Files.move(file.toPath(), targetFile.toPath())
             Nicephore.LOGGER.info("Moved {} to trash", file.name)
             true
         } catch (e: IOException) {

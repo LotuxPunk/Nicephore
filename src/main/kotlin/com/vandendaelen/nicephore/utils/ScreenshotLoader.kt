@@ -38,7 +38,7 @@ class ScreenshotLoader {
 
     fun loadBatch(files: List<File>, idPrefix: String, useThumbnails: Boolean = false) {
         cancelAll()
-        slots.clear()
+        releaseTextures()
 
         files.forEachIndexed { index, file ->
             slots[index] = SlotState(LoadState.LOADING)
@@ -63,7 +63,7 @@ class ScreenshotLoader {
 
     fun loadSingle(file: File, idPrefix: String) {
         cancelAll()
-        slots.clear()
+        releaseTextures()
         slots[0] = SlotState(LoadState.LOADING)
 
         scope.launch {
@@ -102,7 +102,6 @@ class ScreenshotLoader {
 
     fun cancelAll() {
         scope.coroutineContext[Job]?.children?.forEach { it.cancel() }
-        releaseTextures()
     }
 
     fun releaseTextures() {

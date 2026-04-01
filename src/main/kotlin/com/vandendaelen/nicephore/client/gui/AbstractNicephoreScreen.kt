@@ -103,6 +103,46 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
         )
     }
 
+    data class GridLayout(
+        val columns: Int,
+        val rows: Int,
+        val imageWidth: Int,
+        val imageHeight: Int,
+        val slotHeight: Int
+    ) {
+        val imagesToDisplay: Int get() = rows * columns
+
+        fun slotX(slotIndex: Int): Int = PADDING + (slotIndex % columns) * (imageWidth + PADDING)
+
+        fun slotY(slotIndex: Int, baseY: Int = TOOLBAR_HEIGHT): Int {
+            val row = slotIndex / columns
+            return baseY + row * slotHeight
+        }
+    }
+
+    protected fun computeGrid(
+        screenWidth: Int,
+        screenHeight: Int,
+        aspectRatio: Float,
+        configColumns: Int = 0
+    ): GridLayout {
+        val availableWidth = screenWidth - 2 * PADDING
+        val availableHeight = screenHeight - TOOLBAR_HEIGHT - BOTTOM_BAR_HEIGHT - PADDING
+
+        val columns = if (configColumns in 2..6) {
+            configColumns
+        } else {
+            (availableWidth / (TARGET_THUMBNAIL_WIDTH + PADDING)).coerceIn(2, 6)
+        }
+
+        val imageWidth = (availableWidth - (columns - 1) * PADDING) / columns
+        val imageHeight = (imageWidth / aspectRatio).toInt()
+        val slotHeight = imageHeight + BUTTON_HEIGHT + PADDING
+        val rows = (availableHeight / slotHeight).coerceIn(1, 4)
+
+        return GridLayout(columns, rows, imageWidth, imageHeight, slotHeight)
+    }
+
     companion object {
         val SCREENSHOTS_DIR: File = File(Minecraft.getInstance().gameDirectory, "screenshots")
 
