@@ -38,5 +38,15 @@
   "nicephore.screenshot.screenshotCustomMessage": "Display a customized message on screenshot taken: %s",
   "nicephore.screenshot.setScreenshotToClipboard": "Place the screenshot to the clipboard automatically: %s",
   "nicephore.settings.galleryColumns": "Gallery Columns: %s",
-  "nicephore.tools.unavailable": "Nicephore: optimization tools unavailable — screenshots will not be optimized"
+  "nicephore.tools.unavailable": "Nicephore: optimization tools unavailable — screenshots will not be optimized",
+  "nicephore.sort.newest": "Newest",
+  "nicephore.sort.oldest": "Oldest",
+  "nicephore.sort.name_asc": "Name A-Z",
+  "nicephore.sort.name_desc": "Name Z-A",
+  "nicephore.sort.label": "Sort: %s",
+  "nicephore.group.today": "Today",
+  "nicephore.group.yesterday": "Yesterday",
+  "nicephore.group.thisWeek": "This Week",
+  "nicephore.group.thisMonth": "This Month",
+  "nicephore.group.older": "Older"
 }
