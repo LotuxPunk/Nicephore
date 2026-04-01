@@ -3,12 +3,16 @@ package com.vandendaelen.nicephore.utils
 import com.mojang.blaze3d.platform.NativeImage
 import com.vandendaelen.nicephore.Nicephore
 import com.vandendaelen.nicephore.config.NicephoreConfig
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import net.minecraft.client.renderer.texture.DynamicTexture
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import java.text.DecimalFormat
 import java.util.Comparator
 import java.util.stream.IntStream
 import java.util.stream.Stream
@@ -62,5 +66,25 @@ object Util {
             Nicephore.LOGGER.warn("Failed to count files in {}", directory.absolutePath, e)
             0L
         }
+    }
+
+    fun formatFileSize(file: File): String {
+        val size = file.length().toDouble()
+        val formatter = DecimalFormat("#0.00")
+        val mbSize = 1024 * 1024
+        val kbSize = 1024
+
+        return if (size > mbSize) {
+            "${formatter.format(size / mbSize)} MB"
+        } else {
+            "${formatter.format(size / kbSize)} KB"
+        }
+    }
+
+    fun formatFileDate(file: File): String {
+        val instant = Instant.fromEpochMilliseconds(file.lastModified())
+        val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        val month = local.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+        return "$month ${local.dayOfMonth}, ${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')}"
     }
 }
