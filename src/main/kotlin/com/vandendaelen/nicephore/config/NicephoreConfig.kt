@@ -2,6 +2,7 @@ package com.vandendaelen.nicephore.config
 
 import com.vandendaelen.nicephore.enums.OperatingSystems
 import com.vandendaelen.nicephore.enums.ScreenshotFilter
+import com.vandendaelen.nicephore.enums.SortOrder
 import net.neoforged.neoforge.common.ModConfigSpec
 
 object NicephoreConfig {
@@ -24,6 +25,7 @@ object NicephoreConfig {
         val pngOptimisationLevel: ModConfigSpec.IntValue
         val screenshotFilter: ModConfigSpec.EnumValue<ScreenshotFilter>
         val galleryColumns: ModConfigSpec.IntValue
+        val sortOrder: ModConfigSpec.EnumValue<SortOrder>
 
         init {
             builder.push("Client settings")
@@ -64,6 +66,10 @@ object NicephoreConfig {
                     "Set to 0 for automatic (based on screen width). Valid range: 0, 2-6."
                 )
                 .defineInRange("galleryColumns", 0, 0, 6)
+
+            sortOrder = builder
+                .comment("Sort order for the gallery. Options: NEWEST, OLDEST, NAME_ASC, NAME_DESC")
+                .defineEnum("sortOrder", SortOrder.NEWEST)
 
             builder.pop()
 
@@ -138,6 +144,12 @@ object NicephoreConfig {
 
             fun setGalleryColumns(value: Int) {
                 NicephoreConfig.CLIENT.galleryColumns.set(value)
+            }
+
+            fun getSortOrder(): SortOrder = NicephoreConfig.CLIENT.sortOrder.get()
+
+            fun setSortOrder(value: SortOrder) {
+                NicephoreConfig.CLIENT.sortOrder.set(value)
             }
         }
     }
