@@ -26,3 +26,7 @@ repo
 forge*changelog.txt
 
 /libs/
+
+# claude
+.claude/
+docs/superpowers/
