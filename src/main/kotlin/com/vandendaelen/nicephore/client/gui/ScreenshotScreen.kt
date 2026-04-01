@@ -73,6 +73,10 @@ class ScreenshotScreen @JvmOverloads constructor(
                 Button.builder(Component.translatable("nicephore.gui.screenshots.delete")) { deleteScreenshot(screenshots[index]) }
                     .bounds(centerX + 3, bottomLine, 50, BUTTON_HEIGHT).build()
             )
+            this.addRenderableWidget(
+                Button.builder(Component.translatable("nicephore.gui.rename")) { renameScreenshot(screenshots[index]) }
+                    .bounds(centerX + 58, bottomLine, 50, BUTTON_HEIGHT).build()
+            )
         }
     }
 
@@ -165,6 +169,10 @@ class ScreenshotScreen @JvmOverloads constructor(
                 if (galleryScreenPage > -1) GalleryScreen(galleryScreenPage) else ScreenshotScreen(index)
             )
         )
+    }
+
+    private fun renameScreenshot(file: File) {
+        Minecraft.getInstance().pushGuiLayer(RenameScreen(file, galleryScreenPage))
     }
 
     override fun onClose() {

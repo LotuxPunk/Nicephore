@@ -64,5 +64,13 @@
   "nicephore.gui.trash.empty": "Empty Trash",
   "nicephore.gui.trash.empty.confirm": "Permanently delete all trashed files?",
   "nicephore.gui.trash.empty.success": "Emptied trash (%s files)",
-  "nicephore.gui.trash.count": "%s file(s) in trash"
+  "nicephore.gui.trash.count": "%s file(s) in trash",
+  "nicephore.gui.rename": "Rename",
+  "nicephore.gui.rename.title": "Rename Screenshot",
+  "nicephore.gui.rename.save": "Save",
+  "nicephore.gui.rename.cancel": "Cancel",
+  "nicephore.gui.rename.success": "Renamed to %s",
+  "nicephore.gui.rename.error": "Failed to rename file",
+  "nicephore.gui.rename.exists": "A file with that name already exists",
+  "nicephore.gui.rename.invalid": "Invalid filename"
 }

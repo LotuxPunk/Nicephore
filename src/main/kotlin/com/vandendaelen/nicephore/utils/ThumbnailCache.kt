@@ -17,6 +17,11 @@ object ThumbnailCache {
         }
     }
 
+    fun removeThumbnail(originalName: String) {
+        val thumbFile = File(cacheDir, originalName)
+        if (thumbFile.exists()) thumbFile.delete()
+    }
+
     fun getThumbnail(original: File): File {
         val thumbFile = File(cacheDir, original.name)
 
