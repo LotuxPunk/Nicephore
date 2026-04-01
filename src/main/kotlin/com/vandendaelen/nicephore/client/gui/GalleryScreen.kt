@@ -5,6 +5,7 @@ import com.vandendaelen.nicephore.enums.ScreenshotFilter
 import com.vandendaelen.nicephore.enums.SortOrder
 import com.vandendaelen.nicephore.utils.FilterListener
 import com.vandendaelen.nicephore.utils.ScreenshotLoader
+import com.vandendaelen.nicephore.utils.TrashManager
 import com.vandendaelen.nicephore.utils.Util
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
@@ -34,6 +35,9 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
     private var aspectRatio: Float = DEFAULT_ASPECT_RATIO
     private val loader = ScreenshotLoader()
 
+    private var selectionMode: Boolean = false
+    private val selectedIndices: MutableSet<Int> = mutableSetOf()
+
     private var columns: Int = 4
     private var rows: Int = 3
     private val imagesToDisplay: Int get() = rows * columns
@@ -62,6 +66,8 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
 
     override fun init() {
         super.init()
+        TrashManager.cleanupOldFiles()
+        selectedIndices.clear()
 
         computeGrid()
 
@@ -138,6 +144,39 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                 .bounds(PADDING + 110, PADDING, 80, BUTTON_HEIGHT).build()
         )
 
+        // Trash button
+        val trashCount = TrashManager.trashCount()
+        this.addRenderableWidget(
+            Button.builder(Component.translatable("nicephore.gui.trash", trashCount)) { openTrashScreen() }
+                .bounds(this.width - PADDING - 170, PADDING, 50, BUTTON_HEIGHT).build()
+        )
+
+        // Select toggle
+        this.addRenderableWidget(
+            Button.builder(Component.translatable("nicephore.gui.select")) { toggleSelectionMode() }
+                .bounds(PADDING + 200, PADDING, 50, BUTTON_HEIGHT).build()
+        )
+
+        if (selectionMode) {
+            this.addRenderableWidget(
+                Button.builder(Component.translatable("nicephore.gui.select.all")) { selectAll() }
+                    .bounds(PADDING + 260, PADDING, 30, BUTTON_HEIGHT).build()
+            )
+            this.addRenderableWidget(
+                Button.builder(Component.translatable("nicephore.gui.select.none")) { selectedIndices.clear(); refreshWidgets() }
+                    .bounds(PADDING + 300, PADDING, 40, BUTTON_HEIGHT).build()
+            )
+
+            if (selectedIndices.isNotEmpty()) {
+                val centerX = this.width / 2
+                val bottomLine = this.height - BOTTOM_BAR_HEIGHT
+                this.addRenderableWidget(
+                    Button.builder(Component.translatable("nicephore.gui.trash.move", selectedIndices.size)) { bulkMoveToTrash() }
+                        .bounds(centerX - 60, bottomLine, 120, BUTTON_HEIGHT).build()
+                )
+            }
+        }
+
         if (pageScreenshots.isNotEmpty()) {
             val centerX = this.width / 2
             val bottomLine = this.height - BOTTOM_BAR_HEIGHT
@@ -156,9 +195,15 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                     val name = file.name
                     val text = Component.literal(StringUtils.abbreviate(name, imageWidth / 6))
 
+                    val capturedSlotIndex = slotIndex
                     this.addRenderableWidget(
-                        Button.builder(text) { openScreenshotScreen(allScreenshots.indexOf(file)) }
-                            .bounds(x, y + imageHeight + 2, imageWidth, BUTTON_HEIGHT).build()
+                        Button.builder(text) {
+                            if (selectionMode) {
+                                toggleSelection(capturedSlotIndex)
+                            } else {
+                                openScreenshotScreen(allScreenshots.indexOf(file))
+                            }
+                        }.bounds(x, y + imageHeight + 2, imageWidth, BUTTON_HEIGHT).build()
                     )
                     slotIndex++
                 }
@@ -240,6 +285,16 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                                 guiGraphics.text(font, dateText, x + 2, overlayY + 2, Color.WHITE.rgb)
                                 guiGraphics.text(font, sizeText, x + imageWidth - font.width(sizeText) - 2, overlayY + 2, Color.WHITE.rgb)
                             }
+
+                            if (selectionMode) {
+                                val checkX = x + 2
+                                val checkY = y + 2
+                                val isSelected = selectedIndices.contains(slotIndex)
+                                guiGraphics.fill(checkX, checkY, checkX + 10, checkY + 10, if (isSelected) 0xFF00FF00.toInt() else 0xAAFFFFFF.toInt())
+                                if (isSelected) {
+                                    guiGraphics.text(Minecraft.getInstance().font, "✓", checkX + 1, checkY, Color.BLACK.rgb)
+                                }
+                            }
                         }
                         ScreenshotLoader.LoadState.LOADING -> {
                             guiGraphics.centeredText(
@@ -300,6 +355,39 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
     override fun onFilterChange(filter: ScreenshotFilter) {
         NicephoreConfig.Client.setScreenshotFilter(filter)
         init()
+    }
+
+    private fun toggleSelectionMode() {
+        selectionMode = !selectionMode
+        selectedIndices.clear()
+        refreshWidgets()
+    }
+
+    private fun toggleSelection(slotIndex: Int) {
+        if (selectedIndices.contains(slotIndex)) {
+            selectedIndices.remove(slotIndex)
+        } else {
+            selectedIndices.add(slotIndex)
+        }
+        refreshWidgets()
+    }
+
+    private fun selectAll() {
+        for (i in pageScreenshots.indices) {
+            selectedIndices.add(i)
+        }
+        refreshWidgets()
+    }
+
+    private fun bulkMoveToTrash() {
+        val filesToTrash = selectedIndices.mapNotNull { pageScreenshots.getOrNull(it) }
+        Minecraft.getInstance().pushGuiLayer(
+            DeleteConfirmScreen(filesToTrash, GalleryScreen(index))
+        )
+    }
+
+    private fun openTrashScreen() {
+        Minecraft.getInstance().pushGuiLayer(TrashScreen())
     }
 
     companion object {
