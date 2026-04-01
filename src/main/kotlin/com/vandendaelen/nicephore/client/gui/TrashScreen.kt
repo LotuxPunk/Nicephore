@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component
 import java.awt.Color
 import java.io.File
 
-class TrashScreen : AbstractNicephoreScreen(TITLE) {
+class TrashScreen(private val onTrashClosed: () -> Unit = {}) : AbstractNicephoreScreen(TITLE) {
     private var trashedFiles: List<File> = emptyList()
     private var aspectRatio: Float = DEFAULT_ASPECT_RATIO
     private val loader = ScreenshotLoader()
@@ -27,7 +27,7 @@ class TrashScreen : AbstractNicephoreScreen(TITLE) {
     override fun init() {
         super.init()
 
-        grid = computeGrid(this.width, this.height, aspectRatio)
+        grid = computeGrid(this.width, this.height - PAGE_TEXT_HEIGHT, aspectRatio)
         trashedFiles = TrashManager.listTrash()
         pageIndex = clampIndex(pageIndex, getNumberOfPages())
 
@@ -148,7 +148,7 @@ class TrashScreen : AbstractNicephoreScreen(TITLE) {
                 guiGraphics.centeredText(
                     Minecraft.getInstance().font,
                     Component.literal("${pageIndex + 1} / ${getNumberOfPages()}"),
-                    centerX, bottomLine + 5, Color.WHITE.rgb
+                    centerX, bottomLine - 12, Color.WHITE.rgb
                 )
             }
         }
@@ -184,6 +184,7 @@ class TrashScreen : AbstractNicephoreScreen(TITLE) {
     override fun onClose() {
         loader.destroy()
         super.onClose()
+        onTrashClosed()
     }
 
     companion object {

@@ -33,6 +33,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
     private var selectionMode: Boolean = false
     private val selectedIndices: MutableSet<Int> = mutableSetOf()
     private lateinit var grid: GridLayout
+    private var contentTopY: Int = TOOLBAR_HEIGHT
 
     private fun getNumberOfPages(): Int {
         return kotlin.math.ceil(allScreenshots.size / grid.imagesToDisplay.toDouble()).toInt().coerceAtLeast(1)
@@ -42,7 +43,11 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
         super.init()
         selectedIndices.clear()
 
-        grid = computeGrid(this.width, this.height, aspectRatio, NicephoreConfig.Client.getGalleryColumns())
+        // Gallery always uses two toolbar rows
+        contentTopY = TOOLBAR_HEIGHT + BUTTON_HEIGHT + PADDING
+        val extraToolbarOffset = contentTopY - TOOLBAR_HEIGHT
+
+        grid = computeGrid(this.width, this.height - extraToolbarOffset - PAGE_TEXT_HEIGHT, aspectRatio, NicephoreConfig.Client.getGalleryColumns())
 
         val sortOrder = NicephoreConfig.Client.getSortOrder()
         allScreenshots = loadAllScreenshots(sortOrder)
@@ -57,6 +62,20 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
             computeDateGroups(pageScreenshots)
         } else {
             listOf(ScreenshotGroup("", pageScreenshots))
+        }
+
+        // Validate grid fits with group headers; reduce rows if needed
+        var attempts = 0
+        while (attempts < 3) {
+            val headerPx = groups.count { it.label.isNotEmpty() } * GROUP_HEADER_HEIGHT
+            val usedHeight = grid.rows * grid.slotHeight + headerPx
+            val available = this.height - contentTopY - BOTTOM_BAR_HEIGHT - PAGE_TEXT_HEIGHT - PADDING
+            if (usedHeight <= available || grid.rows <= 1) break
+
+            grid = computeGrid(this.width, this.height - extraToolbarOffset - PAGE_TEXT_HEIGHT - headerPx, aspectRatio, NicephoreConfig.Client.getGalleryColumns())
+            pageScreenshots = allScreenshots.drop(grid.imagesToDisplay * index).take(grid.imagesToDisplay)
+            groups = if (sortOrder.useDateGroups) computeDateGroups(pageScreenshots) else listOf(ScreenshotGroup("", pageScreenshots))
+            attempts++
         }
 
         if (pageScreenshots.isNotEmpty()) {
@@ -109,36 +128,39 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
     }
 
     override fun buildWidgets() {
+        // Row 1: Filter | Settings | Exit
         addToolbarButtons { cycleFilter() }
+
+        // Row 2: Sort | Select | [All | None] | Trash
+        val row2Y = PADDING + BUTTON_HEIGHT + PADDING
+        val gap = 5
+        var nextX = PADDING
 
         val sortOrder = NicephoreConfig.Client.getSortOrder()
         this.addRenderableWidget(
             Button.builder(Component.translatable("nicephore.sort.label", Component.translatable(sortOrder.displayKey).string)) { cycleSortOrder() }
-                .bounds(PADDING + 110, PADDING, 80, BUTTON_HEIGHT).build()
+                .bounds(nextX, row2Y, 80, BUTTON_HEIGHT).build()
         )
+        nextX += 80 + gap
 
-        // Trash button
-        val trashCount = TrashManager.trashCount()
-        this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.gui.trash", trashCount)) { openTrashScreen() }
-                .bounds(this.width - PADDING - 170, PADDING, 50, BUTTON_HEIGHT).build()
-        )
-
-        // Select toggle
         this.addRenderableWidget(
             Button.builder(Component.translatable("nicephore.gui.select")) { toggleSelectionMode() }
-                .bounds(PADDING + 200, PADDING, 50, BUTTON_HEIGHT).build()
+                .bounds(nextX, row2Y, 50, BUTTON_HEIGHT).build()
         )
+        nextX += 50 + gap
 
         if (selectionMode) {
             this.addRenderableWidget(
                 Button.builder(Component.translatable("nicephore.gui.select.all")) { selectAll() }
-                    .bounds(PADDING + 260, PADDING, 30, BUTTON_HEIGHT).build()
+                    .bounds(nextX, row2Y, 30, BUTTON_HEIGHT).build()
             )
+            nextX += 30 + gap
+
             this.addRenderableWidget(
                 Button.builder(Component.translatable("nicephore.gui.select.none")) { selectedIndices.clear(); refreshWidgets() }
-                    .bounds(PADDING + 300, PADDING, 40, BUTTON_HEIGHT).build()
+                    .bounds(nextX, row2Y, 40, BUTTON_HEIGHT).build()
             )
+            nextX += 40 + gap
 
             if (selectedIndices.isNotEmpty()) {
                 val centerX = this.width / 2
@@ -149,6 +171,12 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                 )
             }
         }
+
+        val trashCount = TrashManager.trashCount()
+        this.addRenderableWidget(
+            Button.builder(Component.translatable("nicephore.gui.trash", trashCount)) { openTrashScreen() }
+                .bounds(this.width - PADDING - 50, row2Y, 50, BUTTON_HEIGHT).build()
+        )
 
         if (pageScreenshots.isNotEmpty()) {
             val centerX = this.width / 2
@@ -180,7 +208,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
     }
 
     private fun computeSlotY(slotIndex: Int): Int {
-        var y = TOOLBAR_HEIGHT
+        var y = contentTopY + grid.verticalOffset
         var slotsConsumed = 0
 
         for (group in groups) {
@@ -215,7 +243,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
 
             for (group in groups) {
                 if (group.label.isNotEmpty()) {
-                    val headerY = computeSlotY(slotIndex) - GROUP_HEADER_HEIGHT + PADDING
+                    val headerY = computeSlotY(slotIndex) - GROUP_HEADER_HEIGHT
                     guiGraphics.centeredText(
                         Minecraft.getInstance().font,
                         Component.literal(group.label),
@@ -281,7 +309,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
             guiGraphics.centeredText(
                 Minecraft.getInstance().font,
                 Component.translatable("nicephore.gui.gallery.pages", index + 1, getNumberOfPages()),
-                centerX, bottomLine + 5, Color.WHITE.rgb
+                centerX, bottomLine - 12, Color.WHITE.rgb
             )
         }
 
@@ -323,7 +351,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
     private fun toggleSelectionMode() {
         selectionMode = !selectionMode
         selectedIndices.clear()
-        refreshWidgets()
+        init()
     }
 
     private fun toggleSelection(slotIndex: Int) {
@@ -350,7 +378,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
     }
 
     private fun openTrashScreen() {
-        Minecraft.getInstance().pushGuiLayer(TrashScreen())
+        Minecraft.getInstance().pushGuiLayer(TrashScreen { init() })
     }
 
     companion object {

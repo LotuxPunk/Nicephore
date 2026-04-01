@@ -5,11 +5,11 @@ import net.minecraft.client.Minecraft
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
+import kotlin.time.Duration.Companion.days
 
 object TrashManager {
     private const val TRASH_DIR_NAME = ".nicephore_trash"
-    private const val MAX_AGE_DAYS = 30L
-    private const val MAX_AGE_MS = MAX_AGE_DAYS * 24 * 60 * 60 * 1000
+    private val MAX_AGE = 30.days
 
     val trashDir: File by lazy {
         File(Minecraft.getInstance().gameDirectory, "screenshots${File.separator}$TRASH_DIR_NAME").also {
@@ -79,11 +79,11 @@ object TrashManager {
     }
 
     fun cleanupOldFiles() {
-        val cutoff = System.currentTimeMillis() - MAX_AGE_MS
+        val cutoff = System.currentTimeMillis() - MAX_AGE.inWholeMilliseconds
         val oldFiles = listTrash().filter { it.lastModified() < cutoff }
         if (oldFiles.isNotEmpty()) {
             val count = oldFiles.count { deletePermanently(it) }
-            Nicephore.LOGGER.info("Cleaned up {} old files from trash (>{}d)", count, MAX_AGE_DAYS)
+            Nicephore.LOGGER.info("Cleaned up {} old files from trash (>{}d)", count, MAX_AGE.inWholeDays)
         }
     }
 

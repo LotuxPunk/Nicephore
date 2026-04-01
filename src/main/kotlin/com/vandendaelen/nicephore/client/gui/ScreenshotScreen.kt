@@ -55,7 +55,16 @@ class ScreenshotScreen @JvmOverloads constructor(
             val centerX = this.width / 2
             val bottomLine = this.height - BOTTOM_BAR_HEIGHT
 
-            addNavigationButtons(centerX, bottomLine, { modIndex(-1) }, { modIndex(1) })
+            val navW = 20
+            val actionW = 50
+            val gap = 5
+            val totalW = 2 * navW + 3 * actionW + 4 * gap  // 210
+            val startX = centerX - totalW / 2
+
+            this.addRenderableWidget(
+                Button.builder(Component.literal("<")) { modIndex(-1) }
+                    .bounds(startX, bottomLine, navW, BUTTON_HEIGHT).build()
+            )
 
             val copyButton = Button.builder(Component.translatable("nicephore.gui.screenshots.copy")) {
                 val screenshot = screenshots[index]
@@ -64,18 +73,23 @@ class ScreenshotScreen @JvmOverloads constructor(
                 } else {
                     PlayerHelper.sendMessage(Component.translatable("nicephore.clipboard.error"))
                 }
-            }.bounds(centerX - 52, bottomLine, 50, BUTTON_HEIGHT).build()
+            }.bounds(startX + navW + gap, bottomLine, actionW, BUTTON_HEIGHT).build()
 
             copyButton.active = OperatingSystems.getOS().manager != null
             this.addRenderableWidget(copyButton)
 
             this.addRenderableWidget(
                 Button.builder(Component.translatable("nicephore.gui.screenshots.delete")) { deleteScreenshot(screenshots[index]) }
-                    .bounds(centerX + 3, bottomLine, 50, BUTTON_HEIGHT).build()
+                    .bounds(startX + navW + actionW + 2 * gap, bottomLine, actionW, BUTTON_HEIGHT).build()
             )
             this.addRenderableWidget(
                 Button.builder(Component.translatable("nicephore.gui.rename")) { renameScreenshot(screenshots[index]) }
-                    .bounds(centerX + 58, bottomLine, 50, BUTTON_HEIGHT).build()
+                    .bounds(startX + navW + 2 * actionW + 3 * gap, bottomLine, actionW, BUTTON_HEIGHT).build()
+            )
+
+            this.addRenderableWidget(
+                Button.builder(Component.literal(">")) { modIndex(1) }
+                    .bounds(startX + totalW - navW, bottomLine, navW, BUTTON_HEIGHT).build()
             )
         }
     }
@@ -140,7 +154,8 @@ class ScreenshotScreen @JvmOverloads constructor(
             )
 
             // Tooltip for disabled copy button
-            val copyButtonX = centerX - 52
+            val totalW = 2 * 20 + 3 * 50 + 4 * 5  // 210
+            val copyButtonX = centerX - totalW / 2 + 20 + 5
             val copyButtonY = this.height - BOTTOM_BAR_HEIGHT
             if (OperatingSystems.getOS().manager == null &&
                 mouseX >= copyButtonX && mouseY >= copyButtonY &&
@@ -183,7 +198,7 @@ class ScreenshotScreen @JvmOverloads constructor(
     companion object {
         private val TITLE = Component.translatable("nicephore.gui.screenshots")
         private const val SIDE_PADDING = 40
-        private const val IMAGE_TOP = 50
+        private const val IMAGE_TOP = 65
 
         fun canBeShow(): Boolean {
             return SCREENSHOTS_DIR.exists() && (SCREENSHOTS_DIR.list()?.isNotEmpty() == true)

@@ -34,7 +34,7 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
     }
 
     protected fun openSettingsScreen() {
-        Minecraft.getInstance().pushGuiLayer(SettingsScreen())
+        Minecraft.getInstance().pushGuiLayer(SettingsScreen { init() })
     }
 
     protected fun readAspectRatio(file: File): Float {
@@ -108,7 +108,8 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
         val rows: Int,
         val imageWidth: Int,
         val imageHeight: Int,
-        val slotHeight: Int
+        val slotHeight: Int,
+        val verticalOffset: Int
     ) {
         val imagesToDisplay: Int get() = rows * columns
 
@@ -116,7 +117,7 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
 
         fun slotY(slotIndex: Int, baseY: Int = TOOLBAR_HEIGHT): Int {
             val row = slotIndex / columns
-            return baseY + row * slotHeight
+            return baseY + verticalOffset + row * slotHeight
         }
     }
 
@@ -136,11 +137,13 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
         }
 
         val imageWidth = (availableWidth - (columns - 1) * PADDING) / columns
-        val imageHeight = (imageWidth / aspectRatio).toInt()
+        val maxImageHeight = (availableHeight - BUTTON_HEIGHT - PADDING).coerceAtLeast(1)
+        val imageHeight = (imageWidth / aspectRatio).toInt().coerceAtMost(maxImageHeight)
         val slotHeight = imageHeight + BUTTON_HEIGHT + PADDING
         val rows = (availableHeight / slotHeight).coerceIn(1, 4)
+        val verticalOffset = if (rows == 1) ((availableHeight - slotHeight) / 2).coerceAtLeast(0) else 0
 
-        return GridLayout(columns, rows, imageWidth, imageHeight, slotHeight)
+        return GridLayout(columns, rows, imageWidth, imageHeight, slotHeight, verticalOffset)
     }
 
     companion object {
@@ -151,6 +154,7 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
         const val TOOLBAR_HEIGHT = 40
         const val BUTTON_HEIGHT = 20
         const val BOTTOM_BAR_HEIGHT = 30
+        const val PAGE_TEXT_HEIGHT = 14
         const val TARGET_THUMBNAIL_WIDTH = 150
     }
 }
