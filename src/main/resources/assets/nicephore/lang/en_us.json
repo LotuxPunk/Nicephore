@@ -48,5 +48,21 @@
   "nicephore.group.yesterday": "Yesterday",
   "nicephore.group.thisWeek": "This Week",
   "nicephore.group.thisMonth": "This Month",
-  "nicephore.group.older": "Older"
+  "nicephore.group.older": "Older",
+  "nicephore.gui.select": "Select",
+  "nicephore.gui.select.all": "All",
+  "nicephore.gui.select.none": "None",
+  "nicephore.gui.trash": "Trash (%s)",
+  "nicephore.gui.trash.title": "Trash",
+  "nicephore.gui.trash.move": "Move to Trash (%s)",
+  "nicephore.gui.trash.move.confirm": "Move %s screenshot(s) to trash?",
+  "nicephore.gui.trash.move.single": "Move to trash?",
+  "nicephore.gui.trash.restore": "Restore",
+  "nicephore.gui.trash.restore.success": "Restored %s",
+  "nicephore.gui.trash.restore.error": "Cannot restore: file already exists",
+  "nicephore.gui.trash.delete": "Delete",
+  "nicephore.gui.trash.empty": "Empty Trash",
+  "nicephore.gui.trash.empty.confirm": "Permanently delete all trashed files?",
+  "nicephore.gui.trash.empty.success": "Emptied trash (%s files)",
+  "nicephore.gui.trash.count": "%s file(s) in trash"
 }
