@@ -6,18 +6,15 @@ import com.vandendaelen.nicephore.utils.CopyImageToClipBoard
 import com.vandendaelen.nicephore.utils.FilterListener
 import com.vandendaelen.nicephore.utils.PlayerHelper
 import com.vandendaelen.nicephore.utils.ScreenshotLoader
+import com.vandendaelen.nicephore.utils.Util
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
-import org.apache.commons.io.FileUtils
 import java.awt.Color
 import java.io.File
-import java.text.DecimalFormat
-import java.text.MessageFormat
-import java.text.NumberFormat
 import java.util.Comparator
 
 class ScreenshotScreen @JvmOverloads constructor(
@@ -134,7 +131,7 @@ class ScreenshotScreen @JvmOverloads constructor(
             )
             guiGraphics.centeredText(
                 Minecraft.getInstance().font,
-                Component.literal(MessageFormat.format("{0} ({1})", currentScreenshot.name, getFileSizeMegaBytes(currentScreenshot))),
+                Component.literal("${currentScreenshot.name} (${Util.formatFileSize(currentScreenshot)})"),
                 centerX, TOOLBAR_HEIGHT + 12, Color.WHITE.rgb
             )
 
@@ -182,19 +179,6 @@ class ScreenshotScreen @JvmOverloads constructor(
 
         fun canBeShow(): Boolean {
             return SCREENSHOTS_DIR.exists() && (SCREENSHOTS_DIR.list()?.isNotEmpty() == true)
-        }
-
-        private fun getFileSizeMegaBytes(file: File): String {
-            val size = FileUtils.sizeOf(file).toDouble()
-            val formatter: NumberFormat = DecimalFormat("#0.00")
-            val mbSize = 1024 * 1024
-            val kbSize = 1024
-
-            return if (size > mbSize) {
-                MessageFormat.format("{0} MB", formatter.format(size / mbSize))
-            } else {
-                MessageFormat.format("{0} KB", formatter.format(size / kbSize))
-            }
         }
     }
 }
