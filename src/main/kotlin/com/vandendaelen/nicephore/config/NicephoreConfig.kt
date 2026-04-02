@@ -68,7 +68,7 @@ object NicephoreConfig {
                 .defineInRange("galleryColumns", 0, 0, 6)
 
             sortOrder = builder
-                .comment("Sort order for the gallery. Options: NEWEST, OLDEST, NAME_ASC, NAME_DESC")
+                .comment("Sort order for the gallery. Options: NEWEST, OLDEST")
                 .defineEnum("sortOrder", SortOrder.NEWEST)
 
             builder.pop()

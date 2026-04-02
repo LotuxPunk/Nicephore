@@ -12,7 +12,7 @@ import java.io.File
 
 class RenameScreen(
     private val file: File,
-    private val galleryScreenPage: Int = -1
+    private val galleryScrollOffset: Float = -1f
 ) : AbstractNicephoreScreen(Component.translatable("nicephore.gui.rename.title")) {
 
     private var nameField: EditBox? = null
@@ -71,7 +71,7 @@ class RenameScreen(
             ThumbnailCache.removeThumbnail(file.name)
             PlayerHelper.sendMessage(Component.translatable("nicephore.gui.rename.success", newFile.name))
             Minecraft.getInstance().setScreen(
-                if (galleryScreenPage > -1) GalleryScreen(galleryScreenPage) else ScreenshotScreen()
+                if (galleryScrollOffset >= 0f) GalleryScreen(galleryScrollOffset) else ScreenshotScreen()
             )
         } else {
             PlayerHelper.sendMessage(Component.translatable("nicephore.gui.rename.error"))

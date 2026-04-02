@@ -82,6 +82,37 @@ class ScreenshotLoader {
         }
     }
 
+    fun loadSlot(index: Int, file: File, idPrefix: String, useThumbnails: Boolean = false) {
+        if (slots.containsKey(index)) return // already loading or loaded
+        slots[index] = SlotState(LoadState.LOADING)
+
+        scope.launch {
+            val fileToLoad = if (useThumbnails) ThumbnailCache.getThumbnail(file) else file
+            val nativeImage = readImageFromDisk(fileToLoad)
+            Minecraft.getInstance().execute {
+                if (nativeImage != null) {
+                    val id = "${idPrefix}_$index"
+                    val texture = DynamicTexture({ "nicephore_$id" }, nativeImage)
+                    val textureId = Identifier.withDefaultNamespace("nicephore_$id")
+                    Minecraft.getInstance().textureManager.register(textureId, texture)
+                    slots[index] = SlotState(LoadState.LOADED, LoadedTexture(texture, textureId))
+                } else {
+                    slots[index] = SlotState(LoadState.ERROR)
+                }
+                onLoadComplete?.invoke()
+            }
+        }
+    }
+
+    fun releaseSlot(index: Int) {
+        slots.remove(index)?.loaded?.texture?.close()
+    }
+
+    fun releaseAllExcept(activeIndices: Set<Int>) {
+        val toRemove = slots.keys.filter { it !in activeIndices }
+        toRemove.forEach { releaseSlot(it) }
+    }
+
     private fun readImageFromDisk(file: File): NativeImage? {
         return try {
             if (file.extension.lowercase() == "png") {

@@ -19,7 +19,7 @@ import java.util.Comparator
 
 class ScreenshotScreen @JvmOverloads constructor(
     private var index: Int = 0,
-    private val galleryScreenPage: Int = -1,
+    private val galleryScrollOffset: Float = -1f,
     private val listener: FilterListener? = null
 ) : AbstractNicephoreScreen(TITLE) {
 
@@ -181,13 +181,13 @@ class ScreenshotScreen @JvmOverloads constructor(
         Minecraft.getInstance().pushGuiLayer(
             DeleteConfirmScreen(
                 file,
-                if (galleryScreenPage > -1) GalleryScreen(galleryScreenPage) else ScreenshotScreen(index)
+                if (galleryScrollOffset >= 0f) GalleryScreen(galleryScrollOffset) else ScreenshotScreen(index)
             )
         )
     }
 
     private fun renameScreenshot(file: File) {
-        Minecraft.getInstance().pushGuiLayer(RenameScreen(file, galleryScreenPage))
+        Minecraft.getInstance().pushGuiLayer(RenameScreen(file, galleryScrollOffset))
     }
 
     override fun onClose() {
