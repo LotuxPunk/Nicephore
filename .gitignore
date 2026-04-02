@@ -20,8 +20,13 @@ build
 # other
 eclipse
 run
+repo
 
 # Files from Forge MDK
 forge*changelog.txt
 
 /libs/
+
+# claude
+.claude/
+docs/superpowers/
