@@ -34,9 +34,10 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
     private val selectedIndices: MutableSet<Int> = mutableSetOf()
     private lateinit var grid: GridLayout
     private var contentTopY: Int = TOOLBAR_HEIGHT
+    private var itemsPerPage: Int = 1
 
     private fun getNumberOfPages(): Int {
-        return kotlin.math.ceil(allScreenshots.size / grid.imagesToDisplay.toDouble()).toInt().coerceAtLeast(1)
+        return kotlin.math.ceil(allScreenshots.size / itemsPerPage.toDouble()).toInt().coerceAtLeast(1)
     }
 
     override fun init() {
@@ -48,13 +49,14 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
         val extraToolbarOffset = contentTopY - TOOLBAR_HEIGHT
 
         grid = computeGrid(this.width, this.height - extraToolbarOffset - PAGE_TEXT_HEIGHT, aspectRatio, NicephoreConfig.Client.getGalleryColumns())
+        itemsPerPage = grid.imagesToDisplay
 
         val sortOrder = NicephoreConfig.Client.getSortOrder()
         allScreenshots = loadAllScreenshots(sortOrder)
         index = clampIndex(index, getNumberOfPages())
 
-        val skip = grid.imagesToDisplay * index
-        pageScreenshots = allScreenshots.drop(skip).take(grid.imagesToDisplay)
+        val skip = itemsPerPage * index
+        pageScreenshots = allScreenshots.drop(skip).take(itemsPerPage)
 
         aspectRatio = if (pageScreenshots.isNotEmpty()) readAspectRatio(pageScreenshots[0]) else DEFAULT_ASPECT_RATIO
 
@@ -64,18 +66,19 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
             listOf(ScreenshotGroup("", pageScreenshots))
         }
 
-        // Validate grid fits with group headers; reduce rows if needed
-        var attempts = 0
-        while (attempts < 3) {
-            val headerPx = groups.count { it.label.isNotEmpty() } * GROUP_HEADER_HEIGHT
-            val usedHeight = grid.rows * grid.slotHeight + headerPx
-            val available = this.height - contentTopY - BOTTOM_BAR_HEIGHT - PAGE_TEXT_HEIGHT - PADDING
-            if (usedHeight <= available || grid.rows <= 1) break
-
-            grid = computeGrid(this.width, this.height - extraToolbarOffset - PAGE_TEXT_HEIGHT - headerPx, aspectRatio, NicephoreConfig.Client.getGalleryColumns())
-            pageScreenshots = allScreenshots.drop(grid.imagesToDisplay * index).take(grid.imagesToDisplay)
-            groups = if (sortOrder.useDateGroups) computeDateGroups(pageScreenshots) else listOf(ScreenshotGroup("", pageScreenshots))
-            attempts++
+        // Trim items whose slots would overflow into the bottom bar.
+        // computeSlotY accounts for group headers and partial rows, so we
+        // check each slot against the actual available space.
+        val maxContentBottom = this.height - BOTTOM_BAR_HEIGHT - PAGE_TEXT_HEIGHT - PADDING
+        for (i in pageScreenshots.indices) {
+            if (computeSlotY(i) + grid.slotHeight > maxContentBottom) {
+                itemsPerPage = i.coerceAtLeast(1)
+                // Re-page with the reduced item count
+                pageScreenshots = allScreenshots.drop(itemsPerPage * index).take(itemsPerPage)
+                groups = if (sortOrder.useDateGroups) computeDateGroups(pageScreenshots)
+                         else listOf(ScreenshotGroup("", pageScreenshots))
+                break
+            }
         }
 
         if (pageScreenshots.isNotEmpty()) {
@@ -186,7 +189,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
             var slotIndex = 0
             for (group in groups) {
                 for (file in group.files) {
-                    val x = grid.slotX(slotIndex)
+                    val x = computeSlotX(slotIndex)
                     val y = computeSlotY(slotIndex)
                     val name = file.name
                     val text = Component.literal(StringUtils.abbreviate(name, grid.imageWidth / 6))
@@ -205,6 +208,19 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                 }
             }
         }
+    }
+
+    private fun computeSlotX(slotIndex: Int): Int {
+        var slotsConsumed = 0
+        for (group in groups) {
+            val slotsInThisGroup = slotIndex - slotsConsumed
+            if (slotsInThisGroup < group.files.size) {
+                val colInGroup = slotsInThisGroup % grid.columns
+                return PADDING + colInGroup * (grid.imageWidth + PADDING)
+            }
+            slotsConsumed += group.files.size
+        }
+        return grid.slotX(slotIndex)
     }
 
     private fun computeSlotY(slotIndex: Int): Int {
@@ -252,7 +268,7 @@ class GalleryScreen(private var index: Int = 0) : AbstractNicephoreScreen(TITLE)
                 }
 
                 for (file in group.files) {
-                    val x = grid.slotX(slotIndex)
+                    val x = computeSlotX(slotIndex)
                     val y = computeSlotY(slotIndex)
 
                     val slot = loader.getSlotState(slotIndex)

@@ -11,6 +11,7 @@ import java.awt.datatransfer.Clipboard
 import java.io.File
 
 object CopyImageToClipBoard : ClipboardOwner {
+    @Volatile
     private var lastScreenshot: File? = null
 
     fun setLastScreenshot(screenshot: File) {

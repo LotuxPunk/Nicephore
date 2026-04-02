@@ -15,11 +15,12 @@ class WindowsClipboardManagerImpl private constructor() : ClipboardManager {
     }
 
     override fun clipboardImage(screenshot: File): Boolean {
+        val escapedPath = screenshot.absolutePath.replace("'", "''")
         val command = """
             [Reflection.Assembly]::LoadWithPartialName('System.Drawing');
             [Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms');
-            
-            ${'$'}filename = "${screenshot.absolutePath}";
+
+            ${'$'}filename = '$escapedPath';
             ${'$'}file = get-item(${'$'}filename);
             ${'$'}img = [System.Drawing.Image]::Fromfile(${'$'}file);
             [System.Windows.Forms.Clipboard]::SetImage(${'$'}img);

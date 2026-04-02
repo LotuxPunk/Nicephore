@@ -45,8 +45,11 @@ class ScreenshotThread(
                 params.compressionMode = ImageWriteParam.MODE_EXPLICIT
                 params.progressiveMode = ImageWriteParam.MODE_DEFAULT
                 params.compressionQuality = NicephoreConfig.Client.getCompressionLevel()
-                writer.output = FileImageOutputStream(jpegFile)
-                writer.write(null, IIOImage(result, null, null), params)
+                FileImageOutputStream(jpegFile).use { outputStream ->
+                    writer.output = outputStream
+                    writer.write(null, IIOImage(result, null, null), params)
+                    writer.dispose()
+                }
             }
 
             if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
@@ -58,8 +61,8 @@ class ScreenshotThread(
                 if (NicephoreConfig.Client.getJPEGToggle()) {
                     try {
                         val ect = File("mods${File.separator}nicephore${File.separator}${Reference.File.ECT}")
-                        val p = Runtime.getRuntime().exec(MessageFormat.format(Reference.Command.ECT, ect, jpegFile))
-                        p.waitFor()
+                        val cmd = MessageFormat.format(Reference.Command.ECT, ect, jpegFile)
+                        ProcessBuilder(cmd.split(" ")).start().waitFor()
                     } catch (e: Exception) {
                         Nicephore.LOGGER.warn("ECT not found or failed, skipping JPEG optimization", e)
                     }
@@ -68,10 +71,8 @@ class ScreenshotThread(
                 try {
                     val oxipng = File("mods${File.separator}nicephore${File.separator}${Reference.File.OXIPNG}")
                     val pngFile = File(screenshot.parentFile, screenshot.name)
-                    val p = Runtime.getRuntime().exec(
-                        MessageFormat.format(Reference.Command.OXIPNG, oxipng, NicephoreConfig.Client.getPNGOptimisationLevel(), pngFile)
-                    )
-                    p.waitFor()
+                    val cmd = MessageFormat.format(Reference.Command.OXIPNG, oxipng, NicephoreConfig.Client.getPNGOptimisationLevel(), pngFile)
+                    ProcessBuilder(cmd.split(" ")).start().waitFor()
                 } catch (e: Exception) {
                     Nicephore.LOGGER.warn("oxipng not found or failed, skipping PNG optimization", e)
                 }

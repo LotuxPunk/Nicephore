@@ -7,9 +7,12 @@ import java.io.IOException
 
 class MacOSClipboardManagerImpl private constructor() : ClipboardManager {
     override fun clipboardImage(screenshot: File): Boolean {
+        val escapedPath = screenshot.absolutePath
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
         val cmd = arrayOf(
             "osascript", "-e",
-            "tell app \"Finder\" to set the clipboard to ( POSIX file \"${screenshot.absolutePath}\" )"
+            "tell app \"Finder\" to set the clipboard to ( POSIX file \"$escapedPath\" )"
         )
         return try {
             Runtime.getRuntime().exec(cmd)
