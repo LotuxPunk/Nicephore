@@ -1,6 +1,6 @@
 package com.vandendaelen.nicephore.client.gui
 
-import com.vandendaelen.nicephore.config.NicephoreConfig
+import com.vandendaelen.nicephore.platform.Services
 import com.vandendaelen.nicephore.enums.ScreenshotFilter
 import com.vandendaelen.nicephore.utils.ScreenshotLoader
 import com.vandendaelen.nicephore.utils.Util
@@ -42,7 +42,7 @@ class ScrollableGalleryWidget(
     private val separatorLabels: Map<Int, String>
 
     init {
-        val configColumns = NicephoreConfig.Client.getGalleryColumns()
+        val configColumns = Services.config.getGalleryColumns()
         val availableWidth = width - SCROLLBAR_WIDTH - GRID_PADDING
         columns = if (configColumns in 2..6) configColumns
                   else (availableWidth / (TARGET_THUMB_WIDTH + GRID_PADDING)).coerceIn(2, 6)
@@ -175,7 +175,7 @@ class ScrollableGalleryWidget(
                             )
                         }
 
-                        if (NicephoreConfig.Client.getScreenshotFilter() == ScreenshotFilter.BOTH) {
+                        if (Services.config.getScreenshotFilter() == ScreenshotFilter.BOTH) {
                             guiGraphics.text(font, FilenameUtils.getExtension(file.name).uppercase(), slotX + 2, slotY + imageHeight - 12, Color.WHITE.rgb)
                         }
 

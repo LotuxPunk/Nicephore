@@ -2,7 +2,7 @@ package com.vandendaelen.nicephore.thread
 
 import com.mojang.blaze3d.platform.NativeImage
 import com.vandendaelen.nicephore.Nicephore
-import com.vandendaelen.nicephore.config.NicephoreConfig
+import com.vandendaelen.nicephore.platform.Services
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard
 import com.vandendaelen.nicephore.utils.PlayerHelper
 import com.vandendaelen.nicephore.utils.Reference
@@ -39,12 +39,12 @@ class ScreenshotThread(
             val result = BufferedImage(png.width, png.height, BufferedImage.TYPE_INT_RGB)
             result.createGraphics().drawImage(png, 0, 0, Color.WHITE, null)
 
-            if (NicephoreConfig.Client.getJPEGToggle()) {
+            if (Services.config.getJPEGToggle()) {
                 val writer = ImageIO.getImageWritersByFormatName("jpg").next()
                 val params = writer.defaultWriteParam
                 params.compressionMode = ImageWriteParam.MODE_EXPLICIT
                 params.progressiveMode = ImageWriteParam.MODE_DEFAULT
-                params.compressionQuality = NicephoreConfig.Client.getCompressionLevel()
+                params.compressionQuality = Services.config.getCompressionLevel()
                 FileImageOutputStream(jpegFile).use { outputStream ->
                     writer.output = outputStream
                     writer.write(null, IIOImage(result, null, null), params)
@@ -52,13 +52,13 @@ class ScreenshotThread(
                 }
             }
 
-            if (NicephoreConfig.Client.getOptimisedOutputToggle()) {
-                val shouldShowOptStatus = NicephoreConfig.Client.getShouldShowOptStatus()
+            if (Services.config.getOptimisedOutputToggle()) {
+                val shouldShowOptStatus = Services.config.getShouldShowOptStatus()
                 if (shouldShowOptStatus) {
                     PlayerHelper.sendHotbarMessage(Component.translatable("nicephore.screenshot.optimize"))
                 }
 
-                if (NicephoreConfig.Client.getJPEGToggle()) {
+                if (Services.config.getJPEGToggle()) {
                     try {
                         val ect = File("mods${File.separator}nicephore${File.separator}${Reference.File.ECT}")
                         val cmd = MessageFormat.format(Reference.Command.ECT, ect, jpegFile)
@@ -71,7 +71,7 @@ class ScreenshotThread(
                 try {
                     val oxipng = File("mods${File.separator}nicephore${File.separator}${Reference.File.OXIPNG}")
                     val pngFile = File(screenshot.parentFile, screenshot.name)
-                    val cmd = MessageFormat.format(Reference.Command.OXIPNG, oxipng, NicephoreConfig.Client.getPNGOptimisationLevel(), pngFile)
+                    val cmd = MessageFormat.format(Reference.Command.OXIPNG, oxipng, Services.config.getPNGOptimisationLevel(), pngFile)
                     ProcessBuilder(cmd.split(" ")).start().waitFor()
                 } catch (e: Exception) {
                     Nicephore.LOGGER.warn("oxipng not found or failed, skipping PNG optimization", e)
@@ -84,8 +84,8 @@ class ScreenshotThread(
 
             CopyImageToClipBoard.setLastScreenshot(screenshot)
 
-            if (NicephoreConfig.Client.getScreenshotCustomMessage()) {
-                if (NicephoreConfig.Client.getScreenshotToClipboard()) {
+            if (Services.config.getScreenshotCustomMessage()) {
+                if (Services.config.getScreenshotToClipboard()) {
                     if (CopyImageToClipBoard.copyLastScreenshot()) {
                         PlayerHelper.sendMessage(
                             Component.translatable("nicephore.clipboard.success").withStyle(ChatFormatting.GREEN)
@@ -119,7 +119,7 @@ class ScreenshotThread(
                     Component.translatable("nicephore.screenshot.success", screenshot.name.replace(".png", ""))
                 )
 
-                if (NicephoreConfig.Client.getJPEGToggle()) {
+                if (Services.config.getJPEGToggle()) {
                     PlayerHelper.sendMessage(
                         Component.translatable("nicephore.screenshot.options", pngComponent, jpgComponent, folderComponent)
                     )

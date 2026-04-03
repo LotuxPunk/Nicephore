@@ -1,6 +1,6 @@
 package com.vandendaelen.nicephore.client.gui
 
-import com.vandendaelen.nicephore.config.NicephoreConfig
+import com.vandendaelen.nicephore.platform.Services
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
@@ -32,30 +32,30 @@ class SettingsScreen(private val onSettingsClosed: () -> Unit = {}) : AbstractNi
         )
         this.addRenderableWidget(
             Button.builder(
-                Component.translatable("nicephore.screenshot.showOptimisationStatus", if (NicephoreConfig.Client.getShouldShowOptStatus()) "ON" else "OFF")
-            ) { toggleSetting { NicephoreConfig.Client.setShouldShowOptStatus(!NicephoreConfig.Client.getShouldShowOptStatus()) } }
+                Component.translatable("nicephore.screenshot.showOptimisationStatus", if (Services.config.getShouldShowOptStatus()) "ON" else "OFF")
+            ) { toggleSetting { Services.config.setShouldShowOptStatus(!Services.config.getShouldShowOptStatus()) } }
                 .bounds(startingLine, contentStartY, 300, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
             Button.builder(
-                Component.translatable("nicephore.screenshot.makeJPEGs", if (NicephoreConfig.Client.getJPEGToggle()) "ON" else "OFF")
-            ) { toggleSetting { NicephoreConfig.Client.setJPEGToggle(!NicephoreConfig.Client.getJPEGToggle()) } }
+                Component.translatable("nicephore.screenshot.makeJPEGs", if (Services.config.getJPEGToggle()) "ON" else "OFF")
+            ) { toggleSetting { Services.config.setJPEGToggle(!Services.config.getJPEGToggle()) } }
                 .bounds(startingLine, contentStartY + itemHeight, 300, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
             Button.builder(
-                Component.translatable("nicephore.screenshot.screenshotCustomMessage", if (NicephoreConfig.Client.getScreenshotCustomMessage()) "ON" else "OFF")
-            ) { toggleSetting { NicephoreConfig.Client.setScreenshotCustomMessage(!NicephoreConfig.Client.getScreenshotCustomMessage()) } }
+                Component.translatable("nicephore.screenshot.screenshotCustomMessage", if (Services.config.getScreenshotCustomMessage()) "ON" else "OFF")
+            ) { toggleSetting { Services.config.setScreenshotCustomMessage(!Services.config.getScreenshotCustomMessage()) } }
                 .bounds(startingLine, contentStartY + 2 * itemHeight, 300, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
             Button.builder(
-                Component.translatable("nicephore.screenshot.setScreenshotToClipboard", if (NicephoreConfig.Client.getScreenshotToClipboard()) "ON" else "OFF")
-            ) { toggleSetting { NicephoreConfig.Client.setScreenshotToClipboard(!NicephoreConfig.Client.getScreenshotToClipboard()) } }
+                Component.translatable("nicephore.screenshot.setScreenshotToClipboard", if (Services.config.getScreenshotToClipboard()) "ON" else "OFF")
+            ) { toggleSetting { Services.config.setScreenshotToClipboard(!Services.config.getScreenshotToClipboard()) } }
                 .bounds(startingLine, contentStartY + 3 * itemHeight, 300, BUTTON_HEIGHT).build()
         )
 
-        val currentColumns = NicephoreConfig.Client.getGalleryColumns()
+        val currentColumns = Services.config.getGalleryColumns()
         val label = if (currentColumns == 0) "Auto" else "$currentColumns"
         this.addRenderableWidget(
             Button.builder(
@@ -83,13 +83,13 @@ class SettingsScreen(private val onSettingsClosed: () -> Unit = {}) : AbstractNi
     }
 
     private fun cycleGalleryColumns() {
-        val current = NicephoreConfig.Client.getGalleryColumns()
+        val current = Services.config.getGalleryColumns()
         val next = when (current) {
             0 -> 2
             in 2..5 -> current + 1
             else -> 0
         }
-        NicephoreConfig.Client.setGalleryColumns(next)
+        Services.config.setGalleryColumns(next)
         refreshWidgets()
     }
 

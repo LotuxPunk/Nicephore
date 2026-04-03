@@ -1,6 +1,6 @@
 package com.vandendaelen.nicephore.client.gui
 
-import com.vandendaelen.nicephore.config.NicephoreConfig
+import com.vandendaelen.nicephore.platform.Services
 import com.vandendaelen.nicephore.enums.OperatingSystems
 import com.vandendaelen.nicephore.utils.CopyImageToClipBoard
 import com.vandendaelen.nicephore.utils.FilterListener
@@ -30,7 +30,7 @@ class ScreenshotScreen @JvmOverloads constructor(
     override fun init() {
         super.init()
 
-        val filter = NicephoreConfig.Client.getScreenshotFilter().predicate
+        val filter = Services.config.getScreenshotFilter().predicate
         screenshots = ArrayList(
             SCREENSHOTS_DIR.listFiles(filter)
                 ?.sortedWith(Comparator.comparingLong(File::lastModified).reversed())

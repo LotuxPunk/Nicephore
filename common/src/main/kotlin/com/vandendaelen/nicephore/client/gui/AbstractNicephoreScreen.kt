@@ -1,7 +1,7 @@
 package com.vandendaelen.nicephore.client.gui
 
 import com.vandendaelen.nicephore.Nicephore
-import com.vandendaelen.nicephore.config.NicephoreConfig
+import com.vandendaelen.nicephore.platform.Services
 import com.vandendaelen.nicephore.utils.FilterListener
 import com.vandendaelen.nicephore.utils.PlayerHelper
 import net.minecraft.client.Minecraft
@@ -71,15 +71,15 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
     }
 
     protected fun cycleFilter(listener: FilterListener? = null) {
-        val nextFilter = NicephoreConfig.Client.getScreenshotFilter().next()
-        NicephoreConfig.Client.setScreenshotFilter(nextFilter)
+        val nextFilter = Services.config.getScreenshotFilter().next()
+        Services.config.setScreenshotFilter(nextFilter)
         init()
         listener?.onFilterChange(nextFilter)
     }
 
     protected fun addToolbarButtons(onFilterChange: () -> Unit) {
         this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name)) { onFilterChange() }
+            Button.builder(Component.translatable("nicephore.screenshot.filter", Services.config.getScreenshotFilter().name)) { onFilterChange() }
                 .bounds(PADDING, PADDING, 100, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
