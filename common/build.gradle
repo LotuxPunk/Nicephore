@@ -1,0 +1,30 @@
+plugins {
+    id 'multiloader-common'
+    id 'net.neoforged.moddev'
+}
+
+neoForge {
+    neoFormVersion = neo_form_version
+}
+
+dependencies {
+    implementation 'com.profesorfalken:jPowerShell:3.1.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.7.1'
+}
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava file('src/main/kotlin')
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}

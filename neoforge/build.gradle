@@ -1,0 +1,85 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+}
+
+neoForge {
+    version = neo_version
+
+    runs {
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        data {
+            clientData()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    implementation 'com.profesorfalken:jPowerShell:3.1.1'
+    jarJar('com.profesorfalken:jPowerShell:[3.1.1,4.0.0)') {
+        version { prefer '3.1.1' }
+    }
+
+    // Bundle Kotlin stdlib since we're not using KotlinForForge
+    jarJar('org.jetbrains.kotlin:kotlin-stdlib:[2.3.20,2.4.0)') {
+        version { prefer '2.3.20' }
+    }
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
+    jarJar('org.jetbrains.kotlinx:kotlinx-coroutines-core:[1.10.2,1.11.0)') {
+        version { prefer '1.10.2' }
+    }
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.7.1'
+    jarJar('org.jetbrains.kotlinx:kotlinx-datetime:[0.7.1,0.8.0)') {
+        version { prefer '0.7.1' }
+    }
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}

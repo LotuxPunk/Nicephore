@@ -8,3 +8,8 @@ pluginManagement {
 plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }
+
+// This should match the folder name of the project, or else IDEA may complain
+rootProject.name = 'Nicephore'
+include('common')
+include('neoforge')
