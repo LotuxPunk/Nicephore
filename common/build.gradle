@@ -1,0 +1,4 @@
+// :common will be fleshed out in Task 4+.
+// For now, it is an empty Kotlin library so the multi-module tree resolves.
+dependencies {
+}

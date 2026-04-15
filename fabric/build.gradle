@@ -1,0 +1,4 @@
+// :fabric will be fleshed out in Task 12+.
+// For now, it is an empty Kotlin library so the multi-module tree resolves.
+dependencies {
+}
