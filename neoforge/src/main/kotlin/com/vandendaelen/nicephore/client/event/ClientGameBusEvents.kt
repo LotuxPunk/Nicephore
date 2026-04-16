@@ -1,6 +1,7 @@
 package com.vandendaelen.nicephore.client.event
 
 import com.vandendaelen.nicephore.Nicephore
+import com.vandendaelen.nicephore.NicephoreClient
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -11,6 +12,6 @@ object ClientGameBusEvents {
     @SubscribeEvent
     @JvmStatic
     fun onKey(event: InputEvent.Key) {
-        // Keybinding polling rewired via NicephoreClient in Task 9
+        NicephoreClient.pollKeybindings()
     }
 }
