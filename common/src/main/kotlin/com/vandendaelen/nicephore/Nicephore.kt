@@ -1,15 +1,15 @@
 package com.vandendaelen.nicephore
 
 import com.mojang.logging.LogUtils
+import com.vandendaelen.nicephore.utils.TrashManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.slf4j.Logger
 
-/**
- * Loader-agnostic constants and shared infrastructure for Nicephore.
- * The loader-specific entry point (NicephoreNeoForge, NicephoreFabric) references these.
- */
 object Nicephore {
     const val MODID: String = "nicephore"
     const val MOD_NAME: String = "Nicephore"
@@ -17,13 +17,17 @@ object Nicephore {
     @JvmField
     val LOGGER: Logger = LogUtils.getLogger()
 
-    internal val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    @Volatile private var started = false
 
-    /**
-     * Starts the TrashManager cleanup coroutine. Idempotent — safe to call from any loader's init.
-     * Implementation populated in Task 5 when TrashManager moves to :common.
-     */
     fun startBackgroundTasks() {
-        // Populated in Task 5.
+        if (started) return
+        started = true
+        backgroundScope.launch {
+            while (isActive) {
+                TrashManager.cleanupOldFiles()
+                delay(60 * 60 * 1000L) // 1 hour
+            }
+        }
     }
 }
