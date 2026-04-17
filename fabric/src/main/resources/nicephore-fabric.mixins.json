@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.vandendaelen.nicephore.fabric.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ScreenshotMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

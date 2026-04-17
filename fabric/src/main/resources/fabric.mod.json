@@ -24,5 +24,8 @@
     "fabric-language-kotlin": ">=1.13.0",
     "fabric-api": "*"
   },
-  "icon": "nicephore.png"
+  "icon": "nicephore.png",
+  "mixins": [
+    "nicephore-fabric.mixins.json"
+  ]
 }
