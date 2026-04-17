@@ -1,7 +1,7 @@
 package com.vandendaelen.nicephore.utils
 
 import com.vandendaelen.nicephore.Nicephore
-import net.minecraft.client.Minecraft
+import com.vandendaelen.nicephore.platform.PlatformContext
 import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
@@ -12,7 +12,7 @@ object ThumbnailCache {
     private const val THUMBNAIL_MAX_WIDTH = 200
 
     private val cacheDir: File by lazy {
-        File(Minecraft.getInstance().gameDirectory, ".nicephore${File.separator}thumbnails").also {
+        File(PlatformContext.current.minecraftDir.toFile(), ".nicephore${File.separator}thumbnails").also {
             if (!it.exists()) it.mkdirs()
         }
     }

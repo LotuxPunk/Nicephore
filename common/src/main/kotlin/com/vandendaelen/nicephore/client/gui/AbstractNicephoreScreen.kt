@@ -147,7 +147,9 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
     }
 
     companion object {
-        val SCREENSHOTS_DIR: File = File(Minecraft.getInstance().gameDirectory, "screenshots")
+        val SCREENSHOTS_DIR: File by lazy {
+            com.vandendaelen.nicephore.platform.PlatformContext.current.screenshotDir.toFile()
+        }
 
         const val DEFAULT_ASPECT_RATIO = 16f / 9f
         const val PADDING = 10

@@ -138,13 +138,18 @@ class InitThread(private val optimiseConfig: Boolean) : Thread() {
         private const val CONNECT_TIMEOUT_MS = 10_000
         private const val READ_TIMEOUT_MS = 30_000
 
-        private val DESTINATION = File(
-            Minecraft.getInstance().gameDirectory.absolutePath,
-            "mods${File.separator}nicephore"
-        )
-        private val REFERENCES_JSON = File(DESTINATION, "${File.separator}references.json")
-        private val OXIPNG_ZIP = File(DESTINATION, "${File.separator}oxipng.zip")
-        private val ECT_ZIP = File(DESTINATION, "${File.separator}ect.zip")
+        // Lazy: resolved via PlatformContext at first use, which happens after client setup.
+        // Do NOT touch Minecraft.getInstance() here — it is null during mod initialization on
+        // the modloading-worker thread.
+        private val DESTINATION: File by lazy {
+            File(
+                com.vandendaelen.nicephore.platform.PlatformContext.current.minecraftDir.toFile(),
+                "mods${File.separator}nicephore"
+            )
+        }
+        private val REFERENCES_JSON: File by lazy { File(DESTINATION, "${File.separator}references.json") }
+        private val OXIPNG_ZIP: File by lazy { File(DESTINATION, "${File.separator}oxipng.zip") }
+        private val ECT_ZIP: File by lazy { File(DESTINATION, "${File.separator}ect.zip") }
 
         private fun downloadAndExtract(url: String, zip: File, toolName: String) {
             var lastException: Exception? = null

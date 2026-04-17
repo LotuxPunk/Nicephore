@@ -1,7 +1,7 @@
 package com.vandendaelen.nicephore.utils
 
 import com.vandendaelen.nicephore.Nicephore
-import net.minecraft.client.Minecraft
+import com.vandendaelen.nicephore.platform.PlatformContext
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -11,8 +11,11 @@ object TrashManager {
     private const val TRASH_DIR_NAME = ".nicephore_trash"
     private val MAX_AGE = 30.days
 
+    private val screenshotsDir: File
+        get() = PlatformContext.current.screenshotDir.toFile()
+
     val trashDir: File by lazy {
-        File(Minecraft.getInstance().gameDirectory, "screenshots${File.separator}$TRASH_DIR_NAME").also {
+        File(screenshotsDir, TRASH_DIR_NAME).also {
             if (!it.exists()) it.mkdirs()
         }
     }
@@ -35,7 +38,6 @@ object TrashManager {
     }
 
     fun restore(trashedFile: File): Boolean {
-        val screenshotsDir = File(Minecraft.getInstance().gameDirectory, "screenshots")
         return try {
             val targetFile = File(screenshotsDir, trashedFile.name)
             if (targetFile.exists()) {
