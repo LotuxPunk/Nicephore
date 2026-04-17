@@ -1,6 +1,6 @@
 package com.vandendaelen.nicephore.client.gui
 
-import com.vandendaelen.nicephore.config.NicephoreConfig
+import com.vandendaelen.nicephore.config.NicephoreConfigHolder
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
@@ -32,30 +32,30 @@ class SettingsScreen(private val onSettingsClosed: () -> Unit = {}) : AbstractNi
         )
         this.addRenderableWidget(
             Button.builder(
-                Component.translatable("nicephore.screenshot.showOptimisationStatus", if (NicephoreConfig.Client.getShouldShowOptStatus()) "ON" else "OFF")
-            ) { toggleSetting { NicephoreConfig.Client.setShouldShowOptStatus(!NicephoreConfig.Client.getShouldShowOptStatus()) } }
+                Component.translatable("nicephore.screenshot.showOptimisationStatus", if (NicephoreConfigHolder.current.showOptimisationStatus) "ON" else "OFF")
+            ) { toggleSetting { NicephoreConfigHolder.update { it.copy(showOptimisationStatus = !it.showOptimisationStatus) } } }
                 .bounds(startingLine, contentStartY, 300, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
             Button.builder(
-                Component.translatable("nicephore.screenshot.makeJPEGs", if (NicephoreConfig.Client.getJPEGToggle()) "ON" else "OFF")
-            ) { toggleSetting { NicephoreConfig.Client.setJPEGToggle(!NicephoreConfig.Client.getJPEGToggle()) } }
+                Component.translatable("nicephore.screenshot.makeJPEGs", if (NicephoreConfigHolder.current.makeJPEGs) "ON" else "OFF")
+            ) { toggleSetting { NicephoreConfigHolder.update { it.copy(makeJPEGs = !it.makeJPEGs) } } }
                 .bounds(startingLine, contentStartY + itemHeight, 300, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
             Button.builder(
-                Component.translatable("nicephore.screenshot.screenshotCustomMessage", if (NicephoreConfig.Client.getScreenshotCustomMessage()) "ON" else "OFF")
-            ) { toggleSetting { NicephoreConfig.Client.setScreenshotCustomMessage(!NicephoreConfig.Client.getScreenshotCustomMessage()) } }
+                Component.translatable("nicephore.screenshot.screenshotCustomMessage", if (NicephoreConfigHolder.current.screenshotCustomMessage) "ON" else "OFF")
+            ) { toggleSetting { NicephoreConfigHolder.update { it.copy(screenshotCustomMessage = !it.screenshotCustomMessage) } } }
                 .bounds(startingLine, contentStartY + 2 * itemHeight, 300, BUTTON_HEIGHT).build()
         )
         this.addRenderableWidget(
             Button.builder(
-                Component.translatable("nicephore.screenshot.setScreenshotToClipboard", if (NicephoreConfig.Client.getScreenshotToClipboard()) "ON" else "OFF")
-            ) { toggleSetting { NicephoreConfig.Client.setScreenshotToClipboard(!NicephoreConfig.Client.getScreenshotToClipboard()) } }
+                Component.translatable("nicephore.screenshot.setScreenshotToClipboard", if (NicephoreConfigHolder.current.screenshotToClipboard) "ON" else "OFF")
+            ) { toggleSetting { NicephoreConfigHolder.update { it.copy(screenshotToClipboard = !it.screenshotToClipboard) } } }
                 .bounds(startingLine, contentStartY + 3 * itemHeight, 300, BUTTON_HEIGHT).build()
         )
 
-        val currentColumns = NicephoreConfig.Client.getGalleryColumns()
+        val currentColumns = NicephoreConfigHolder.current.galleryColumns
         val label = if (currentColumns == 0) "Auto" else "$currentColumns"
         this.addRenderableWidget(
             Button.builder(
@@ -83,13 +83,13 @@ class SettingsScreen(private val onSettingsClosed: () -> Unit = {}) : AbstractNi
     }
 
     private fun cycleGalleryColumns() {
-        val current = NicephoreConfig.Client.getGalleryColumns()
+        val current = NicephoreConfigHolder.current.galleryColumns
         val next = when (current) {
             0 -> 2
             in 2..5 -> current + 1
             else -> 0
         }
-        NicephoreConfig.Client.setGalleryColumns(next)
+        NicephoreConfigHolder.update { it.copy(galleryColumns = next) }
         refreshWidgets()
     }
 

@@ -1,5 +1,6 @@
 plugins {
     id 'net.neoforged.moddev' version '2.0.141'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.3.20'
 }
 
 base {
@@ -70,6 +71,14 @@ dependencies {
     jarJar('org.jetbrains.kotlinx:kotlinx-datetime:[0.7.1,0.8.0)') {
         version { prefer '0.7.1' }
     }
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3'
+    jarJar('org.jetbrains.kotlinx:kotlinx-serialization-json:[1.7.3,1.8.0)') {
+        version { prefer '1.7.3' }
+    }
+    jarJar('org.jetbrains.kotlinx:kotlinx-serialization-core:[1.7.3,1.8.0)') {
+        version { prefer '1.7.3' }
+    }
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
@@ -89,3 +98,8 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 }
 sourceSets.main.resources.srcDir generateModMetadata
 neoForge.ideSyncTask generateModMetadata
+
+// Pull :common's resources (lang, pack.mcmeta, logo) into the NeoForge jar.
+tasks.named('processResources', ProcessResources) {
+    from(project(':common').sourceSets.main.resources)
+}

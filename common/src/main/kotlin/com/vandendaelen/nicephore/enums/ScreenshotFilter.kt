@@ -1,7 +1,9 @@
 package com.vandendaelen.nicephore.enums
 
 import java.io.FilenameFilter
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class ScreenshotFilter(val predicate: FilenameFilter) {
     JPEG(FilenameFilter { _, name -> name.endsWith(".jpg") }),
     PNG(FilenameFilter { _, name -> name.endsWith(".png") }),

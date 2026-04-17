@@ -2,7 +2,7 @@ package com.vandendaelen.nicephore.utils
 
 import com.mojang.blaze3d.platform.NativeImage
 import com.vandendaelen.nicephore.Nicephore
-import com.vandendaelen.nicephore.config.NicephoreConfig
+import com.vandendaelen.nicephore.config.NicephoreConfigHolder
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -41,7 +41,7 @@ object Util {
     fun getBatchOfFiles(toSkip: Long, toTake: Long, directory: File): List<File> {
         return try {
             Files.list(directory.toPath()).use { stream ->
-                val filter = NicephoreConfig.Client.getScreenshotFilter().predicate
+                val filter = NicephoreConfigHolder.current.screenshotFilter.predicate
                 stream
                     .filter { path -> !Files.isDirectory(path) && filter.accept(path.toFile(), path.fileName.toString()) }
                     .sequential()

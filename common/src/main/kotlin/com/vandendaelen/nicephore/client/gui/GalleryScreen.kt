@@ -1,6 +1,6 @@
 package com.vandendaelen.nicephore.client.gui
 
-import com.vandendaelen.nicephore.config.NicephoreConfig
+import com.vandendaelen.nicephore.config.NicephoreConfigHolder
 import com.vandendaelen.nicephore.enums.ScreenshotFilter
 import com.vandendaelen.nicephore.utils.FilterListener
 import com.vandendaelen.nicephore.utils.ScreenshotLoader
@@ -30,8 +30,8 @@ class GalleryScreen(
         super.init()
         selectedIndices.clear()
 
-        val sortOrder = NicephoreConfig.Client.getSortOrder()
-        val filter = NicephoreConfig.Client.getScreenshotFilter().predicate
+        val sortOrder = NicephoreConfigHolder.current.sortOrder
+        val filter = NicephoreConfigHolder.current.screenshotFilter.predicate
         allScreenshots = SCREENSHOTS_DIR.listFiles(filter)
             ?.sortedWith(sortOrder.comparator)
             ?: emptyList()
@@ -46,12 +46,12 @@ class GalleryScreen(
         var buttonY = SIDEBAR_PADDING + SIDEBAR_TITLE_HEIGHT
 
         this.addRenderableWidget(
-            Button.builder(Component.translatable("nicephore.screenshot.filter", NicephoreConfig.Client.getScreenshotFilter().name)) { cycleFilter() }
+            Button.builder(Component.translatable("nicephore.screenshot.filter", NicephoreConfigHolder.current.screenshotFilter.name)) { cycleFilter() }
                 .bounds(SIDEBAR_PADDING, buttonY, SIDEBAR_BUTTON_WIDTH, BUTTON_HEIGHT).build()
         )
         buttonY += BUTTON_HEIGHT + SIDEBAR_GAP
 
-        val sortOrder = NicephoreConfig.Client.getSortOrder()
+        val sortOrder = NicephoreConfigHolder.current.sortOrder
         this.addRenderableWidget(
             Button.builder(Component.translatable("nicephore.sort.label", Component.translatable(sortOrder.displayKey).string)) { cycleSortOrder() }
                 .bounds(SIDEBAR_PADDING, buttonY, SIDEBAR_BUTTON_WIDTH, BUTTON_HEIGHT).build()
@@ -173,8 +173,8 @@ class GalleryScreen(
     }
 
     private fun cycleSortOrder() {
-        val next = NicephoreConfig.Client.getSortOrder().next()
-        NicephoreConfig.Client.setSortOrder(next)
+        val next = NicephoreConfigHolder.current.sortOrder.next()
+        NicephoreConfigHolder.update { it.copy(sortOrder = next) }
         init()
     }
 
@@ -189,7 +189,7 @@ class GalleryScreen(
     }
 
     override fun onFilterChange(filter: ScreenshotFilter) {
-        NicephoreConfig.Client.setScreenshotFilter(filter)
+        NicephoreConfigHolder.update { it.copy(screenshotFilter = filter) }
         init()
     }
 
