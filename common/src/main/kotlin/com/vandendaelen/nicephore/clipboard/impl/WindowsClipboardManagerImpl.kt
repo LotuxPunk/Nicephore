@@ -2,12 +2,11 @@ package com.vandendaelen.nicephore.clipboard.impl
 
 import com.profesorfalken.jpowershell.PowerShell
 import com.vandendaelen.nicephore.clipboard.ClipboardManager
-import net.minecraft.util.Util
 import java.io.File
 
 class WindowsClipboardManagerImpl private constructor() : ClipboardManager {
     private val session: PowerShell? by lazy {
-        if (Util.getPlatform() == Util.OS.WINDOWS) {
+        if (System.getProperty("os.name", "").lowercase().contains("win")) {
             PowerShell.openSession()
         } else {
             null

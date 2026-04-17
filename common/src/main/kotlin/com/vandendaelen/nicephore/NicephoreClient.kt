@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage
 import com.vandendaelen.nicephore.client.KeyMappings
 import com.vandendaelen.nicephore.client.gui.GalleryScreen
 import com.vandendaelen.nicephore.client.gui.ScreenshotScreen
-import com.vandendaelen.nicephore.config.NicephoreConfig
+import com.vandendaelen.nicephore.config.NicephoreConfigHolder
 import com.vandendaelen.nicephore.platform.ClientLifecycleHook
 import com.vandendaelen.nicephore.platform.KeybindingRegistry
 import com.vandendaelen.nicephore.platform.ScreenshotHook
@@ -54,7 +54,7 @@ object NicephoreClient {
 
     private fun onScreenshotTaken(image: NativeImage, file: File): Component? {
         ScreenshotThread(image, file).start()
-        return if (NicephoreConfig.Client.getScreenshotCustomMessage()) {
+        return if (NicephoreConfigHolder.current.screenshotCustomMessage) {
             Component.literal("")
         } else {
             null
@@ -62,6 +62,6 @@ object NicephoreClient {
     }
 
     private fun onClientReady() {
-        InitThread(NicephoreConfig.Client.getOptimisedOutputToggle()).start()
+        InitThread(NicephoreConfigHolder.current.optimiseScreenshots).start()
     }
 }
