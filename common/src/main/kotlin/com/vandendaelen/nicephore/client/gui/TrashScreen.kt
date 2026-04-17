@@ -176,7 +176,7 @@ class TrashScreen(private val onTrashClosed: () -> Unit = {}) : AbstractNicephor
     }
 
     private fun confirmEmptyTrash() {
-        Minecraft.getInstance().setScreen(
+        com.vandendaelen.nicephore.platform.ScreenStack.current.push(
             EmptyTrashConfirmScreen(this)
         )
     }

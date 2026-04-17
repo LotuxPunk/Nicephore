@@ -34,7 +34,7 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
     }
 
     protected fun openSettingsScreen() {
-        Minecraft.getInstance().setScreen(SettingsScreen { init() })
+        com.vandendaelen.nicephore.platform.ScreenStack.current.push(SettingsScreen { init() })
     }
 
     protected fun readAspectRatio(file: File): Float {
