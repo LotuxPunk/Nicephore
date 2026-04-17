@@ -65,10 +65,16 @@ tasks.register('dist', Sync) {
     group = 'build'
     description = 'Builds both loader jars and collects them into build/dist/.'
     dependsOn ':fabric:build', ':neoforge:build'
+    // Capture the version string at configuration time — using project.version inside
+    // the closure would break the configuration cache.
+    def currentVersion = project.version.toString()
     from(project(':fabric').layout.buildDirectory.dir('libs'))
     from(project(':neoforge').layout.buildDirectory.dir('libs'))
     into layout.buildDirectory.dir('dist')
-    include '*.jar'
+    // Only pick up the current version's jars; loader build plugins don't clean
+    // their own libs/ directory when the version string changes, so stale older
+    // jars would otherwise pile up in build/dist/.
+    include "*-${currentVersion}.jar"
     exclude '*-sources.jar'
     exclude '*-javadoc.jar'
     exclude '*-dev.jar'

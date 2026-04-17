@@ -32,23 +32,33 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
 }
 
+// Capture values at configuration time so the filesMatching closure (which runs at task
+// execution time) doesn't reference the Gradle script's 'project' delegate — doing so is
+// unsupported with the configuration cache.
+def modVersion = project.version.toString()
+def modIdValue = project.mod_id
+def modNameValue = project.mod_name
+def modLicenseValue = project.mod_license
+def fabricMcRange = project.fabric_minecraft_version_range
+def commonResources = project(':common').sourceSets.main.resources
+
 tasks.named('processResources', ProcessResources) {
-    inputs.property "version", project.version
-    inputs.property "mod_id", project.mod_id
-    inputs.property "mod_name", project.mod_name
-    inputs.property "mod_license", project.mod_license
-    inputs.property "fabric_minecraft_version_range", project.fabric_minecraft_version_range
+    inputs.property "version", modVersion
+    inputs.property "mod_id", modIdValue
+    inputs.property "mod_name", modNameValue
+    inputs.property "mod_license", modLicenseValue
+    inputs.property "fabric_minecraft_version_range", fabricMcRange
 
     filesMatching("fabric.mod.json") {
         expand(
-            version: project.version,
-            mod_id: project.mod_id,
-            mod_name: project.mod_name,
-            mod_license: project.mod_license,
-            minecraft_version_range: project.fabric_minecraft_version_range,
+            version: modVersion,
+            mod_id: modIdValue,
+            mod_name: modNameValue,
+            mod_license: modLicenseValue,
+            minecraft_version_range: fabricMcRange,
         )
     }
 
     // Pull :common's resources (lang, pack.mcmeta, logo) into the Fabric jar.
-    from(project(':common').sourceSets.main.resources)
+    from(commonResources)
 }
