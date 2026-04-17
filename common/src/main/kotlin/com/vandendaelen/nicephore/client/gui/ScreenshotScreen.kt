@@ -178,7 +178,7 @@ class ScreenshotScreen @JvmOverloads constructor(
     }
 
     private fun deleteScreenshot(file: File) {
-        Minecraft.getInstance().pushGuiLayer(
+        Minecraft.getInstance().setScreen(
             DeleteConfirmScreen(
                 file,
                 if (galleryScrollOffset >= 0f) GalleryScreen(galleryScrollOffset) else ScreenshotScreen(index)
@@ -187,7 +187,7 @@ class ScreenshotScreen @JvmOverloads constructor(
     }
 
     private fun renameScreenshot(file: File) {
-        Minecraft.getInstance().pushGuiLayer(RenameScreen(file, galleryScrollOffset))
+        Minecraft.getInstance().setScreen(RenameScreen(file, galleryScrollOffset))
     }
 
     override fun onClose() {

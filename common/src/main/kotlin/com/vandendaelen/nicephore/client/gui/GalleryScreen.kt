@@ -180,7 +180,7 @@ class GalleryScreen(
 
     private fun openScreenshotScreen(fileIndex: Int) {
         val scrollOffset = galleryWidget?.scrollOffset ?: 0f
-        Minecraft.getInstance().pushGuiLayer(ScreenshotScreen(fileIndex, scrollOffset, this))
+        Minecraft.getInstance().setScreen(ScreenshotScreen(fileIndex, scrollOffset, this))
     }
 
     override fun onClose() {
@@ -208,13 +208,13 @@ class GalleryScreen(
 
     private fun bulkMoveToTrash() {
         val filesToTrash = selectedIndices.mapNotNull { allScreenshots.getOrNull(it) }
-        Minecraft.getInstance().pushGuiLayer(
+        Minecraft.getInstance().setScreen(
             DeleteConfirmScreen(filesToTrash, GalleryScreen())
         )
     }
 
     private fun openTrashScreen() {
-        Minecraft.getInstance().pushGuiLayer(TrashScreen { init() })
+        Minecraft.getInstance().setScreen(TrashScreen { init() })
     }
 
     companion object {
