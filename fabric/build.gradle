@@ -1,4 +1,48 @@
-// :fabric will be fleshed out in Task 12+.
-// For now, it is an empty Kotlin library so the multi-module tree resolves.
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+base {
+    archivesName = "${mod_id}-fabric"
+}
+
 dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    implementation "net.fabricmc:fabric-language-kotlin:${fabric_kotlin_version}"
+
+    // Shared multi-loader module
+    implementation project(':common')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 25
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+tasks.named('processResources', ProcessResources) {
+    inputs.property "version", project.version
+    inputs.property "mod_id", project.mod_id
+    inputs.property "mod_name", project.mod_name
+    inputs.property "mod_license", project.mod_license
+    inputs.property "minecraft_version_range", project.minecraft_version_range
+
+    filesMatching("fabric.mod.json") {
+        expand(
+            version: project.version,
+            mod_id: project.mod_id,
+            mod_name: project.mod_name,
+            mod_license: project.mod_license,
+            minecraft_version_range: project.minecraft_version_range,
+        )
+    }
+
+    // Pull :common's resources (lang, pack.mcmeta, logo) into the Fabric jar.
+    from(project(':common').sourceSets.main.resources)
 }
