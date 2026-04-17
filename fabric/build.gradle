@@ -31,7 +31,7 @@ tasks.named('processResources', ProcessResources) {
     inputs.property "mod_id", project.mod_id
     inputs.property "mod_name", project.mod_name
     inputs.property "mod_license", project.mod_license
-    inputs.property "minecraft_version_range", project.minecraft_version_range
+    inputs.property "fabric_minecraft_version_range", project.fabric_minecraft_version_range
 
     filesMatching("fabric.mod.json") {
         expand(
@@ -39,7 +39,7 @@ tasks.named('processResources', ProcessResources) {
             mod_id: project.mod_id,
             mod_name: project.mod_name,
             mod_license: project.mod_license,
-            minecraft_version_range: project.minecraft_version_range,
+            minecraft_version_range: project.fabric_minecraft_version_range,
         )
     }
 
