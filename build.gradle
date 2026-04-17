@@ -57,3 +57,19 @@ idea {
         downloadJavadoc = true
     }
 }
+
+// Aggregate both loader jars into a single location for easy distribution.
+// Usage: ./gradlew dist
+// Output: build/dist/nicephore-{fabric,neoforge}-<version>.jar
+tasks.register('dist', Sync) {
+    group = 'build'
+    description = 'Builds both loader jars and collects them into build/dist/.'
+    dependsOn ':fabric:build', ':neoforge:build'
+    from(project(':fabric').layout.buildDirectory.dir('libs'))
+    from(project(':neoforge').layout.buildDirectory.dir('libs'))
+    into layout.buildDirectory.dir('dist')
+    include '*.jar'
+    exclude '*-sources.jar'
+    exclude '*-javadoc.jar'
+    exclude '*-dev.jar'
+}
