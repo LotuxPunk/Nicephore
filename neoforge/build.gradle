@@ -40,6 +40,10 @@ neoForge {
     mods {
         "${mod_id}" {
             sourceSet(sourceSets.main)
+            // Pull :common's compiled classes into NeoForge's TRANSFORMER classloader so
+            // NativeImage and other Minecraft types resolve to the same Class object on
+            // both sides of the ServiceLoader boundary (fixes ClassCastException on events).
+            sourceSet(project(':common').sourceSets.main)
         }
     }
 }
