@@ -15,6 +15,12 @@ dependencies {
 
     // Shared multi-loader module
     implementation project(':common')
+
+    // jPowerShell is used by :common's WindowsClipboardManagerImpl. On Fabric, this class
+    // is only instantiated when running on Windows (guarded by OperatingSystems.getOS()).
+    // Needs to be on the runtime classpath for Windows Fabric users; pulled into the jar
+    // via include so end users don't need a separate install.
+    include(implementation("com.profesorfalken:jPowerShell:3.1.1"))
 }
 
 tasks.withType(JavaCompile).configureEach {
