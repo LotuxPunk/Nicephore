@@ -11,6 +11,13 @@ val minecraftVersion = project.property("minecraft_version") as String
 val minecraftVersionRange = project.property("minecraft_version_range") as String
 val neoVersion = project.property("neo_version") as String
 
+// Plain File paths to :common's build outputs so the jar task can pack them.
+// Using sourceSets references would pull a Project reference that breaks the
+// configuration cache and Kotlin DSL lambda capture.
+val commonResourceDir = rootDir.resolve("common/src/main/resources")
+val commonClassesKotlinDir = rootDir.resolve("common/build/classes/kotlin/main")
+val commonClassesJavaDir = rootDir.resolve("common/build/classes/java/main")
+
 base {
     archivesName.set("$modId-neoforge")
 }
@@ -133,9 +140,17 @@ sourceSets.named("main") {
 neoForge.ideSyncTask(generateModMetadata.get())
 
 // Pull :common's resources (lang, pack.mcmeta, logo) into the NeoForge jar.
-// Use a plain File from rootDir to avoid carrying a SourceDirectorySet reference to :common's
-// script — the configuration cache refuses to serialize it.
-val commonResourceDir = rootDir.resolve("common/src/main/resources")
 tasks.named<ProcessResources>("processResources") {
     from(commonResourceDir)
+}
+
+// Bundle :common's compiled classes into the NeoForge jar. ModDev's
+// mods { sourceSet(project(":common")...) } block makes :common visible on the
+// dev runClient classpath, but the built jar distributed to end users only
+// contains what the jar task writes. Without this, NicephoreNeoForge crashes
+// at runtime with NoClassDefFoundError: com/vandendaelen/nicephore/config/NicephoreConfigHolder.
+tasks.named<Jar>("jar") {
+    dependsOn(":common:classes")
+    from(commonClassesKotlinDir)
+    from(commonClassesJavaDir)
 }
