@@ -66,9 +66,6 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("mod_license", modLicense)
     inputs.property("fabric_minecraft_version_range", fabricMcRange)
 
-    // Use an explicit Action<FileCopyDetails> (not a Kotlin lambda with implicit
-    // receiver) because Kotlin DSL lambdas on filesMatching capture the enclosing
-    // KotlinBuildScript, which the configuration cache refuses to serialize.
     filesMatching("fabric.mod.json") {
         expand(modJsonProps)
     }
