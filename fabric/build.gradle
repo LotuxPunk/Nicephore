@@ -41,6 +41,7 @@ def modNameValue = project.mod_name
 def modLicenseValue = project.mod_license
 def fabricMcRange = project.fabric_minecraft_version_range
 def commonResources = project(':common').sourceSets.main.resources
+def commonClasses = project(':common').sourceSets.main.output.classesDirs
 
 tasks.named('processResources', ProcessResources) {
     inputs.property "version", modVersion
@@ -61,4 +62,13 @@ tasks.named('processResources', ProcessResources) {
 
     // Pull :common's resources (lang, pack.mcmeta, logo) into the Fabric jar.
     from(commonResources)
+}
+
+// Bundle :common's compiled classes into the Fabric jar. The dev-run classpath sees :common
+// directly, but the packaged jar distributed to end users only contains what the jar task
+// writes — without this, NicephoreFabric crashes at runtime with
+// NoClassDefFoundError: com/vandendaelen/nicephore/Nicephore.
+tasks.named('jar', Jar) {
+    dependsOn(':common:classes')
+    from(commonClasses)
 }
