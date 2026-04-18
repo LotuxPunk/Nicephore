@@ -15,8 +15,11 @@ val fabricApiVersion = project.property("fabric_api_version") as String
 val fabricKotlinVersion = project.property("fabric_kotlin_version") as String
 val fabricMcRange = project.property("fabric_minecraft_version_range") as String
 
-val commonResources = project(":common").sourceSets.getByName("main").resources
-val commonClasses = project(":common").sourceSets.getByName("main").output.classesDirs
+// Use plain Files resolved from rootDir to avoid back-references to :common's build script
+// (Gradle 9.4's configuration cache rejects Gradle script object references).
+val commonResourceDir = rootDir.resolve("common/src/main/resources")
+val commonClassesKotlinDir = rootDir.resolve("common/build/classes/kotlin/main")
+val commonClassesJavaDir = rootDir.resolve("common/build/classes/java/main")
 
 base {
     archivesName.set("$modId-fabric")
@@ -48,6 +51,14 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
 }
 
+val modJsonProps: Map<String, Any> = mapOf(
+    "version" to modVersion,
+    "mod_id" to modId,
+    "mod_name" to modName,
+    "mod_license" to modLicense,
+    "minecraft_version_range" to fabricMcRange,
+)
+
 tasks.named<ProcessResources>("processResources") {
     inputs.property("version", modVersion)
     inputs.property("mod_id", modId)
@@ -55,20 +66,15 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("mod_license", modLicense)
     inputs.property("fabric_minecraft_version_range", fabricMcRange)
 
+    // Use an explicit Action<FileCopyDetails> (not a Kotlin lambda with implicit
+    // receiver) because Kotlin DSL lambdas on filesMatching capture the enclosing
+    // KotlinBuildScript, which the configuration cache refuses to serialize.
     filesMatching("fabric.mod.json") {
-        expand(
-            mapOf(
-                "version" to modVersion,
-                "mod_id" to modId,
-                "mod_name" to modName,
-                "mod_license" to modLicense,
-                "minecraft_version_range" to fabricMcRange,
-            )
-        )
+        expand(modJsonProps)
     }
 
     // Pull :common's resources (lang, pack.mcmeta, logo) into the Fabric jar.
-    from(commonResources)
+    from(commonResourceDir)
 }
 
 // Bundle :common's compiled classes into the Fabric jar. The dev-run classpath sees :common
@@ -77,5 +83,6 @@ tasks.named<ProcessResources>("processResources") {
 // NoClassDefFoundError: com/vandendaelen/nicephore/Nicephore.
 tasks.named<Jar>("jar") {
     dependsOn(":common:classes")
-    from(commonClasses)
+    from(commonClassesKotlinDir)
+    from(commonClassesJavaDir)
 }

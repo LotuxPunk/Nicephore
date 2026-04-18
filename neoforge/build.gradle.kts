@@ -133,6 +133,9 @@ sourceSets.named("main") {
 neoForge.ideSyncTask(generateModMetadata.get())
 
 // Pull :common's resources (lang, pack.mcmeta, logo) into the NeoForge jar.
+// Use a plain File from rootDir to avoid carrying a SourceDirectorySet reference to :common's
+// script — the configuration cache refuses to serialize it.
+val commonResourceDir = rootDir.resolve("common/src/main/resources")
 tasks.named<ProcessResources>("processResources") {
-    from(project(":common").sourceSets.getByName("main").resources)
+    from(commonResourceDir)
 }
