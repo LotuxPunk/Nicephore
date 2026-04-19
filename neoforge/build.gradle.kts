@@ -72,49 +72,42 @@ configurations.named("runtimeClasspath") {
     extendsFrom(localRuntime)
 }
 
+/**
+ * Declares a library bundled into the NeoForge mod jar via jarJar with a version range.
+ * Adds it to implementation (compile+runtime) unless [includeAsImplementation] is false —
+ * set false only for libs the Kotlin plugin brings in automatically (kotlin-stdlib) or
+ * transitive-only libs (kotlinx-serialization-core is pulled in by serialization-json).
+ */
+fun DependencyHandlerScope.bundledLib(
+    group: String,
+    name: String,
+    version: String,
+    versionRangeMax: String,
+    includeAsImplementation: Boolean = true,
+) {
+    val coords = "$group:$name"
+    if (includeAsImplementation) {
+        "implementation"("$coords:$version")
+    }
+    "jarJar"("$coords:[$version,$versionRangeMax)") {
+        (this as ExternalModuleDependency).version { prefer(version) }
+    }
+}
+
 dependencies {
     // Shared multi-loader module
     implementation(project(":common"))
 
-    implementation("com.profesorfalken:jPowerShell:3.1.1")
-    jarJar("com.profesorfalken:jPowerShell:[3.1.1,4.0.0)") {
-        version {
-            prefer("3.1.1")
-        }
-    }
-
-    // Bundle Kotlin stdlib since we're not using KotlinForForge
-    jarJar("org.jetbrains.kotlin:kotlin-stdlib:[2.3.20,2.4.0)") {
-        version {
-            prefer("2.3.20")
-        }
-    }
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    jarJar("org.jetbrains.kotlinx:kotlinx-coroutines-core:[1.10.2,1.11.0)") {
-        version {
-            prefer("1.10.2")
-        }
-    }
-
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-    jarJar("org.jetbrains.kotlinx:kotlinx-datetime:[0.7.1,0.8.0)") {
-        version {
-            prefer("0.7.1")
-        }
-    }
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-    jarJar("org.jetbrains.kotlinx:kotlinx-serialization-json:[1.7.3,1.8.0)") {
-        version {
-            prefer("1.7.3")
-        }
-    }
-    jarJar("org.jetbrains.kotlinx:kotlinx-serialization-core:[1.7.3,1.8.0)") {
-        version {
-            prefer("1.7.3")
-        }
-    }
+    bundledLib("com.profesorfalken", "jPowerShell", "3.1.1", "4.0.0")
+    // kotlin-stdlib: the Kotlin plugin adds it to implementation automatically, we only
+    // need to jarJar it for runtime bundling.
+    bundledLib("org.jetbrains.kotlin", "kotlin-stdlib", "2.3.20", "2.4.0", includeAsImplementation = false)
+    bundledLib("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.10.2", "1.11.0")
+    bundledLib("org.jetbrains.kotlinx", "kotlinx-datetime", "0.7.1", "0.8.0")
+    bundledLib("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.7.3", "1.8.0")
+    // serialization-core is a transitive of serialization-json; jarJar it so the nested
+    // jar contains the runtime classes, no implementation entry needed.
+    bundledLib("org.jetbrains.kotlinx", "kotlinx-serialization-core", "1.7.3", "1.8.0", includeAsImplementation = false)
 }
 
 val generateModMetadata by tasks.registering(ProcessResources::class) {
