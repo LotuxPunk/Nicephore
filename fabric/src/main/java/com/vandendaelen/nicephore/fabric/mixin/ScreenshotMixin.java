@@ -19,6 +19,18 @@ import java.util.function.Consumer;
  * Screenshot.lambda$grab$1 — the Runnable submitted to the IO pool that writes the file
  * and posts the result Component. Target is a static synthetic method, so the handler
  * must also be static (written in Java for predictable Mixin bytecode behaviour).
+ *
+ * <p><b>Fragility:</b> the target method name {@code lambda$grab$1} is compiler-generated
+ * and may change in future Minecraft versions (renumbering, refactor). Mitigations:
+ * <ul>
+ *   <li>{@code required: false} and {@code defaultRequire: 0} in the mixin config so a
+ *       failed apply is a log warning, not a fatal boot error.</li>
+ *   <li>A reflection probe in {@link FabricScreenshotHook#probeTargetMethodPresent()}
+ *       checks at boot whether the target still exists and logs explicitly if it doesn't.</li>
+ *   <li>The screenshot capture silently becomes a no-op if the mixin fails to apply; users
+ *       still get vanilla screenshots (just without Nicephore's custom chat message, clipboard
+ *       copy, and optimisation pipeline on Fabric).</li>
+ * </ul>
  */
 @Mixin(Screenshot.class)
 public abstract class ScreenshotMixin {
@@ -27,7 +39,8 @@ public abstract class ScreenshotMixin {
             method = "lambda$grab$1(Lcom/mojang/blaze3d/platform/NativeImage;Ljava/io/File;Ljava/util/function/Consumer;)V",
             at = @At("HEAD"),
             cancellable = true,
-            remap = false
+            remap = false,
+            require = 0
     )
     private static void nicephore$onGrabLambda1(
             NativeImage image,
@@ -35,7 +48,7 @@ public abstract class ScreenshotMixin {
             Consumer<Component> msgConsumer,
             CallbackInfo ci
     ) {
-        Function2<NativeImage, File, Component> callback = FabricScreenshotHook.Companion.getRegistered();
+        Function2<NativeImage, File, Component> callback = FabricScreenshotHook.getRegistered();
         if (callback == null) {
             return;
         }
