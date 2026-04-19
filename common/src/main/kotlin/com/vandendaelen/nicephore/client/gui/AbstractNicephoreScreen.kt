@@ -19,6 +19,19 @@ abstract class AbstractNicephoreScreen(title: Component) : Screen(title) {
         this.extractTransparentBackground(guiGraphics)
     }
 
+    /**
+     * Returns to the parent screen that pushed this one, or falls through to default
+     * close behaviour (exits to game world) if this screen was opened top-level from
+     * a keybind. ScreenStack.pop() knows which applies per-loader:
+     * - NeoForge: delegates to popGuiLayer (returns to the prior layer).
+     * - Fabric: restores the Screen captured on the internal parent-stack at push time.
+     */
+    override fun onClose() {
+        if (!com.vandendaelen.nicephore.platform.ScreenStack.current.pop()) {
+            super.onClose()
+        }
+    }
+
     protected fun refreshWidgets() {
         this.clearWidgets()
         buildWidgets()
