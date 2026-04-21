@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "Take better screenshots in Minecraft.",
+  "authors": ["LotuxPunk", "Paint_Ninja"],
+  "contact": {
+    "sources": "https://github.com/LotuxPunk/Nicephore"
+  },
+  "license": "${mod_license}",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "com.vandendaelen.nicephore.fabric.NicephoreFabric"
+      }
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18",
+    "minecraft": "${minecraft_version_range}",
+    "fabric-language-kotlin": ">=1.13.0",
+    "fabric-api": "*"
+  },
+  "icon": "nicephore.png",
+  "mixins": [
+    "nicephore-fabric.mixins.json"
+  ]
+}

@@ -1,0 +1,34 @@
+package com.vandendaelen.nicephore.clipboard.impl
+
+import com.profesorfalken.jpowershell.PowerShell
+import com.vandendaelen.nicephore.clipboard.ClipboardManager
+import java.io.File
+
+class WindowsClipboardManagerImpl private constructor() : ClipboardManager {
+    private val session: PowerShell? by lazy {
+        if (System.getProperty("os.name", "").lowercase().contains("win")) {
+            PowerShell.openSession()
+        } else {
+            null
+        }
+    }
+
+    override fun clipboardImage(screenshot: File): Boolean {
+        val escapedPath = screenshot.absolutePath.replace("'", "''")
+        val command = """
+            [Reflection.Assembly]::LoadWithPartialName('System.Drawing');
+            [Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms');
+
+            ${'$'}filename = '$escapedPath';
+            ${'$'}file = get-item(${'$'}filename);
+            ${'$'}img = [System.Drawing.Image]::Fromfile(${'$'}file);
+            [System.Windows.Forms.Clipboard]::SetImage(${'$'}img);
+        """.trimIndent()
+
+        return session?.executeCommand(command)?.isError?.not() ?: false
+    }
+
+    companion object {
+        val instance: WindowsClipboardManagerImpl by lazy { WindowsClipboardManagerImpl() }
+    }
+}
