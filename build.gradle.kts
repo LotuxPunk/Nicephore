@@ -50,6 +50,10 @@ subprojects {
             name = "Fabric"
             url = uri("https://maven.fabricmc.net/")
         }
+        maven {
+            name = "MinecraftForge"
+            url = uri("https://maven.minecraftforge.net/")
+        }
     }
 }
 
@@ -60,18 +64,19 @@ idea {
     }
 }
 
-// Aggregate both loader jars into a single location for easy distribution.
+// Aggregate all loader jars into a single location for easy distribution.
 // Usage: ./gradlew dist
-// Output: build/dist/nicephore-{fabric,neoforge}-<version>.jar
+// Output: build/dist/nicephore-{fabric,neoforge,forge}-<version>.jar
 tasks.register<Sync>("dist") {
     group = "build"
-    description = "Builds both loader jars and collects them into build/dist/."
-    dependsOn(":fabric:build", ":neoforge:build")
+    description = "Builds all loader jars and collects them into build/dist/."
+    dependsOn(":fabric:build", ":neoforge:build", ":forge:build")
     // Capture the version string at configuration time — using project.version inside
     // the closure would break the configuration cache.
     val currentVersion = project.version.toString()
     from(project(":fabric").layout.buildDirectory.dir("libs"))
     from(project(":neoforge").layout.buildDirectory.dir("libs"))
+    from(project(":forge").layout.buildDirectory.dir("libs"))
     into(layout.buildDirectory.dir("dist"))
     // Only pick up the current version's jars; loader build plugins don't clean
     // their own libs/ directory when the version string changes, so stale older

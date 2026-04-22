@@ -1,7 +1,9 @@
 pluginManagement {
     val loomVersion = settings.providers.gradleProperty("loom_version").get()
+    val forgeGradleVersion = settings.providers.gradleProperty("forge_gradle_version").get()
     plugins {
         id("net.fabricmc.fabric-loom") version loomVersion
+        id("net.minecraftforge.gradle") version forgeGradleVersion
     }
     repositories {
         gradlePluginPortal()
@@ -13,6 +15,10 @@ pluginManagement {
         maven {
             name = "NeoForged"
             url = uri("https://maven.neoforged.net/releases")
+        }
+        maven {
+            name = "MinecraftForge"
+            url = uri("https://maven.minecraftforge.net/")
         }
     }
 }
@@ -26,3 +32,4 @@ rootProject.name = "nicephore"
 include(":common")
 include(":fabric")
 include(":neoforge")
+include(":forge")

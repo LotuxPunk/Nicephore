@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="${forge_loader_version_range}"
+license="${mod_license}"
+issueTrackerURL="https://github.com/LotuxPunk/Nicephore/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/nicephore"
+logoFile="nicephore.png"
+authors="LotuxPunk, Paint_Ninja"
+description='''
+This Forge mod makes it quicker to share screenshots online by giving you the ability to quickly open the screenshots folder and also easily deal with Discord's max sharing limit and slow uploads by saving lower quality, smaller sized JPEGs that you can share instead!
+'''
+
+[[dependencies.${mod_id}]]
+    modId="forge"
+    type="required"
+    versionRange="[${forge_version},)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
